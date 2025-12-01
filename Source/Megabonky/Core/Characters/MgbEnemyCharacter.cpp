@@ -12,6 +12,8 @@ AMgbEnemyCharacter::AMgbEnemyCharacter()
 
 void AMgbEnemyCharacter::BeginPlay()
 {
+	Super::BeginPlay();
+
 	UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
 	if (IsValid(ASC))
 	{
@@ -21,4 +23,5 @@ void AMgbEnemyCharacter::BeginPlay()
 
 void AMgbEnemyCharacter::Tick(float DeltaTime)
 {
+	Super::Tick(DeltaTime);
 }
