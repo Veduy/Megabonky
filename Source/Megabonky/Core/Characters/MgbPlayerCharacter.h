@@ -1,4 +1,4 @@
-// Copyright is owned by Veduy.
+﻿// Copyright is owned by Veduy.
 
 #pragma once
 
@@ -9,6 +9,9 @@
 class USpringArmComponent;
 class UCameraComponent;
 class UInputAction;
+class UGameplayAbility;
+class AMgbWeapon;
+
 /**
  * 
  */
@@ -22,12 +25,25 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	virtual void PossessedBy(AController* NewController) override;
+
+protected:
+	virtual void BeginPlay() override;
+
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<USpringArmComponent> SpringArm;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UCameraComponent> MainCamera;
+
+public:
+	// For Test
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
+	TArray<TSubclassOf<UGameplayAbility>> TestAbilities;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapons")
+	TArray<TObjectPtr<AMgbWeapon>> Weapons;
 
 public:
 	UFUNCTION()

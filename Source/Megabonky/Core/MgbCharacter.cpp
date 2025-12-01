@@ -14,8 +14,6 @@ AMgbCharacter::AMgbCharacter()
 	AbilitySystemComponent = CreateDefaultSubobject<UMgbAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
-
-	AttributeSet = CreateDefaultSubobject<UMgbAttributeSet>(TEXT("AttributeSet"));
 }
 
 // Called when the game starts or when spawned
@@ -30,20 +28,6 @@ void AMgbCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-}
-
-//// Called to bind functionality to input
-//void AMgbCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-//{
-//	Super::SetupPlayerInputComponent(PlayerInputComponent);
-//
-//}
-
-void AMgbCharacter::PossessedBy(AController* NewController)
-{
-	Super::PossessedBy(NewController);
-
-	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 }
 
 UAbilitySystemComponent* AMgbCharacter::GetAbilitySystemComponent() const

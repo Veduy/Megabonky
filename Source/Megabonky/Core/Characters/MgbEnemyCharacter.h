@@ -13,5 +13,12 @@ UCLASS()
 class MEGABONKY_API AMgbEnemyCharacter : public AMgbCharacter
 {
 	GENERATED_BODY()
+
+public:
+	AMgbEnemyCharacter();
+
+	virtual void BeginPlay() override;
+
+	virtual void Tick(float DeltaTime) override;
 	
 };

@@ -11,11 +11,15 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "InputAction.h"
 #include "EnhancedInputComponent.h"
+#include "AbilitySystemComponent.h"
+#include "../AbilitySystem/AttributeSet/CharacterAttributeSet.h"
+#include "../AbilitySystem/AttributeSet/WeaponAttributeSet.h"
 
 AMgbPlayerCharacter::AMgbPlayerCharacter()
 {
 	GetCharacterMovement()->bUseControllerDesiredRotation = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->MaxWalkSpeed = 300.f;
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
@@ -35,6 +39,9 @@ AMgbPlayerCharacter::AMgbPlayerCharacter()
 
 	MainCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	MainCamera->SetupAttachment(SpringArm);
+
+	GetAbilitySystemComponent()->AddAttributeSetSubobject(CreateDefaultSubobject<UCharacterAttributeSet>(TEXT("CharacterAttributeSet")));
+	GetAbilitySystemComponent()->AddAttributeSetSubobject(CreateDefaultSubobject<UWeaponAttributeSet>(TEXT("WeaponAttributeSet")));
 }
 
 void AMgbPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -47,6 +54,23 @@ void AMgbPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 		Input->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMgbPlayerCharacter::Look);
 		Input->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
 	}
+}
+
+void AMgbPlayerCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
+	if (IsValid(ASC))
+	{
+		//If it has an initialization function, this is a good place to call it.
+		//ASC->GiveAbility()
+	}
+}
+
+void AMgbPlayerCharacter::BeginPlay()
+{
+	Super::BeginPlay();
 }
 
 void AMgbPlayerCharacter::Move(const FInputActionValue& Value)

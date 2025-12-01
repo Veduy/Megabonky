@@ -6,12 +6,15 @@
 #include "AttributeSet.h"
 #include "MgbAttributeSet.generated.h"
 
+
 /**
- * 
+ *
  */
 UCLASS()
 class MEGABONKY_API UMgbAttributeSet : public UAttributeSet
 {
 	GENERATED_BODY()
-	
+
+
+
 };

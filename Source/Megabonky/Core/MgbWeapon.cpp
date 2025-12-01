@@ -14,10 +14,3 @@ void AMgbWeapon::BeginPlay()
 	Super::BeginPlay();
 	
 }
-
-void AMgbWeapon::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-

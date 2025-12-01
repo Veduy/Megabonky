@@ -24,17 +24,13 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 
-	//virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	virtual void PossessedBy(AController* NewController) override;
-
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 protected:
-	UPROPERTY()
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
 	TObjectPtr<UMgbAbilitySystemComponent> AbilitySystemComponent;
 	
 	UPROPERTY()
-	TObjectPtr<UMgbAttributeSet> AttributeSet;
+	const TObjectPtr<UMgbAttributeSet> AttributeSet;
 
 };
