@@ -5,6 +5,7 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "../Core/MgbGameplayTags.h"
 
 AMgbEffectActor::AMgbEffectActor()
 {
@@ -17,7 +18,6 @@ void AMgbEffectActor::BeginPlay()
 {
 	Super::BeginPlay();
 	
-
 }
 
 void AMgbEffectActor::ApplyEffectToTarget(AActor* Target, TSubclassOf<UGameplayEffect> GameplayEffectClass)
@@ -34,4 +34,3 @@ void AMgbEffectActor::ApplyEffectToTarget(AActor* Target, TSubclassOf<UGameplayE
 	FGameplayEffectSpecHandle EffectSpecHandle = TargetASC->MakeOutgoingSpec(GameplayEffectClass, 1, EffectContextHandle);
 	TargetASC->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
 }
-

@@ -10,8 +10,6 @@ public class MgbDebugTool : ModuleRules
 		
 		PublicIncludePaths.AddRange(
 			new string[] {
-			"Megabonky",
-			"Megabonky/Core/AbilitySystem/AttributeSet"
             }
 			);
 				

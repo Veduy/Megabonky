@@ -12,7 +12,7 @@
 #include "InputAction.h"
 #include "EnhancedInputComponent.h"
 #include "AbilitySystemComponent.h"
-#include "../AbilitySystem/AttributeSet/CharacterAttributeSet.h"
+#include "../AbilitySystem/AttributeSet/PlayerAttributeSet.h"
 #include "../AbilitySystem/AttributeSet/WeaponAttributeSet.h"
 
 AMgbPlayerCharacter::AMgbPlayerCharacter()
@@ -40,7 +40,7 @@ AMgbPlayerCharacter::AMgbPlayerCharacter()
 	MainCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	MainCamera->SetupAttachment(SpringArm);
 
-	GetAbilitySystemComponent()->AddAttributeSetSubobject(CreateDefaultSubobject<UCharacterAttributeSet>(TEXT("CharacterAttributeSet")));
+	GetAbilitySystemComponent()->AddAttributeSetSubobject(CreateDefaultSubobject<UPlayerAttributeSet>(TEXT("CharacterAttributeSet")));
 	GetAbilitySystemComponent()->AddAttributeSetSubobject(CreateDefaultSubobject<UWeaponAttributeSet>(TEXT("WeaponAttributeSet")));
 }
 
