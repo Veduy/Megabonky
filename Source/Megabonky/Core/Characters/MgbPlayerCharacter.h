@@ -38,12 +38,18 @@ public:
 	TObjectPtr<UCameraComponent> MainCamera;
 
 public:
-	// For Test
+	/** Gameplay Ability System */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
 	TArray<TSubclassOf<UGameplayAbility>> TestAbilities;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapons")
 	TArray<TObjectPtr<AMgbWeapon>> Weapons;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attributes")
+	TObjectPtr<UAttributeSet> PlayerAttributeSet;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attributes")
+	TObjectPtr<UAttributeSet> WeaponAttributeSet;
 
 public:
 	UFUNCTION()

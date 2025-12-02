@@ -7,8 +7,8 @@
 #include "AbilitySystemInterface.h"
 #include "MgbCharacter.generated.h"
 
-class UMgbAbilitySystemComponent;
-class UMgbAttributeSet;
+class UAbilitySystemComponent;
+class UAttributeSet;
 
 UCLASS()
 class MEGABONKY_API AMgbCharacter : public ACharacter, public IAbilitySystemInterface
@@ -26,11 +26,11 @@ public:
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
-protected:
+public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
-	TObjectPtr<UMgbAbilitySystemComponent> AbilitySystemComponent;
+	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 	
 	UPROPERTY()
-	const TObjectPtr<UMgbAttributeSet> AttributeSet;
+	const TObjectPtr<UAttributeSet> AttributeSet;
 
 };

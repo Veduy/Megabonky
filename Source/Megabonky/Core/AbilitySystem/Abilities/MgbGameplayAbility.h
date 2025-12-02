@@ -31,9 +31,16 @@
 /**
  * 
  */
+
 UCLASS()
 class MEGABONKY_API UMgbGameplayAbility : public UGameplayAbility
 {
 	GENERATED_BODY()
+
+public:
+	/** Actually activate ability, do not call this directly */
+	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 	
+	/** Called when the ability is given to an AbilitySystemComponent */
+	virtual void OnGiveAbility(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) override;
 };

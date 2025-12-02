@@ -11,7 +11,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "InputAction.h"
 #include "EnhancedInputComponent.h"
-#include "AbilitySystemComponent.h"
+#include "../AbilitySystem/MgbAbilitySystemComponent.h"
 #include "../AbilitySystem/AttributeSet/PlayerAttributeSet.h"
 #include "../AbilitySystem/AttributeSet/WeaponAttributeSet.h"
 
@@ -40,8 +40,12 @@ AMgbPlayerCharacter::AMgbPlayerCharacter()
 	MainCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	MainCamera->SetupAttachment(SpringArm);
 
-	GetAbilitySystemComponent()->AddAttributeSetSubobject(CreateDefaultSubobject<UPlayerAttributeSet>(TEXT("CharacterAttributeSet")));
-	GetAbilitySystemComponent()->AddAttributeSetSubobject(CreateDefaultSubobject<UWeaponAttributeSet>(TEXT("WeaponAttributeSet")));
+	AbilitySystemComponent = CreateDefaultSubobject<UMgbAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
+	AbilitySystemComponent->SetIsReplicated(true);
+	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
+
+	PlayerAttributeSet = CreateDefaultSubobject<UPlayerAttributeSet>(TEXT("PlayerAttributeSet"));
+	WeaponAttributeSet = CreateDefaultSubobject<UWeaponAttributeSet>(TEXT("WeaponAttributeSet"));
 }
 
 void AMgbPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -63,14 +67,19 @@ void AMgbPlayerCharacter::PossessedBy(AController* NewController)
 	UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
 	if (IsValid(ASC))
 	{
-		//If it has an initialization function, this is a good place to call it.
-		//ASC->GiveAbility()
+		ASC->InitAbilityActorInfo(this, this);
+	}
+	else if (!ASC)
+	{
+		UE_LOG(LogTemp, Fatal, TEXT("Ability System is Null"));
 	}
 }
 
 void AMgbPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+
 }
 
 void AMgbPlayerCharacter::Move(const FInputActionValue& Value)

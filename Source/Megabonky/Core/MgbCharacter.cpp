@@ -2,20 +2,14 @@
 
 
 #include "MgbCharacter.h"
-#include "AbilitySystem/MgbAbilitySystemComponent.h"
-#include "AbilitySystem/MgbAttributeSet.h"
 
 // Sets default values
 AMgbCharacter::AMgbCharacter()
 {
-	SetNetUpdateFrequency(100.f);
-
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	AbilitySystemComponent = CreateDefaultSubobject<UMgbAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
-	AbilitySystemComponent->SetIsReplicated(true);
-	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
+	SetNetUpdateFrequency(100.f);
+
 }
 
 // Called when the game starts or when spawned
