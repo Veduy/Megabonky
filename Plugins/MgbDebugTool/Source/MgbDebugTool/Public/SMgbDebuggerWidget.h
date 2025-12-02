@@ -4,10 +4,10 @@
 #include "CoreMinimal.h"
 #include "Widgets/SCompoundWidget.h"
 
-class SGASDebuggerWidget : public SCompoundWidget
+class SMgbDebuggerWidget : public SCompoundWidget
 {
 public:
-    SLATE_BEGIN_ARGS(SGASDebuggerWidget) {}
+    SLATE_BEGIN_ARGS(SMgbDebuggerWidget) {}
     SLATE_END_ARGS()
 
     void Construct(const FArguments& InArgs);

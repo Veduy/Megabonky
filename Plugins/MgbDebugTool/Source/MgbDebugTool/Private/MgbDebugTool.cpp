@@ -2,7 +2,7 @@
 
 #include "MgbDebugTool.h"
 
-#include "SGASDebuggerWidget.h"
+#include "SMgbDebuggerWidget.h"
 #include "LevelEditor.h"
 #include "Widgets/Docking/SDockTab.h"
 
@@ -22,9 +22,9 @@ void FMgbDebugToolModule::StartupModule()
 
 	// 탭 등록
 	FGlobalTabmanager::Get()->RegisterNomadTabSpawner(
-		"GASDebugger",
-		FOnSpawnTab::CreateRaw(this, &FMgbDebugToolModule::OnSpawnGASTab))
-		.SetDisplayName(NSLOCTEXT("GASDebugger", "TabTitle", "GAS Debugger"))
+		"MgbDebugger",
+		FOnSpawnTab::CreateRaw(this, &FMgbDebugToolModule::OnSpawnMgbTab))
+		.SetDisplayName(NSLOCTEXT("MgbDebugger", "TabTitle", "Mgb Debugger"))
 		.SetMenuType(ETabSpawnerMenuType::Hidden);
 }
 
@@ -32,30 +32,30 @@ void FMgbDebugToolModule::ShutdownModule()
 {
 	// This function may be called during shutdown to clean up your module.  For modules that support dynamic reloading,
 	// we call this function before unloading the module.
-	FGlobalTabmanager::Get()->UnregisterNomadTabSpawner("GASDebugger");
+	FGlobalTabmanager::Get()->UnregisterNomadTabSpawner("MgbDebugger");
 }
 
-TSharedRef<class SDockTab> FMgbDebugToolModule::OnSpawnGASTab(const FSpawnTabArgs& SpawnTabArgs)
+TSharedRef<class SDockTab> FMgbDebugToolModule::OnSpawnMgbTab(const FSpawnTabArgs& SpawnTabArgs)
 {
 	return SNew(SDockTab)
 		.TabRole(ETabRole::NomadTab)
 		[
-			SNew(SGASDebuggerWidget)
+			SNew(SMgbDebuggerWidget)
 		];
 }
 
 void FMgbDebugToolModule::AddMenuEntry(FMenuBuilder& MenuBuilder)
 {
 	MenuBuilder.AddMenuEntry(
-		LOCTEXT("OpenTab", "Open GAS Debugger"),
-		LOCTEXT("OpenTabTooltip", "Opens the GAS Debugger window"),
+		LOCTEXT("OpenTab", "Open Mgb Debugger"),
+		LOCTEXT("OpenTabTooltip", "Opens the Mgb Debugger window"),
 		FSlateIcon(),
 		FUIAction(FExecuteAction::CreateRaw(this, &FMgbDebugToolModule::OpenTab)));
 }
 
 void FMgbDebugToolModule::OpenTab()
 {
-	FGlobalTabmanager::Get()->TryInvokeTab(FTabId("GASDebugger"));
+	FGlobalTabmanager::Get()->TryInvokeTab(FTabId("MgbDebugger"));
 }
 
 #undef LOCTEXT_NAMESPACE

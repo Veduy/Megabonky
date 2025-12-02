@@ -36,7 +36,8 @@ public class MgbDebugTool : ModuleRules
                 "GameplayTags",
                 "GameplayTasks",
                 "UnrealEd",
-				"Megabonky",
+                "PropertyEditor",
+                "Megabonky",
             }
 			);
 			

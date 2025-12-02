@@ -15,7 +15,7 @@ public:
 	virtual void ShutdownModule() override;
 
 public:
-	TSharedRef<class SDockTab> OnSpawnGASTab(const class FSpawnTabArgs& SpawnTabArgs);
+	TSharedRef<class SDockTab> OnSpawnMgbTab(const class FSpawnTabArgs& SpawnTabArgs);
 
 	void AddMenuEntry(FMenuBuilder& MenuBuilder);
 
