@@ -46,6 +46,9 @@ public:
 	TArray<TObjectPtr<AMgbWeapon>> Weapons;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attributes")
+	TObjectPtr<UAttributeSet> CharacterAttributeSet;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attributes")
 	TObjectPtr<UAttributeSet> PlayerAttributeSet;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attributes")

@@ -8,7 +8,7 @@
 
 UWeaponAttributeSet::UWeaponAttributeSet()
 {
-	InitDamage(10.f);
+	InitDamage(1.f);
 }
 
 void UWeaponAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

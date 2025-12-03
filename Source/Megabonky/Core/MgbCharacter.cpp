@@ -3,12 +3,18 @@
 
 #include "MgbCharacter.h"
 
+#include "AbilitySystem/MgbAbilitySystemComponent.h"
+
 // Sets default values
 AMgbCharacter::AMgbCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
 	SetNetUpdateFrequency(100.f);
+
+	AbilitySystemComponent = CreateDefaultSubobject<UMgbAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
+	AbilitySystemComponent->SetIsReplicated(true);
+	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 
 }
 

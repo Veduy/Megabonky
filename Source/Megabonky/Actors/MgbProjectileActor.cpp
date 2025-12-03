@@ -4,6 +4,8 @@
 #include "MgbProjectileActor.h"
 
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemComponent.h"
 
 // Sets default values
 AMgbProjectileActor::AMgbProjectileActor()
@@ -31,3 +33,14 @@ void AMgbProjectileActor::Tick(float DeltaTime)
 
 }
 
+void AMgbProjectileActor::BeginOverlap(AActor* OtherActor)
+{
+	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor);
+	if (TargetASC)
+	{
+		FGameplayEffectContextHandle EffectContextHandle = TargetASC->MakeEffectContext();
+
+
+		TargetASC->ApplyGameplayEffectSpecToSelf()
+	}
+}

@@ -31,14 +31,7 @@ public:
 
 	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
 
-
-public:
-	UFUNCTION()
-	virtual void OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth);
-
-	UFUNCTION()
-	virtual void OnRep_Health(const FGameplayAttributeData& OldHealth);
-	
+public:	
 	UFUNCTION()
 	virtual void OnRep_HealthRegen(const FGameplayAttributeData& OldHealthRegen);
 
@@ -68,9 +61,6 @@ public:
 
 	UFUNCTION()
 	virtual void OnRep_DamageToElites(const FGameplayAttributeData& OldDamageToElites);
-
-	UFUNCTION()
-	virtual void OnRep_MovementSpeed(const FGameplayAttributeData& OldMovementSpeed);
 
 	UFUNCTION()
 	virtual void OnRep_ExtraJumps(const FGameplayAttributeData& OldExtraJumps);
@@ -106,14 +96,6 @@ public:
 	virtual void OnRep_PowerupDropChance(const FGameplayAttributeData& OldPowerupDropChance);
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_MaxHealth)
-	FGameplayAttributeData MaxHealth;
-	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, MaxHealth);
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_Health)
-	FGameplayAttributeData Health;
-	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, Health);
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_HealthRegen)
 	FGameplayAttributeData HealthRegen;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, HealthRegen);
@@ -153,10 +135,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_DamageToElites)
 	FGameplayAttributeData DamageToElites;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, DamageToElites);
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_MovementSpeed)
-	FGameplayAttributeData MovementSpeed;
-	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, MovementSpeed);
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_ExtraJumps)
 	FGameplayAttributeData ExtraJumps;

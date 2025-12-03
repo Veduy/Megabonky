@@ -6,6 +6,8 @@
 #include "../MgbCharacter.h"
 #include "MgbEnemyCharacter.generated.h"
 
+
+class UCharacterAttributeSet;
 /**
  * 
  */
@@ -20,5 +22,8 @@ public:
 	virtual void BeginPlay() override;
 
 	virtual void Tick(float DeltaTime) override;
-	
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attributes")
+	TObjectPtr<UCharacterAttributeSet> CharacterAttributeSet;
 };

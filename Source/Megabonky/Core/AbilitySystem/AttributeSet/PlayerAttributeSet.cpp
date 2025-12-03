@@ -8,16 +8,13 @@
 
 UPlayerAttributeSet::UPlayerAttributeSet()
 {
-	InitMaxHealth(100.f);
-	InitHealth(100.f);
+
 }
 
 void UPlayerAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME_CONDITION_NOTIFY(UPlayerAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UPlayerAttributeSet, Health, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UPlayerAttributeSet, HealthRegen, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UPlayerAttributeSet, OverHeal, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UPlayerAttributeSet, MaxShield, COND_None, REPNOTIFY_Always);
@@ -28,7 +25,6 @@ void UPlayerAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 	DOREPLIFETIME_CONDITION_NOTIFY(UPlayerAttributeSet, Thorns, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UPlayerAttributeSet, AttackSpeed, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UPlayerAttributeSet, DamageToElites, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UPlayerAttributeSet, MovementSpeed, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UPlayerAttributeSet, ExtraJumps, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UPlayerAttributeSet, JumpHeight, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UPlayerAttributeSet, Luck, COND_None, REPNOTIFY_Always);
@@ -46,11 +42,6 @@ void UPlayerAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute
 {
 	Super::PreAttributeChange(Attribute, NewValue);
 
-	if (Attribute == GetHealthAttribute())
-	{
-		//UE_LOG(LogTemp, Warning, TEXT("Health: %f"), NewValue);
-		NewValue = FMath::Clamp(NewValue, 0, GetMaxHealth());
-	}
 	if (Attribute == GetShieldAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0, GetMaxShield());
@@ -71,16 +62,6 @@ void UPlayerAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCall
 	//Data.EvaluatedData.Attribute.
 	
 	//FGameplayEffectContextHandle EffectContextHandle = Data.EffectSpec.GetContext();
-}
-
-void UPlayerAttributeSet::OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth)
-{
-	GAMEPLAYATTRIBUTE_REPNOTIFY(UPlayerAttributeSet, MaxHealth, OldMaxHealth);
-}
-
-void UPlayerAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth)
-{
-	GAMEPLAYATTRIBUTE_REPNOTIFY(UPlayerAttributeSet, Health, OldHealth);
 }
 
 void UPlayerAttributeSet::OnRep_HealthRegen(const FGameplayAttributeData& OldHealthRegen)
@@ -131,11 +112,6 @@ void UPlayerAttributeSet::OnRep_AttackSpeed(const FGameplayAttributeData& OldAtt
 void UPlayerAttributeSet::OnRep_DamageToElites(const FGameplayAttributeData& OldDamageToElites)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UPlayerAttributeSet, DamageToElites, OldDamageToElites);
-}
-
-void UPlayerAttributeSet::OnRep_MovementSpeed(const FGameplayAttributeData& OldMovementSpeed)
-{
-	GAMEPLAYATTRIBUTE_REPNOTIFY(UPlayerAttributeSet, MovementSpeed, OldMovementSpeed);
 }
 
 void UPlayerAttributeSet::OnRep_ExtraJumps(const FGameplayAttributeData& OldExtraJumps)

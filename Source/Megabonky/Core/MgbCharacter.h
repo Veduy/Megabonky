@@ -29,8 +29,4 @@ public:
 public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
-	
-	UPROPERTY()
-	const TObjectPtr<UAttributeSet> AttributeSet;
-
 };

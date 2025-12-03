@@ -3,8 +3,11 @@
 
 #include "MgbEnemyCharacter.h"
 
+#include "../AbilitySystem/AttributeSet/CharacterAttributeSet.h"
+
 AMgbEnemyCharacter::AMgbEnemyCharacter()
 {
+	CharacterAttributeSet = CreateDefaultSubobject<UCharacterAttributeSet>(TEXT("CharacterAttributeSet"));
 }
 
 void AMgbEnemyCharacter::BeginPlay()

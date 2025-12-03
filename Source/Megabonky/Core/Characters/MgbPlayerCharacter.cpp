@@ -12,6 +12,7 @@
 #include "InputAction.h"
 #include "EnhancedInputComponent.h"
 #include "../AbilitySystem/MgbAbilitySystemComponent.h"
+#include "../AbilitySystem/AttributeSet/CharacterAttributeSet.h"
 #include "../AbilitySystem/AttributeSet/PlayerAttributeSet.h"
 #include "../AbilitySystem/AttributeSet/WeaponAttributeSet.h"
 
@@ -40,10 +41,7 @@ AMgbPlayerCharacter::AMgbPlayerCharacter()
 	MainCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	MainCamera->SetupAttachment(SpringArm);
 
-	AbilitySystemComponent = CreateDefaultSubobject<UMgbAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
-	AbilitySystemComponent->SetIsReplicated(true);
-	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
-
+	CharacterAttributeSet = CreateDefaultSubobject<UCharacterAttributeSet>(TEXT("CharacterAttributeSet"));
 	PlayerAttributeSet = CreateDefaultSubobject<UPlayerAttributeSet>(TEXT("PlayerAttributeSet"));
 	WeaponAttributeSet = CreateDefaultSubobject<UWeaponAttributeSet>(TEXT("WeaponAttributeSet"));
 }
