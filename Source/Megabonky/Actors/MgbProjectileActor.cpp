@@ -35,12 +35,21 @@ void AMgbProjectileActor::Tick(float DeltaTime)
 
 void AMgbProjectileActor::BeginOverlap(AActor* OtherActor)
 {
+	if (Cast<APlayerController>(GetOwner()->GetOwner()))
+	{
+		// Owner의 Owner가 플레이어 컨트롤인경우 데미지 처리 x 
+		return;
+	}
+
 	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor);
 	if (TargetASC)
 	{
 		FGameplayEffectContextHandle EffectContextHandle = TargetASC->MakeEffectContext();
+		EffectContextHandle.AddSourceObject(this);
+		EffectContextHandle.AddInstigator(GetOwner(), GetOwner());
 
-
-		TargetASC->ApplyGameplayEffectSpecToSelf()
+		check(DamageEffectClass);
+		FGameplayEffectSpecHandle EffectSpecHandle = TargetASC->MakeOutgoingSpec(DamageEffectClass, 1.f, EffectContextHandle);
+		TargetASC->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
 	}
 }

@@ -13,6 +13,20 @@ void AMgbPlayerController::AcknowledgePossession(APawn* P)
 {
 	Super::AcknowledgePossession(P);
 
+
+}
+
+void AMgbPlayerController::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(GetLocalPlayer()))
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* InputSubsystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
+		{
+			InputSubsystem->AddMappingContext(InputMappingContext, 0);
+		}
+	}
 }
 
 void AMgbPlayerController::OnPossess(APawn* aPawn)
@@ -26,6 +40,7 @@ void AMgbPlayerController::OnPossess(APawn* aPawn)
 			InputSubsystem->AddMappingContext(InputMappingContext, 0);
 		}
 	}
+
 }
 
 void AMgbPlayerController::OnUnPossess()

@@ -8,6 +8,7 @@
 
 class UProjectileMovementComponent;
 class UPrimitiveComponent;
+class UGameplayEffect;
 
 UCLASS()
 class MEGABONKY_API AMgbProjectileActor : public AActor
@@ -34,4 +35,8 @@ public:
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
+
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "AbilitySystem")
+	TSubclassOf<UGameplayEffect> DamageEffectClass;
 };

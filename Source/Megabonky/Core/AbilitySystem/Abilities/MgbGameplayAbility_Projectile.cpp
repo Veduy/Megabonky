@@ -12,7 +12,7 @@ void UMgbGameplayAbility_Projectile::ActivateAbility(const FGameplayAbilitySpecH
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	FTransform SpawnTransform = FTransform(FVector(0.f, 0.f, 0.f));
-	Projectile = GetWorld()->SpawnActorDeferred<AMgbProjectileActor>(
+	AMgbProjectileActor* SpawnedProjectile = GetWorld()->SpawnActorDeferred<AMgbProjectileActor>(
 		ProjectileClass,
 		SpawnTransform, 
 		ActorInfo->OwnerActor.Get(),
@@ -20,13 +20,9 @@ void UMgbGameplayAbility_Projectile::ActivateAbility(const FGameplayAbilitySpecH
 		ESpawnActorCollisionHandlingMethod::AlwaysSpawn,
 		ESpawnActorScaleMethod::MultiplyWithRoot);
 
-	if (Projectile)
+	if (SpawnedProjectile)
 	{
-		// 스폰 완료전 데이터 설정할게 생기면 추가.
-		// Projectile Actor에 Effect를 변수로 가
-
-		UE_LOG(LogTemp, Warning, TEXT("\"%s\"'s Owner : %s"), *GetName(), *ActorInfo->OwnerActor->GetName());
-
-		UGameplayStatics::FinishSpawningActor(Projectile, SpawnTransform);
+		// 초기 설정할게 있다면 여기에 추가.
+		UGameplayStatics::FinishSpawningActor(SpawnedProjectile, SpawnTransform);
 	}
 }

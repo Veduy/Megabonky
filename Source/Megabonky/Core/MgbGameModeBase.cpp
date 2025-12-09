@@ -3,3 +3,27 @@
 
 #include "MgbGameModeBase.h"
 
+#include "MgbGameStateBase.h"
+
+AMgbGameModeBase::AMgbGameModeBase()
+{
+
+}
+
+void AMgbGameModeBase::BeginPlay()
+{
+	Super::BeginPlay();
+
+
+}
+
+void AMgbGameModeBase::StartPlay()
+{
+	Super::StartPlay();
+
+	AMgbGameStateBase* GS = GetGameState<AMgbGameStateBase>();
+	if (GS)
+	{
+		GS->InitSpawnEnemyTimer();
+	}
+}

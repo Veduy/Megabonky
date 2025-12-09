@@ -13,7 +13,7 @@ UPlayerAttributeSet::UPlayerAttributeSet()
 
 void UPlayerAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
-	GetLifetimeReplicatedProps(OutLifetimeProps);
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION_NOTIFY(UPlayerAttributeSet, HealthRegen, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UPlayerAttributeSet, OverHeal, COND_None, REPNOTIFY_Always);

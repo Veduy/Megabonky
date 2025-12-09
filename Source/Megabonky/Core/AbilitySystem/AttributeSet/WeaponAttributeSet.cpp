@@ -13,7 +13,7 @@ UWeaponAttributeSet::UWeaponAttributeSet()
 
 void UWeaponAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
-	GetLifetimeReplicatedProps(OutLifetimeProps);
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION_NOTIFY(UWeaponAttributeSet, Damage, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UWeaponAttributeSet, CritChance, COND_None, REPNOTIFY_Always);

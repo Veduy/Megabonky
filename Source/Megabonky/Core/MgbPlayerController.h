@@ -21,6 +21,7 @@ public:
 	/** Called on the client to do local pawn setup after possession, before calling ServerAcknowledgePossession */
 	virtual void AcknowledgePossession(class APawn* P) override;
 
+	virtual void BeginPlay() override;
 protected:
 	virtual void OnPossess(APawn* aPawn) override;
 	virtual void OnUnPossess() override;

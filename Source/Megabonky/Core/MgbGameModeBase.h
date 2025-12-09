@@ -13,5 +13,10 @@ UCLASS()
 class MEGABONKY_API AMgbGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
-	
+
+public:
+	AMgbGameModeBase();
+
+	virtual void BeginPlay() override;
+	virtual void StartPlay() override;
 };

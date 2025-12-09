@@ -20,9 +20,6 @@ public:
 		const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Projectile")
-	TObjectPtr<AMgbProjectileActor> Projectile;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
 	TSubclassOf<AMgbProjectileActor> ProjectileClass;
 
