@@ -7,14 +7,17 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
-#include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetMathLibrary.h"
 #include "InputAction.h"
 #include "EnhancedInputComponent.h"
+
+#include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "../AbilitySystem/MgbAbilitySystemComponent.h"
 #include "../AbilitySystem/AttributeSet/CharacterAttributeSet.h"
 #include "../AbilitySystem/AttributeSet/PlayerAttributeSet.h"
 #include "../AbilitySystem/AttributeSet/WeaponAttributeSet.h"
+
+#include "../../Util/NetworkLog.h"
 
 AMgbPlayerCharacter::AMgbPlayerCharacter()
 {
@@ -78,6 +81,28 @@ void AMgbPlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 
 
+	// <TEST> 모든 어빌리티 Activate
+	float AttackSpeed = GetAbilitySystemComponent()->GetNumericAttribute(UPlayerAttributeSet::GetAttackSpeedAttribute());
+	NET_LOG(FString::Printf(TEXT("AttackSpeed: %f"), AttackSpeed));
+
+	// 	UE_API void GetAllAbilities(TArray<FGameplayAbilitySpecHandle>& OutAbilityHandles) const;
+	FTimerHandle ActivateAbilityHandle;
+	GetWorld()->GetTimerManager().SetTimer(ActivateAbilityHandle,
+		[this]()
+		{
+			GetAbilitySystemComponent()->GetAllAbilities(Abilities);
+
+			if (!Abilities.IsEmpty())
+			{
+				for (const auto& Ability : Abilities)
+				{
+					GetAbilitySystemComponent()->TryActivateAbility(Ability);
+				}
+			}
+		},
+		AttackSpeed,
+		true,
+		1.f);
 }
 
 void AMgbPlayerCharacter::Move(const FInputActionValue& Value)

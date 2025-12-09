@@ -4,13 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "../MgbCharacter.h"
+#include "GameplayAbilitySpec.h"
+
 #include "MgbPlayerCharacter.generated.h"
+
 
 class USpringArmComponent;
 class UCameraComponent;
 class UInputAction;
 class UGameplayAbility;
 class AMgbWeapon;
+
 
 /**
  * 
@@ -27,7 +31,6 @@ public:
 
 	virtual void PossessedBy(AController* NewController) override;
 
-protected:
 	virtual void BeginPlay() override;
 
 public:
@@ -53,6 +56,8 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attributes")
 	TObjectPtr<UAttributeSet> WeaponAttributeSet;
+
+	TArray<FGameplayAbilitySpecHandle> Abilities;
 
 public:
 	UFUNCTION()
