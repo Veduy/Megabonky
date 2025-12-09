@@ -26,7 +26,7 @@ public:
 	void SpawnEnemy();
 
 public:
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
 	TArray<TSubclassOf<AMgbEnemyCharacter>> EnemyClasses;
 
 	UPROPERTY()
