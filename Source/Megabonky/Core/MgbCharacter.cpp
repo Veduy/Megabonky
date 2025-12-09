@@ -22,7 +22,7 @@ AMgbCharacter::AMgbCharacter()
 void AMgbCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 // Called every frame

@@ -23,6 +23,7 @@ public:
 
 public:
 	void InitSpawnEnemyTimer();
+
 	void SpawnEnemy();
 
 public:

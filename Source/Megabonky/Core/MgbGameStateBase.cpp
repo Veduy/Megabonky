@@ -5,6 +5,8 @@
 
 #include "Characters/MgbEnemyCharacter.h"
 #include "../Util/NetworkLog.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "Components/CapsuleComponent.h"
 
 AMgbGameStateBase::AMgbGameStateBase()
 {
@@ -25,9 +27,9 @@ void AMgbGameStateBase::InitSpawnEnemyTimer()
 		{
 			SpawnEnemy();   
 		},
-		5.0f,
+		2.0f,
 		true,
-		3.f
+		1.f
 	);
 }
 
@@ -59,17 +61,40 @@ void AMgbGameStateBase::SpawnEnemy()
 			for (int i = 0; i < 5; ++i)
 			{
 				FVector2D SmallDir = FVector2D(cosf(rand()), sinf(rand()));
-				FVector2D SmallLocation = SmallDir * FMath::FRandRange(100.f, 200.f);
+				FVector2D SmallLocation = SmallDir * FMath::FRandRange(300.f, 500.f);
+				// 플레이어 위치(x,y 좌표만 가져와야함).
+				FVector2D PlayerXY = FVector2D(Player->GetActorLocation().X, Player->GetActorLocation().Y);
 
-				FVector2D RealSpawn2D = Location + SmallLocation;
+				FVector2D RealSpawn2D = Location + SmallLocation + PlayerXY;
 
-				// 일단은 Z = 0
-				// 지형에 따라 높이는 라인트레이싱으로 계산 하도록 수정.
 				FVector RealSpawnLocation = FVector(RealSpawn2D.X, RealSpawn2D.Y, 0);
 
-				// 임시로 플레이어 위치 더해봄.
-				RealSpawnLocation = RealSpawnLocation + Player->GetActorLocation();
-				GetWorld()->SpawnActor<AActor>(EnemyClasses[0], RealSpawnLocation, FRotator::ZeroRotator);
+
+				/*bool UKismetSystemLibrary::LineTraceSingleForObjects(const UObject * WorldContextObject, const FVector Start, const FVector End, const TArray<TEnumAsByte<EObjectTypeQuery> > &ObjectTypes, bool bTraceComplex, const TArray<AActor*>&ActorsToIgnore, EDrawDebugTrace::Type DrawDebugType, FHitResult & OutHit, bool bIgnoreSelf, FLinearColor TraceColor, FLinearColor TraceHitColor, float DrawTime)*/
+
+				// 스폰할 높이는 LineTrace로 설정.
+				FVector Start = RealSpawnLocation + FVector(0.f, 0.f, 3000.f);
+				FVector End = RealSpawnLocation + FVector(0.f, 0.f, -3000.f);
+
+				TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+				ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldStatic));
+
+				TArray<AActor*> ActorsToIgnore;
+				FHitResult Hit;
+
+				bool bResult = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), Start, End,
+					ObjectTypes, false, ActorsToIgnore, EDrawDebugTrace::ForDuration, Hit, false, FLinearColor::Red,
+					FLinearColor::Green, 2.f);
+				
+				if (bResult)
+				{
+					float CapsuleHeight = Cast<ACharacter>(Player)->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+					RealSpawnLocation = Hit.Location - CapsuleHeight;
+				}
+
+				FActorSpawnParameters Params;
+				Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+				GetWorld()->SpawnActor<AActor>(EnemyClasses[0], RealSpawnLocation, FRotator::ZeroRotator, Params);				
 			}
 		}
 	}

@@ -26,4 +26,11 @@ public:
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attributes")
 	TObjectPtr<UCharacterAttributeSet> CharacterAttributeSet;
+
+public:
+	UPROPERTY()
+	uint8 bSpawnFinished : 1 = false;
+
+	UPROPERTY()
+	float TargetSpawnHeight;
 };
