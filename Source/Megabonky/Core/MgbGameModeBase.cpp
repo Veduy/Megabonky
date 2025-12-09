@@ -4,6 +4,7 @@
 #include "MgbGameModeBase.h"
 
 #include "MgbGameStateBase.h"
+#include "../Util/NetworkLog.h"
 
 AMgbGameModeBase::AMgbGameModeBase()
 {

@@ -4,6 +4,7 @@
 #include "MgbGameStateBase.h"
 
 #include "Characters/MgbEnemyCharacter.h"
+#include "../Util/NetworkLog.h"
 
 AMgbGameStateBase::AMgbGameStateBase()
 {
@@ -33,7 +34,6 @@ void AMgbGameStateBase::InitSpawnEnemyTimer()
 
 void AMgbGameStateBase::SpawnEnemy()
 {
-	UE_LOG(LogTemp, Warning, TEXT("SpawnEnemy"));
 	if (!HasAuthority())
 	{
 		return;
@@ -44,7 +44,6 @@ void AMgbGameStateBase::SpawnEnemy()
 	{
 		if (Iterator->Get())
 		{
-			UE_LOG(LogTemp, Warning, TEXT("PlayerController: %s"), *Iterator->Get()->GetName());
 		}
 	}
 
