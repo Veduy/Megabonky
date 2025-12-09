@@ -28,7 +28,7 @@ public:
 	TObjectPtr<UCharacterAttributeSet> CharacterAttributeSet;
 
 public:
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")
 	uint8 bSpawnFinished : 1 = false;
 
 	UPROPERTY()
