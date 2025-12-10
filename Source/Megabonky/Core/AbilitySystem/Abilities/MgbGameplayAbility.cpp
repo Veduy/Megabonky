@@ -7,7 +7,6 @@ void UMgbGameplayAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handl
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 	
-	UE_LOG(LogTemp, Display, TEXT("Activate \"%s\" Ability"), *GetName());
 }
 
 void UMgbGameplayAbility::OnGiveAbility(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)

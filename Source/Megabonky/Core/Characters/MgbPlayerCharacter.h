@@ -29,13 +29,21 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	virtual void BeginPlay() override;
+
 	virtual void PossessedBy(AController* NewController) override;
 
-	virtual void BeginPlay() override;
+public:
 
 public:
 	UFUNCTION()
 	bool FindPrimaryTargetByCondition(AActor*& OutPrimaryTarget);
+
+	UFUNCTION()
+	void SpawnDefaultWeapon();
+
+	UFUNCTION()
+	void ActivateWeaponsAbility();
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")

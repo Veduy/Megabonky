@@ -12,6 +12,8 @@ AMgbProjectileActor::AMgbProjectileActor()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
+	bReplicates = true;
+
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile"));
 	ProjectileMovement->ProjectileGravityScale = 0.f;
 	ProjectileMovement->InitialSpeed = 100.f;

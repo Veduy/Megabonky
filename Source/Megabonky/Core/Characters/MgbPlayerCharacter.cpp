@@ -69,48 +69,21 @@ void AMgbPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	}
 }
 
+void AMgbPlayerCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	NET_LOG("");
+}
 void AMgbPlayerCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
+	NET_LOG("");
 
 	UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
 	if (IsValid(ASC))
 	{
 		ASC->InitAbilityActorInfo(this, this);
 	}
-	else if (!ASC)
-	{
-		UE_LOG(LogTemp, Fatal, TEXT("Ability System is Null"));
-	}
-}
-
-void AMgbPlayerCharacter::BeginPlay()
-{
-	Super::BeginPlay();
-
-	if (DefaultWeaponClass)
-	{
-		AMgbWeapon* SpawnedWeapon = Cast<AMgbWeapon>(GetWorld()->SpawnActor(DefaultWeaponClass));
-		SpawnedWeapon->SetOwner(this);
-		Weapons.Add(SpawnedWeapon);
-	}
-
-	// 모든 Weapon의 어빌리티 Activate
-	float AttackSpeed = GetAbilitySystemComponent()->GetNumericAttribute(UPlayerAttributeSet::GetAttackSpeedAttribute());
-
-	// 	UE_API void GetAllAbilities(TArray<FGameplayAbilitySpecHandle>& OutAbilityHandles) const;
-	FTimerHandle ActivateAbilityHandle;
-	GetWorld()->GetTimerManager().SetTimer(ActivateAbilityHandle,
-		[this]()
-		{
-			for (const auto& Weapon : Weapons)
-			{
-				Weapon->GetAbilitySystemComponent()->TryActivateAbilityByClass(Weapon->AbilityClass);
-			}
-		},
-		AttackSpeed,
-		true,
-		1.f);
 }
 
 bool AMgbPlayerCharacter::FindPrimaryTargetByCondition(AActor*& OutPrimaryTarget)
@@ -142,6 +115,35 @@ bool AMgbPlayerCharacter::FindPrimaryTargetByCondition(AActor*& OutPrimaryTarget
 	}
 
 	return false;
+}
+
+void AMgbPlayerCharacter::SpawnDefaultWeapon()
+{
+	if (DefaultWeaponClass)
+	{
+		AMgbWeapon* SpawnedWeapon = Cast<AMgbWeapon>(GetWorld()->SpawnActor(DefaultWeaponClass));
+		SpawnedWeapon->SetOwner(this);
+		Weapons.Add(SpawnedWeapon);
+	}
+}
+
+void AMgbPlayerCharacter::ActivateWeaponsAbility()
+{
+	// 모든 Weapon의 어빌리티 Activate
+	float AttackSpeed = GetAbilitySystemComponent()->GetNumericAttribute(UPlayerAttributeSet::GetAttackSpeedAttribute());
+	// 	UE_API void GetAllAbilities(TArray<FGameplayAbilitySpecHandle>& OutAbilityHandles) const;
+	FTimerHandle ActivateAbilityHandle;
+	GetWorld()->GetTimerManager().SetTimer(ActivateAbilityHandle,
+		[this]()
+		{
+			for (const auto& Weapon : Weapons)
+			{
+				Weapon->GetAbilitySystemComponent()->TryActivateAbilityByClass(Weapon->AbilityClass);
+			}
+		},
+		AttackSpeed,
+		true,
+		1.f);
 }
 
 void AMgbPlayerCharacter::Move(const FInputActionValue& Value)

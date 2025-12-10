@@ -27,7 +27,7 @@ void AMgbGameStateBase::InitSpawnEnemyTimer()
 		{
 			SpawnEnemy();   
 		},
-		2.0f,
+		5.0f,
 		true,
 		1.f
 	);

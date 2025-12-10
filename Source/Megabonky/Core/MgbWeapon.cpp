@@ -12,6 +12,9 @@ AMgbWeapon::AMgbWeapon()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
+	bReplicates = true;
+	bNetUseOwnerRelevancy = true;
+	
 	AbilitySystemComponent = CreateDefaultSubobject<UMgbAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
@@ -23,8 +26,11 @@ void AMgbWeapon::BeginPlay()
 {
 	Super::BeginPlay();
 
-	FGameplayAbilitySpec AbilitySpec = AbilitySystemComponent->BuildAbilitySpecFromClass(AbilityClass);
-	AbilitySystemComponent->GiveAbility(AbilitySpec);
+	if (HasAuthority())
+	{
+		FGameplayAbilitySpec AbilitySpec = AbilitySystemComponent->BuildAbilitySpecFromClass(AbilityClass);
+		AbilitySystemComponent->GiveAbility(AbilitySpec);
+	}
 }
 
 UAbilitySystemComponent* AMgbWeapon::GetAbilitySystemComponent() const
