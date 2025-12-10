@@ -18,13 +18,15 @@ class MEGABONKY_API AMgbCharacter : public ACharacter, public IAbilitySystemInte
 public:
 	AMgbCharacter();
 
-protected:
+public:
 	virtual void BeginPlay() override;
 
-public:	
 	virtual void Tick(float DeltaTime) override;
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
+	//ENGINE_API virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser);
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Data")

@@ -37,3 +37,13 @@ UAbilitySystemComponent* AMgbCharacter::GetAbilitySystemComponent() const
 	return AbilitySystemComponent;
 }
 
+float AMgbCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	if (DamageAmount > 0)
+	{
+		Destroy();
+	}
+
+	return 0.0f;
+}
+

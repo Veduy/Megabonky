@@ -2,10 +2,8 @@
 
 
 #include "MgbGameplayAbility_Projectile.h"
-
 #include "Kismet/GameplayStatics.h"
 #include "../../../Actors/MgbProjectileActor.h"
-
 #include "../../../Util/NetworkLog.h"
 #include "../../Characters/MgbPlayerCharacter.h"
 
@@ -15,27 +13,27 @@ void UMgbGameplayAbility_Projectile::ActivateAbility(const FGameplayAbilitySpecH
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	// Avatar = Weapon Actor
-	AActor* Avatar = ActorInfo->AvatarActor.Get();
+	AActor* WeaponActor = ActorInfo->AvatarActor.Get();
 
-	// Player
-	AActor* Player = Avatar->GetOwner();
+	// PlayerActor
+	AActor* PlayerActor = WeaponActor->GetOwner();
 
 	//Avatar->GetOwner();
 	FVector SpawnLocation;
 	FVector SpawnDirection;
 	
-	if (Player)
+	if (PlayerActor)
 	{
-		SpawnLocation = Player->GetActorLocation();
-		SpawnDirection = Player->GetActorForwardVector();
+		SpawnLocation = PlayerActor->GetActorLocation();
+		SpawnDirection = PlayerActor->GetActorForwardVector();
 	}
 
 	FTransform SpawnTransform = FTransform(SpawnDirection.Rotation(), SpawnLocation, FVector(1.f,1.f,1.f));
 	AMgbProjectileActor* SpawnedProjectile = GetWorld()->SpawnActorDeferred<AMgbProjectileActor>(
 		ProjectileClass,
 		SpawnTransform, 
-		ActorInfo->OwnerActor.Get(),
-		Cast<APawn>(ActorInfo->OwnerActor.Get()),
+		WeaponActor,
+		nullptr,
 		ESpawnActorCollisionHandlingMethod::AlwaysSpawn,
 		ESpawnActorScaleMethod::MultiplyWithRoot);
 

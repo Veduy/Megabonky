@@ -51,24 +51,6 @@ AMgbPlayerCharacter::AMgbPlayerCharacter()
 	WeaponAttributeSet = CreateDefaultSubobject<UWeaponAttributeSet>(TEXT("WeaponAttributeSet"));
 }
 
-void AMgbPlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-}
-
-void AMgbPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	if (UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(PlayerInputComponent))
-	{
-		Input->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AMgbPlayerCharacter::Move);
-		Input->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMgbPlayerCharacter::Look);
-		Input->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
-	}
-}
-
 void AMgbPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -84,6 +66,24 @@ void AMgbPlayerCharacter::PossessedBy(AController* NewController)
 	{
 		ASC->InitAbilityActorInfo(this, this);
 	}
+}
+
+void AMgbPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	if (UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(PlayerInputComponent))
+	{
+		Input->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AMgbPlayerCharacter::Move);
+		Input->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMgbPlayerCharacter::Look);
+		Input->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
+	}
+}
+
+void AMgbPlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
 }
 
 bool AMgbPlayerCharacter::FindPrimaryTargetByCondition(AActor*& OutPrimaryTarget)

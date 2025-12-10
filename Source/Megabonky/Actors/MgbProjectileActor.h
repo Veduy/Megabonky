@@ -26,11 +26,13 @@ public:
 
 public:
 	/** Delegate for notification of start of overlap with a specific component */
-	//FComponentBeginOverlapSignature, UPrimitiveComponent, OnComponentBeginOverlap, UPrimitiveComponent*, OverlappedComponent, AActor*, OtherActor, UPrimitiveComponent*, OtherComp, int32, OtherBodyIndex, bool, bFromSweep, 
-	//	const FHitResult&, SweepResult);
+	//FComponentBeginOverlapSignature, UPrimitiveComponent, OnComponentBeginOverlap, UPrimitiveComponent*, OverlappedComponent, AActor*, OtherActor, UPrimitiveComponent*, OtherComp, int32, OtherBodyIndex, bool, bFromSweep, const FHitResult&, SweepResult);
 
 	UFUNCTION(BlueprintCallable)
 	void BeginOverlap(AActor* OtherActor);
+
+	UFUNCTION(BlueprintCallable)
+	void ComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
@@ -40,4 +42,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "AbilitySystem")
 	TSubclassOf<UGameplayEffect> DamageEffectClass;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
+	uint8 bRadialDamage : 1 = false;
 };

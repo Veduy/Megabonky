@@ -15,6 +15,8 @@
 AMgbEnemyCharacter::AMgbEnemyCharacter()
 {
 	CharacterAttributeSet = CreateDefaultSubobject<UCharacterAttributeSet>(TEXT("CharacterAttributeSet"));
+	
+	bReplicates = true;
 
 	// 스폰시 AIController가 있으면 유효한 위치로 강제 이동시킴.
 	// 스폰로직이 끝났을때, SpawnDefaultController(); 로 AIController 붙여줌.
@@ -112,7 +114,7 @@ void AMgbEnemyCharacter::MoveToTarget()
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Falling);
 
 		FVector GroundCheckStart = GetActorLocation() - FVector(0.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
-		FVector GroundCheckCheckEnd = GroundCheckStart + GetActorUpVector() * (GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * -1.2f);
+		FVector GroundCheckCheckEnd = GroundCheckStart + GetActorUpVector() * (GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * -0.1f);
 		TArray<TEnumAsByte<EObjectTypeQuery>> GroundCheckObjectTypes;
 		GroundCheckObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldStatic));
 
