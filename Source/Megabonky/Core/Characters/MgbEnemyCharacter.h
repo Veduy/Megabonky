@@ -23,6 +23,8 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attributes")
 	TObjectPtr<UCharacterAttributeSet> CharacterAttributeSet;
@@ -30,6 +32,9 @@ public:
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")
 	uint8 bSpawnFinished : 1 = false;
+
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite, Category = "Data")
+	TObjectPtr<AActor> TargetActor;
 
 	UPROPERTY()
 	float TargetSpawnHeight;

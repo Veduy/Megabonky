@@ -47,6 +47,10 @@ void AMgbGameStateBase::SpawnEnemy()
 		{
 			NET_LOG(FString::Printf(TEXT("Controller : %s"), *Iterator->Get()->GetName()));
 			APawn* Player = Iterator->Get()->GetPawn();
+			if (!Player)
+			{
+				return;
+			}
 		
 			// 일단은 0,0 (캐릭터의 좌표)좌표를 기준으로 원형태의 랜덤 방향을 구함.
 			float y = sinf(rand());
@@ -89,12 +93,13 @@ void AMgbGameStateBase::SpawnEnemy()
 				if (bResult)
 				{
 					float CapsuleHeight = Cast<ACharacter>(Player)->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
-					RealSpawnLocation = Hit.Location - CapsuleHeight;
+					RealSpawnLocation = FVector(Hit.Location.X, Hit.Location.Y, Hit.Location.Z - CapsuleHeight);
 				}
 
 				FActorSpawnParameters Params;
 				Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-				GetWorld()->SpawnActor<AActor>(EnemyClasses[0], RealSpawnLocation, FRotator::ZeroRotator, Params);				
+				AActor* SpawnedActor = GetWorld()->SpawnActor<AActor>(EnemyClasses[0], RealSpawnLocation, FRotator::ZeroRotator, Params);
+				Cast<AMgbEnemyCharacter>(SpawnedActor)->TargetActor = Player;
 			}
 		}
 	}
