@@ -26,6 +26,12 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 public:
+	UFUNCTION()
+	void MoveToTarget();
+
+	UFUNCTION()
+	void LookTarget();
+public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attributes")
 	TObjectPtr<UCharacterAttributeSet> CharacterAttributeSet;
 

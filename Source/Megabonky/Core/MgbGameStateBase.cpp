@@ -99,7 +99,11 @@ void AMgbGameStateBase::SpawnEnemy()
 				FActorSpawnParameters Params;
 				Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 				AActor* SpawnedActor = GetWorld()->SpawnActor<AActor>(EnemyClasses[0], RealSpawnLocation, FRotator::ZeroRotator, Params);
-				Cast<AMgbEnemyCharacter>(SpawnedActor)->TargetActor = Player;
+				AMgbEnemyCharacter* Enemy = Cast<AMgbEnemyCharacter>(SpawnedActor);
+				if (Enemy)
+				{
+					Enemy->TargetActor = Player;
+				}
 			}
 		}
 	}
