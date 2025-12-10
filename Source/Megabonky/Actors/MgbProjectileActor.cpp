@@ -10,7 +10,7 @@
 // Sets default values
 AMgbProjectileActor::AMgbProjectileActor()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile"));
 	ProjectileMovement->ProjectileGravityScale = 0.f;
@@ -22,6 +22,7 @@ AMgbProjectileActor::AMgbProjectileActor()
 void AMgbProjectileActor::BeginPlay()
 {
 	Super::BeginPlay();
+	SetActorTickEnabled(false);
 
 	SetLifeSpan(5.f);	
 }
@@ -35,9 +36,8 @@ void AMgbProjectileActor::Tick(float DeltaTime)
 
 void AMgbProjectileActor::BeginOverlap(AActor* OtherActor)
 {
-	if (Cast<APlayerController>(GetOwner()->GetOwner()))
+	if (!HasAuthority())
 	{
-		// Owner의 Owner가 플레이어 컨트롤인경우 데미지 처리 x 
 		return;
 	}
 
@@ -46,7 +46,7 @@ void AMgbProjectileActor::BeginOverlap(AActor* OtherActor)
 	{
 		FGameplayEffectContextHandle EffectContextHandle = TargetASC->MakeEffectContext();
 		EffectContextHandle.AddSourceObject(this);
-		EffectContextHandle.AddInstigator(GetOwner(), GetOwner());
+		EffectContextHandle.AddInstigator(GetOwner(), GetOwner()); 
 
 		check(DamageEffectClass);
 		FGameplayEffectSpecHandle EffectSpecHandle = TargetASC->MakeOutgoingSpec(DamageEffectClass, 1.f, EffectContextHandle);

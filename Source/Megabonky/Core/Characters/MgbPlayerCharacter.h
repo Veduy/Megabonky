@@ -8,13 +8,11 @@
 
 #include "MgbPlayerCharacter.generated.h"
 
-
 class USpringArmComponent;
 class UCameraComponent;
 class UInputAction;
 class UGameplayAbility;
 class AMgbWeapon;
-
 
 /**
  * 
@@ -27,11 +25,17 @@ class MEGABONKY_API AMgbPlayerCharacter : public AMgbCharacter
 public:
 	AMgbPlayerCharacter();
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	virtual void PossessedBy(AController* NewController) override;
 
 	virtual void BeginPlay() override;
+
+public:
+	UFUNCTION()
+	bool FindPrimaryTargetByCondition(AActor*& OutPrimaryTarget);
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")
@@ -42,22 +46,20 @@ public:
 
 public:
 	/** Gameplay Ability System */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
-	TArray<TSubclassOf<UGameplayAbility>> TestAbilities;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Data")
+	TSubclassOf<AMgbWeapon> DefaultWeaponClass;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapons")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Data")
 	TArray<TObjectPtr<AMgbWeapon>> Weapons;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attributes")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	TObjectPtr<UAttributeSet> CharacterAttributeSet;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attributes")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	TObjectPtr<UAttributeSet> PlayerAttributeSet;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attributes")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	TObjectPtr<UAttributeSet> WeaponAttributeSet;
-
-	TArray<FGameplayAbilitySpecHandle> Abilities;
 
 public:
 	UFUNCTION()

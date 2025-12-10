@@ -9,6 +9,7 @@
 #include "Camera/CameraComponent.h"
 #include "InputAction.h"
 #include "EnhancedInputComponent.h"
+#include "Net/UnrealNetwork.h"
 
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -16,6 +17,7 @@
 #include "../AbilitySystem/AttributeSet/CharacterAttributeSet.h"
 #include "../AbilitySystem/AttributeSet/PlayerAttributeSet.h"
 #include "../AbilitySystem/AttributeSet/WeaponAttributeSet.h"
+#include "../MgbWeapon.h"
 
 #include "../../Util/NetworkLog.h"
 
@@ -49,6 +51,12 @@ AMgbPlayerCharacter::AMgbPlayerCharacter()
 	WeaponAttributeSet = CreateDefaultSubobject<UWeaponAttributeSet>(TEXT("WeaponAttributeSet"));
 }
 
+void AMgbPlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+}
+
 void AMgbPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -80,29 +88,60 @@ void AMgbPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (DefaultWeaponClass)
+	{
+		AMgbWeapon* SpawnedWeapon = Cast<AMgbWeapon>(GetWorld()->SpawnActor(DefaultWeaponClass));
+		SpawnedWeapon->SetOwner(this);
+		Weapons.Add(SpawnedWeapon);
+	}
 
-	// <TEST> 모든 어빌리티 Activate
+	// 모든 Weapon의 어빌리티 Activate
 	float AttackSpeed = GetAbilitySystemComponent()->GetNumericAttribute(UPlayerAttributeSet::GetAttackSpeedAttribute());
-	NET_LOG(FString::Printf(TEXT("AttackSpeed: %f"), AttackSpeed));
 
 	// 	UE_API void GetAllAbilities(TArray<FGameplayAbilitySpecHandle>& OutAbilityHandles) const;
 	FTimerHandle ActivateAbilityHandle;
 	GetWorld()->GetTimerManager().SetTimer(ActivateAbilityHandle,
 		[this]()
 		{
-			GetAbilitySystemComponent()->GetAllAbilities(Abilities);
-
-			if (!Abilities.IsEmpty())
+			for (const auto& Weapon : Weapons)
 			{
-				for (const auto& Ability : Abilities)
-				{
-					GetAbilitySystemComponent()->TryActivateAbility(Ability);
-				}
+				Weapon->GetAbilitySystemComponent()->TryActivateAbilityByClass(Weapon->AbilityClass);
 			}
 		},
 		AttackSpeed,
 		true,
 		1.f);
+}
+
+bool AMgbPlayerCharacter::FindPrimaryTargetByCondition(AActor*& OutPrimaryTarget)
+{
+	// 일정 범위내에 액터들 중에서 거리만 판별해서, 최단거리 액터를 타겟으로 설정.
+	FVector Start = GetActorLocation();
+	FVector End = Start;
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_GameTraceChannel1));
+	TArray<AActor*> ActorsToIgnore;
+	TArray<FHitResult> Hits;
+
+	bool bResult = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(),
+		Start, End, 1000.f, ObjectTypes, false, ActorsToIgnore,
+		EDrawDebugTrace::ForDuration, Hits, true, FLinearColor::Red, FLinearColor::Green, 2.f);
+
+	if (bResult)
+	{
+		float ClosestDistance = MAX_FLT;
+		for (const auto& Hit : Hits)
+		{
+			if (Hit.Distance < ClosestDistance)
+			{
+				ClosestDistance = Hit.Distance;
+				OutPrimaryTarget = Hit.GetActor();
+			}
+		}
+		return true;
+	}
+
+	return false;
 }
 
 void AMgbPlayerCharacter::Move(const FInputActionValue& Value)

@@ -6,12 +6,31 @@
 #include "Kismet/GameplayStatics.h"
 #include "../../../Actors/MgbProjectileActor.h"
 
+#include "../../../Util/NetworkLog.h"
+#include "../../Characters/MgbPlayerCharacter.h"
+
 void UMgbGameplayAbility_Projectile::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	FTransform SpawnTransform = FTransform(FVector(0.f, 0.f, 0.f));
+	// Avatar = Weapon Actor
+	AActor* Avatar = ActorInfo->AvatarActor.Get();
+
+	// Player
+	AActor* Player = Avatar->GetOwner();
+
+	//Avatar->GetOwner();
+	FVector SpawnLocation;
+	FVector SpawnDirection;
+	
+	if (Player)
+	{
+		SpawnLocation = Player->GetActorLocation();
+		SpawnDirection = Player->GetActorForwardVector();
+	}
+
+	FTransform SpawnTransform = FTransform(SpawnDirection.Rotation(), SpawnLocation, FVector(1.f,1.f,1.f));
 	AMgbProjectileActor* SpawnedProjectile = GetWorld()->SpawnActorDeferred<AMgbProjectileActor>(
 		ProjectileClass,
 		SpawnTransform, 

@@ -31,6 +31,12 @@ void AMgbEnemyCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	TargetSpawnHeight = GetActorLocation().Z + GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 2.f;
+
+	UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
+	if (IsValid(ASC))
+	{
+		ASC->InitAbilityActorInfo(this, this);
+	}
 }
 
 void AMgbEnemyCharacter::Tick(float DeltaTime)
@@ -136,7 +142,10 @@ void AMgbEnemyCharacter::MoveToTarget()
 
 void AMgbEnemyCharacter::LookTarget()
 {
-	FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetActor->GetActorLocation());
-	FRotator LookRotation = FRotator(GetActorRotation().Pitch, TargetRotation.Yaw, GetActorRotation().Roll);
-	SetActorRotation(LookRotation);
+	if (TargetActor)
+	{
+		FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetActor->GetActorLocation());
+		FRotator LookRotation = FRotator(GetActorRotation().Pitch, TargetRotation.Yaw, GetActorRotation().Roll);
+		SetActorRotation(LookRotation);
+	}
 }

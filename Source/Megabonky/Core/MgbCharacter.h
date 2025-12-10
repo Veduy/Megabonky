@@ -27,6 +27,6 @@ public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 public:
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Abilities")
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Data")
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 };

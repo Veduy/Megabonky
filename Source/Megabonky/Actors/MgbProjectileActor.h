@@ -31,7 +31,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void BeginOverlap(AActor* OtherActor);
-	
+
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
@@ -39,4 +39,5 @@ public:
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "AbilitySystem")
 	TSubclassOf<UGameplayEffect> DamageEffectClass;
+
 };

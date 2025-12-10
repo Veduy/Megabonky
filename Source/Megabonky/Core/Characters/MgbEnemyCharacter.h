@@ -31,8 +31,9 @@ public:
 
 	UFUNCTION()
 	void LookTarget();
+
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Attributes")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	TObjectPtr<UCharacterAttributeSet> CharacterAttributeSet;
 
 public:
