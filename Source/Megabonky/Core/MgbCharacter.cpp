@@ -50,7 +50,25 @@ float AMgbCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEv
 
 	if (DamageEvent.IsOfType(FDamageEvent::ClassID))
 	{
-		AMgbWeapon* Weapon = Cast<AMgbWeapon>(DamageCauser);
+		AMgbWeapon* SourceWeapon = Cast<AMgbWeapon>(DamageCauser);
+		AMgbCharacter* SourceCharacter = Cast<AMgbCharacter>(EventInstigator->GetPawn());
+
+		if (SourceWeapon)
+		{
+			FGameplayEffectContextHandle EffectContextHandle = SourceWeapon->GetAbilitySystemComponent()->MakeEffectContext();
+			EffectContextHandle.AddSourceObject(SourceWeapon);
+			EffectContextHandle.AddInstigator(SourceWeapon, EventInstigator);
+
+			if (SourceWeapon->DamageEffectClass)
+			{
+				// Spec을 생성한 컴포넌트가 ExecCalc의 Source로 설정.
+				FGameplayEffectSpecHandle EffectSpecHandle = SourceWeapon->GetAbilitySystemComponent()->MakeOutgoingSpec(SourceWeapon->DamageEffectClass, 1.f, EffectContextHandle);
+
+				SourceWeapon->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*EffectSpecHandle.Data.Get(), AbilitySystemComponent);
+			}
+		}
+
+		/*AMgbWeapon* Weapon = Cast<AMgbWeapon>(DamageCauser);
 		if (Weapon)
 		{
 			//GameplayEffect 에서 Custom Calculation -> 내부에서 캐릭터, 무기의 Attribute정보로 데미지 계산.
@@ -60,14 +78,11 @@ float AMgbCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEv
 			
 			if (Weapon->DamageEffectClass)
 			{
-				FGameplayEffectSpecHandle EffectSpecHandle = AbilitySystemComponent->MakeOutgoingSpec(Weapon->DamageEffectClass, 1.f, EffectContextHandle);
-
-
+				FGameplayEffectSpecHandle EffectSpecHandle = AbilitySystemComponent->MakeOutgoingSpec(Weapon->DamageEffectClass,1.f,EffectContextHandle);
 				
 				AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
-				NET_LOG(FString::Printf(TEXT("ApplyEffectToSelf")));
 			}
-		}
+		}*/
 	}
 	else if (DamageEvent.IsOfType(FRadialDamageEvent::ClassID))
 	{	

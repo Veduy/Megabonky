@@ -7,6 +7,9 @@
 #include "AttributeSet/PlayerAttributeSet.h"
 #include "AttributeSet/WeaponAttributeSet.h"
 
+#include "../Characters/MgbPlayerCharacter.h"
+#include "../MgbWeapon.h"
+
 #include "../../Util/NetworkLog.h"
 
 UMgbEffectExecutionCalculation::UMgbEffectExecutionCalculation(const FObjectInitializer& ObjectInitializer)
@@ -20,15 +23,16 @@ UMgbEffectExecutionCalculation::UMgbEffectExecutionCalculation(const FObjectInit
 	// ->CritChance
 	// ->CritDamage
 
-	DEFINE_ATTRIBUTE_CAPTUREDEF(UWeaponAttributeSet, Damage, Source, false);
-
 	// PlayerCharacter->WeaponAttributeset
 	// ->Damage
 	// ->CritChance
 	// ->CritDamage
 	// ->DamageToElite
-	
-	
+
+	// Source가 누구지.
+
+	DEFINE_ATTRIBUTE_CAPTUREDEF(UWeaponAttributeSet, Damage, Source, false);
+
 	// Target -> EnemyCharacter
 	DEFINE_ATTRIBUTE_CAPTUREDEF(UCharacterAttributeSet, Health, Target, false);
 
@@ -39,15 +43,23 @@ UMgbEffectExecutionCalculation::UMgbEffectExecutionCalculation(const FObjectInit
 
 void UMgbEffectExecutionCalculation::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
 {	
+	// SourceObj(Weapon) Player의 Attribute값 정보 가져와서 계산.
+	UObject* SourceObj = ExecutionParams.GetOwningSpec().GetEffectContext().GetSourceObject();
+	//AMgbPlayerCharacter* PlayerCharacter = Cast<AMgbPlayerCharacter>(SourceObj);
+	AMgbWeapon* Weapon = Cast<AMgbWeapon>(SourceObj);
+	AMgbPlayerCharacter* PlayerCharacter = Cast<AMgbPlayerCharacter>(Weapon->GetOwner());
+
 	FAggregatorEvaluateParameters EvaluatedParams;
 
 	EvaluatedParams.SourceTags = ExecutionParams.GetOwningSpec().CapturedSourceTags.GetAggregatedTags();
 	EvaluatedParams.TargetTags = ExecutionParams.GetOwningSpec().CapturedTargetTags.GetAggregatedTags();
 
-	float Damage = 0.f;
-	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageDef, EvaluatedParams, Damage);
+	float PlayerDamage = 0.f;
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageDef, EvaluatedParams, PlayerDamage);
+
+	float TotalDamage = 0.f;
 
 	return OutExecutionOutput.AddOutputModifier(
-		FGameplayModifierEvaluatedData(UCharacterAttributeSet::GetHealthAttribute(), EGameplayModOp::Additive, -Damage));
+		FGameplayModifierEvaluatedData(UCharacterAttributeSet::GetHealthAttribute(), EGameplayModOp::Additive, -TotalDamage));
 
 }
