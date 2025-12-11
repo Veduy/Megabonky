@@ -18,9 +18,6 @@ class MEGABONKY_API UMgbGameplayAbility_Projectile : public UMgbGameplayAbility
 public:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, 
 		const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
-
-public:
-	//void 
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")

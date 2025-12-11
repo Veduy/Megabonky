@@ -38,10 +38,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
 
-public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "AbilitySystem")
-	TSubclassOf<UGameplayEffect> DamageEffectClass;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
 	uint8 bRadialDamage : 1 = false;
 };

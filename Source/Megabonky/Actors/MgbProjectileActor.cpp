@@ -47,7 +47,7 @@ void AMgbProjectileActor::BeginOverlap(AActor* OtherActor)
 		return;
 	}
 
-	// GetOwner() : WeaponActor;
+	// GetOwner() = WeaponActor;
 
 	APlayerController* PlayerController = Cast<APlayerController>(GetOwner()->GetOwner()->GetOwner());
 
@@ -66,20 +66,6 @@ void AMgbProjectileActor::BeginOverlap(AActor* OtherActor)
 			//UGameplayStatics::ApplyRadialDamageWithFalloff();
 		}
 	}
-
-	// OtherActor를 기준으로 
-
-	//UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor);
-	//if (TargetASC)
-	//{
-	//	FGameplayEffectContextHandle EffectContextHandle = TargetASC->MakeEffectContext();
-	//	EffectContextHandle.AddSourceObject(this);
-	//	EffectContextHandle.AddInstigator(GetOwner(), GetOwner()); 
-
-	//	check(DamageEffectClass);
-	//	FGameplayEffectSpecHandle EffectSpecHandle = TargetASC->MakeOutgoingSpec(DamageEffectClass, 1.f, EffectContextHandle);
-	//	TargetASC->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data.Get());
-	//}
 }
 
 void AMgbProjectileActor::ComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
