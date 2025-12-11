@@ -12,7 +12,24 @@
 UMgbEffectExecutionCalculation::UMgbEffectExecutionCalculation(const FObjectInitializer& ObjectInitializer)
 	:Super(ObjectInitializer)
 {
+	// Onwership
+	// GameplayEffect
+
+	// Source(Weapon) = WeaponAttributeset
+	// ->Damage
+	// ->CritChance
+	// ->CritDamage
+
 	DEFINE_ATTRIBUTE_CAPTUREDEF(UWeaponAttributeSet, Damage, Source, false);
+
+	// PlayerCharacter->WeaponAttributeset
+	// ->Damage
+	// ->CritChance
+	// ->CritDamage
+	// ->DamageToElite
+	
+	
+	// Target -> EnemyCharacter
 	DEFINE_ATTRIBUTE_CAPTUREDEF(UCharacterAttributeSet, Health, Target, false);
 
 	// Execution calculation uses these captures
@@ -21,13 +38,7 @@ UMgbEffectExecutionCalculation::UMgbEffectExecutionCalculation(const FObjectInit
 }
 
 void UMgbEffectExecutionCalculation::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
-{
-	NET_LOG("");
-
-	//FGameplayEffectAttributeCaptureSpecContainer SpecContainer = ExecutionParams.GetOwningSpec().CapturedRelevantAttributes;
-
-	//bool FGameplayEffectCustomExecutionParameters::AttemptCalculateCapturedAttributeMagnitude(const FGameplayEffectAttributeCaptureDefinition & InCaptureDef, const FAggregatorEvaluateParameters & InEvalParams, OUT float& OutMagnitude) const
-	
+{	
 	FAggregatorEvaluateParameters EvaluatedParams;
 
 	EvaluatedParams.SourceTags = ExecutionParams.GetOwningSpec().CapturedSourceTags.GetAggregatedTags();
@@ -35,10 +46,6 @@ void UMgbEffectExecutionCalculation::Execute_Implementation(const FGameplayEffec
 
 	float Damage = 0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageDef, EvaluatedParams, Damage);
-	
-	NET_LOG(FString::Printf(TEXT("Source Damage Attribute: %f"), Damage));
-
-	UE_LOG(LogTemp, Warning, TEXT("Damage: %f"), Damage);
 
 	return OutExecutionOutput.AddOutputModifier(
 		FGameplayModifierEvaluatedData(UCharacterAttributeSet::GetHealthAttribute(), EGameplayModOp::Additive, -Damage));

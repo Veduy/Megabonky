@@ -8,7 +8,7 @@
 
 UPlayerAttributeSet::UPlayerAttributeSet()
 {
-	InitAttackSpeed(1.f);
+
 }
 
 void UPlayerAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

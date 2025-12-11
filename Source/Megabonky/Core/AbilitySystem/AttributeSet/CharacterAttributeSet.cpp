@@ -8,8 +8,7 @@
 
 UCharacterAttributeSet::UCharacterAttributeSet()
 {
-	InitMaxHealth(100);
-	InitHealth(100);
+
 }
 
 void UCharacterAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
