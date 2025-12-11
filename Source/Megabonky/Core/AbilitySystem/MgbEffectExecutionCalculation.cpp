@@ -3,6 +3,7 @@
 
 #include "MgbEffectExecutionCalculation.h"
 
+#include "../AbilitySystem/MgbAbilitySystemComponent.h"
 #include "AttributeSet/CharacterAttributeSet.h"
 #include "AttributeSet/PlayerAttributeSet.h"
 #include "AttributeSet/WeaponAttributeSet.h"
@@ -15,50 +16,56 @@
 UMgbEffectExecutionCalculation::UMgbEffectExecutionCalculation(const FObjectInitializer& ObjectInitializer)
 	:Super(ObjectInitializer)
 {
-	// Onwership
-	// GameplayEffect
-
-	// Source(Weapon) = WeaponAttributeset
-	// ->Damage
-	// ->CritChance
-	// ->CritDamage
-
-	// PlayerCharacter->WeaponAttributeset
-	// ->Damage
-	// ->CritChance
-	// ->CritDamage
-	// ->DamageToElite
-
-	// Source가 누구지.
-
+	// Source (Weapon)
 	DEFINE_ATTRIBUTE_CAPTUREDEF(UWeaponAttributeSet, Damage, Source, false);
-
-	// Target -> EnemyCharacter
+	DEFINE_ATTRIBUTE_CAPTUREDEF(UWeaponAttributeSet, CritChance, Source, false);
+	DEFINE_ATTRIBUTE_CAPTUREDEF(UWeaponAttributeSet, CritDamage, Source, false);
+	
+	// Target (EnemyCharacter)
 	DEFINE_ATTRIBUTE_CAPTUREDEF(UCharacterAttributeSet, Health, Target, false);
 
-	// Execution calculation uses these captures
 	RelevantAttributesToCapture.Add(DamageDef);
+	RelevantAttributesToCapture.Add(CritChanceDef);
+	RelevantAttributesToCapture.Add(CritDamageDef);
+
 	RelevantAttributesToCapture.Add(HealthDef);
 }
 
 void UMgbEffectExecutionCalculation::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
 {	
-	// SourceObj(Weapon) Player의 Attribute값 정보 가져와서 계산.
+	// SourceObj(Weapon)->Owner(Player)의 Attribute값 필요.
 	UObject* SourceObj = ExecutionParams.GetOwningSpec().GetEffectContext().GetSourceObject();
-	//AMgbPlayerCharacter* PlayerCharacter = Cast<AMgbPlayerCharacter>(SourceObj);
 	AMgbWeapon* Weapon = Cast<AMgbWeapon>(SourceObj);
 	AMgbPlayerCharacter* PlayerCharacter = Cast<AMgbPlayerCharacter>(Weapon->GetOwner());
 
 	FAggregatorEvaluateParameters EvaluatedParams;
-
 	EvaluatedParams.SourceTags = ExecutionParams.GetOwningSpec().CapturedSourceTags.GetAggregatedTags();
 	EvaluatedParams.TargetTags = ExecutionParams.GetOwningSpec().CapturedTargetTags.GetAggregatedTags();
 
-	float PlayerDamage = 0.f;
-	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageDef, EvaluatedParams, PlayerDamage);
+	float WeaponDamage = 0.f;
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageDef, EvaluatedParams, WeaponDamage);
+
+	float WeaponCritChance = 0.f;
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(CritChanceDef, EvaluatedParams, WeaponCritChance);
+
+	float WeaponCritDamage = 0.f;
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(CritDamageDef, EvaluatedParams, WeaponCritDamage);
+
+	float PlayerDamage = 0.f; //
+	UAbilitySystemComponent* ASC = PlayerCharacter->GetAbilitySystemComponent();
+	PlayerDamage = PlayerCharacter->GetAbilitySystemComponent()->GetNumericAttribute(UWeaponAttributeSet::GetDamageAttribute());
+
+	float PlayerCritChance = 0.f;
+	PlayerCritChance = PlayerCharacter->GetAbilitySystemComponent()->GetNumericAttribute(UWeaponAttributeSet::GetCritChanceAttribute());
+	
+	float PlayerCritDamage = 0.f;
+	PlayerCritDamage = PlayerCharacter->GetAbilitySystemComponent()->GetNumericAttribute(UWeaponAttributeSet::GetCritDamageAttribute());
+
+	float PlayerDamageToElite = 0.f;
+	PlayerDamageToElite = PlayerCharacter->GetAbilitySystemComponent()->GetNumericAttribute(UPlayerAttributeSet::GetDamageToElitesAttribute());
+
 
 	float TotalDamage = 0.f;
-
 	return OutExecutionOutput.AddOutputModifier(
 		FGameplayModifierEvaluatedData(UCharacterAttributeSet::GetHealthAttribute(), EGameplayModOp::Additive, -TotalDamage));
 

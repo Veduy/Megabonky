@@ -54,12 +54,11 @@ AMgbPlayerCharacter::AMgbPlayerCharacter()
 void AMgbPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	NET_LOG("");
 }
+
 void AMgbPlayerCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
-	NET_LOG("");
 
 	UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
 	if (IsValid(ASC))
@@ -132,7 +131,6 @@ void AMgbPlayerCharacter::ActivateWeaponsAbility()
 	// 모든 Weapon의 어빌리티 Activate
 	float AttackSpeed = GetAbilitySystemComponent()->GetNumericAttribute(UPlayerAttributeSet::GetAttackSpeedAttribute());
 	// 	UE_API void GetAllAbilities(TArray<FGameplayAbilitySpecHandle>& OutAbilityHandles) const;
-	FTimerHandle ActivateAbilityHandle;
 	GetWorld()->GetTimerManager().SetTimer(ActivateAbilityHandle,
 		[this]()
 		{
@@ -141,7 +139,7 @@ void AMgbPlayerCharacter::ActivateWeaponsAbility()
 				Weapon->GetAbilitySystemComponent()->TryActivateAbilityByClass(Weapon->AbilityClass);
 			}
 		},
-		AttackSpeed,
+		AttackSpeed * 0.01f,
 		true,
 		1.f);
 }

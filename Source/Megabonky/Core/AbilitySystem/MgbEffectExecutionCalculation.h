@@ -17,9 +17,19 @@
 	P##Def = FGameplayEffectAttributeCaptureDefinition(P##Property, EGameplayEffectAttributeCaptureSource::T, B); \
 }
 
-/**
- * 
- */
+// Source(Weapon)
+// ->Damage		//정수
+// ->CritChance
+// ->CritDamage
+
+// PlayerCharacter (Weapon->Owner)
+// ->Damage		//배율
+// ->CritChance	//퍼센트
+// ->CritDamage	//
+// ->DamageToElite
+
+// Target(Enemy)
+// ->Health
 
 UCLASS()
 class MEGABONKY_API UMgbEffectExecutionCalculation : public UGameplayEffectExecutionCalculation
@@ -33,7 +43,10 @@ public:
 	virtual void Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const override;
 
 public:
-	DECLARE_ATTRIBUTE_CAPTUREDEF(Health);
 	DECLARE_ATTRIBUTE_CAPTUREDEF(Damage);
+	DECLARE_ATTRIBUTE_CAPTUREDEF(CritChance);
+	DECLARE_ATTRIBUTE_CAPTUREDEF(CritDamage);
+
+	DECLARE_ATTRIBUTE_CAPTUREDEF(Health);
 
 };

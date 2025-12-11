@@ -5,11 +5,12 @@
 #include "CoreMinimal.h"
 #include "MgbGameplayAbility.h"
 #include "MgbGameplayAbility_Projectile.generated.h"
-
+  
 class AMgbProjectileActor;
 /**
- * 
+ *
  */
+
 UCLASS()
 class MEGABONKY_API UMgbGameplayAbility_Projectile : public UMgbGameplayAbility
 {

@@ -34,9 +34,6 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 public:
-
-
-public:
 	UFUNCTION()
 	bool FindPrimaryTargetByCondition(AActor*& OutPrimaryTarget);
 
@@ -54,7 +51,6 @@ public:
 	TObjectPtr<UCameraComponent> MainCamera;
 
 public:
-	/** Gameplay Ability System */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Data")
 	TSubclassOf<AMgbWeapon> DefaultWeaponClass;
 
@@ -69,6 +65,8 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	TObjectPtr<UAttributeSet> WeaponAttributeSet;
+
+	FTimerHandle ActivateAbilityHandle;
 
 public:
 	UFUNCTION()
@@ -85,5 +83,4 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input", meta=(DisplayName = "IA_Jump"))
 	TObjectPtr<UInputAction> JumpAction;
-
 };
