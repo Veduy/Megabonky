@@ -34,7 +34,7 @@ public:
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 
 public:
-	// 캐릭터 초기 Attribute 값 적용할 GameplayEffect.
+	// 초기 Attribute 값 적용할 GameplayEffect.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
 	TSubclassOf<UGameplayEffect> InitAttributeEffect;
 };

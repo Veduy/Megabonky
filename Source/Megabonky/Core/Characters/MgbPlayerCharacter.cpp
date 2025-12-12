@@ -14,9 +14,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "../AbilitySystem/MgbAbilitySystemComponent.h"
-#include "../AbilitySystem/AttributeSet/CharacterAttributeSet.h"
 #include "../AbilitySystem/AttributeSet/PlayerAttributeSet.h"
-#include "../AbilitySystem/AttributeSet/WeaponAttributeSet.h"
 #include "../MgbWeapon.h"
 
 #include "../../Util/NetworkLog.h"
@@ -46,9 +44,7 @@ AMgbPlayerCharacter::AMgbPlayerCharacter()
 	MainCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	MainCamera->SetupAttachment(SpringArm);
 
-	CharacterAttributeSet = CreateDefaultSubobject<UCharacterAttributeSet>(TEXT("CharacterAttributeSet"));
 	PlayerAttributeSet = CreateDefaultSubobject<UPlayerAttributeSet>(TEXT("PlayerAttributeSet"));
-	WeaponAttributeSet = CreateDefaultSubobject<UWeaponAttributeSet>(TEXT("WeaponAttributeSet"));
 }
 
 void AMgbPlayerCharacter::BeginPlay()

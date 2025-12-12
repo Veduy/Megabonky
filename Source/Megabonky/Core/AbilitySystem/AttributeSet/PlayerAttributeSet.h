@@ -32,6 +32,13 @@ public:
 	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
 
 public:	
+
+	UFUNCTION()
+	virtual void OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth);
+
+	UFUNCTION()
+	virtual void OnRep_Health(const FGameplayAttributeData& OldHealth);
+
 	UFUNCTION()
 	virtual void OnRep_HealthRegen(const FGameplayAttributeData& OldHealthRegen);
 
@@ -57,10 +64,48 @@ public:
 	virtual void OnRep_Thorns(const FGameplayAttributeData& OldHealth);
 
 	UFUNCTION()
+	virtual void OnRep_Damage(const FGameplayAttributeData& OldDamage);
+
+	UFUNCTION()
+	virtual void OnRep_CritChance(const FGameplayAttributeData& OldCritChance);
+
+	UFUNCTION()
+	virtual void OnRep_CritDamage(const FGameplayAttributeData& OldCritDamage);
+
+	UFUNCTION()
 	virtual void OnRep_AttackSpeed(const FGameplayAttributeData& OldAttackSpeed);
 
 	UFUNCTION()
+	virtual void OnRep_ProjectileCount(const FGameplayAttributeData& OldProjectileCount);
+
+	UFUNCTION()
+	virtual void OnRep_ProjectileBounces(const FGameplayAttributeData& OldProjectileBounces);
+
+	/// <summary>
+	/// 
+	/// </summary>
+	
+	UFUNCTION()
+	virtual void OnRep_Size(const FGameplayAttributeData& OldSize);
+
+	UFUNCTION()
+	virtual void OnRep_ProjectileSpeed(const FGameplayAttributeData& OldProjectileSpeed);
+
+	UFUNCTION()
+	virtual void OnRep_Duration(const FGameplayAttributeData& OldDuration);
+	
+	UFUNCTION()
 	virtual void OnRep_DamageToElites(const FGameplayAttributeData& OldDamageToElites);
+
+	UFUNCTION()
+	virtual void OnRep_Knockback(const FGameplayAttributeData& OldKnockback);
+
+	UFUNCTION()
+	virtual void OnRep_MovementSpeed(const FGameplayAttributeData& OldMovementSpeed);
+
+	/// <summary>
+	/// 
+	/// </summary>
 
 	UFUNCTION()
 	virtual void OnRep_ExtraJumps(const FGameplayAttributeData& OldExtraJumps);
@@ -73,6 +118,10 @@ public:
 
 	UFUNCTION()
 	virtual void OnRep_Difficulty(const FGameplayAttributeData& OldDifficulty);
+
+	/// <summary>
+	/// 
+	/// </summary>
 
 	UFUNCTION()
 	virtual void OnRep_Pickup(const FGameplayAttributeData& OldPickup);
@@ -96,14 +145,22 @@ public:
 	virtual void OnRep_PowerupDropChance(const FGameplayAttributeData& OldPowerupDropChance);
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_MaxHealth)
+	FGameplayAttributeData MaxHealth;
+	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, MaxHealth);
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_Health)
+	FGameplayAttributeData Health;
+	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, Health);
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_HealthRegen)
 	FGameplayAttributeData HealthRegen;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, HealthRegen);
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_OverHeal)
 	FGameplayAttributeData OverHeal;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, OverHeal);
-
+		
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_MaxShield)
 	FGameplayAttributeData MaxShield;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, MaxShield);
@@ -127,14 +184,62 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_Thorns)
 	FGameplayAttributeData Thorns;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, Thorns);
-	
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_Damage)
+	FGameplayAttributeData Damage;
+	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, Damage);
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_CritChance)
+	FGameplayAttributeData CritChance;
+	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, CritChance);
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_CritDamage)
+	FGameplayAttributeData CritDamage;
+	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, CritDamage);
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_AttackSpeed)
 	FGameplayAttributeData AttackSpeed;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, AttackSpeed);
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_ProjectileCount)
+	FGameplayAttributeData ProjectileCount;
+	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, ProjectileCount);
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_ProjectileBounces)
+	FGameplayAttributeData ProjectileBounces;
+	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, ProjectileBounces);
+
+	/// <summary>
+	/// 
+	/// </summary>
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_Size)
+	FGameplayAttributeData Size;
+	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, Size);
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_ProjectileSpeed)
+	FGameplayAttributeData ProjectileSpeed;
+	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, ProjectileSpeed);
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_Duration)
+	FGameplayAttributeData Duration;
+	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, Duration);
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_DamageToElites)
 	FGameplayAttributeData DamageToElites;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, DamageToElites);
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_Knockback)
+	FGameplayAttributeData Knockback;
+	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, Knockback);
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_MovementSpeed)
+	FGameplayAttributeData MovementSpeed;
+	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, MovementSpeed);
+
+	/// <summary>
+	/// 
+	/// </summary>
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_ExtraJumps)
 	FGameplayAttributeData ExtraJumps;
@@ -151,6 +256,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_Difficulty)
 	FGameplayAttributeData Difficulty;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, Difficulty);
+
+	/// <summary>
+	/// 
+	/// </summary>
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_Pickup)
 	FGameplayAttributeData Pickup;

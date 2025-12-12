@@ -58,13 +58,7 @@ public:
 	TArray<TObjectPtr<AMgbWeapon>> Weapons;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
-	TObjectPtr<UAttributeSet> CharacterAttributeSet;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	TObjectPtr<UAttributeSet> PlayerAttributeSet;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
-	TObjectPtr<UAttributeSet> WeaponAttributeSet;
 
 	FTimerHandle ActivateAbilityHandle;
 
