@@ -94,5 +94,4 @@ void UMgbEffectExecutionCalculation::Execute_Implementation(const FGameplayEffec
 
 	return OutExecutionOutput.AddOutputModifier(
 		FGameplayModifierEvaluatedData(UCharacterAttributeSet::GetHealthAttribute(), EGameplayModOp::Additive, -TotalDamage));
-
 }

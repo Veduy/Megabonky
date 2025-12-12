@@ -32,7 +32,7 @@
  * 
  */
 
-UCLASS()
+UCLASS(Blueprintable)
 class MEGABONKY_API UMgbGameplayAbility : public UGameplayAbility
 {
 	GENERATED_BODY()

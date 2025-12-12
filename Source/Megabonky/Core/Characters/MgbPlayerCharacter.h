@@ -43,6 +43,9 @@ public:
 	UFUNCTION()
 	void ActivateWeaponsAbility();
 
+	//UFUNCTION()
+	//void ActivateWeapons();
+
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<USpringArmComponent> SpringArm;

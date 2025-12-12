@@ -135,7 +135,7 @@ void AMgbPlayerCharacter::ActivateWeaponsAbility()
 				Weapon->GetAbilitySystemComponent()->TryActivateAbilityByClass(Weapon->AbilityClass);
 			}
 		},
-		AttackSpeed * 0.01f,
+		2.f,	//(AttackSpeed / 100.f) + 1,
 		true,
 		1.f);
 }
