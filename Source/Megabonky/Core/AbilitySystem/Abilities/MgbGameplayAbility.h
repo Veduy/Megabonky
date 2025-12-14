@@ -28,9 +28,6 @@
 //	
 // ----------------------------------------------------------------------------------------------------------------
 
-/**
- * 
- */
 
 UCLASS(Blueprintable)
 class MEGABONKY_API UMgbGameplayAbility : public UGameplayAbility

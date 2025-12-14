@@ -46,10 +46,12 @@ void AMgbPlayerController::OnPossess(APawn* aPawn)
 		}
 	}
 	
+	// 烙矫 公扁 积己 内靛
 	AMgbPlayerCharacter* PlayerCharacter = Cast<AMgbPlayerCharacter>(aPawn);
 	if (PlayerCharacter)
 	{
 		PlayerCharacter->SpawnDefaultWeapon();
+
 		PlayerCharacter->ActivateWeaponsAbility();
 	}
 }

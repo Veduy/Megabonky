@@ -30,6 +30,8 @@ void AMgbWeapon::BeginPlay()
 	{
 		FGameplayAbilitySpec AbilitySpec = AbilitySystemComponent->BuildAbilitySpecFromClass(AbilityClass);
 		AbilitySystemComponent->GiveAbility(AbilitySpec);
+
+		//AbilitySystemComponent->TryActivateAbilityByClass(AbilityClass);
 	}
 }
 

@@ -20,13 +20,18 @@ public:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, 
 		const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 	
+public:
+	UFUNCTION(BlueprintCallable)
+	void RapidFire();
+
+public:
 	void SpawnProjectile(AActor* Owner, const FVector& InSpawnOrigin, const FVector& InSpawnDir);
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
 	TSubclassOf<AMgbProjectileActor> ProjectileClass;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Projectile");
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data");
 	uint8 SpawnProjectileCount = 1;
 
 	uint8 TempSpawnCount = 0;

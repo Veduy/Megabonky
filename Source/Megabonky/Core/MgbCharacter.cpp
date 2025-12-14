@@ -30,7 +30,7 @@ void AMgbCharacter::BeginPlay()
 	USkeletalMeshComponent* MeshComp = GetMesh();
 	MeshComp->bEnableUpdateRateOptimizations = true;
 	MeshComp->AnimUpdateRateParams->bShouldUseLodMap = true;
-	MeshComp->ForcedLodModel = 2;
+	MeshComp->SetForcedLOD(2);
 	MeshComp->AnimUpdateRateParams->MaxEvalRateForInterpolation = 0;
 	MeshComp->AnimUpdateRateParams->LODToFrameSkipMap.Add(0, 10);
 	MeshComp->AnimUpdateRateParams->LODToFrameSkipMap.Add(1, 10);
