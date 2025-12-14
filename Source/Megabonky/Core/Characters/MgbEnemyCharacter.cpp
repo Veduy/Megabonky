@@ -26,6 +26,7 @@ AMgbEnemyCharacter::AMgbEnemyCharacter()
 	GetCharacterMovement()->MaxAcceleration = 500.f;
 	GetCharacterMovement()->GroundFriction = 100.f;
 	GetCharacterMovement()->MaxStepHeight = 1000.f;
+
 }
 
 void AMgbEnemyCharacter::BeginPlay()

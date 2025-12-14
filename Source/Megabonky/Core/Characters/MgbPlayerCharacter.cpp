@@ -35,15 +35,17 @@ AMgbPlayerCharacter::AMgbPlayerCharacter()
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArm->SetupAttachment(RootComponent);
 	SpringArm->SetRelativeLocation(FVector(0.f, 0.f, 90.f));
-	SpringArm->bEnableCameraLag = true;
+	SpringArm->bEnableCameraLag = false;
 	SpringArm->bEnableCameraRotationLag = true;
 	SpringArm->CameraLagSpeed = 0.f;
-	SpringArm->CameraRotationLagSpeed = 10.f;
+	SpringArm->CameraRotationLagSpeed = 15.f;
 	SpringArm->CameraLagMaxDistance = 0.f;
+	SpringArm->bClampToMaxPhysicsDeltaTime = false;
+	SpringArm->bUseCameraLagSubstepping = false;
 
 	MainCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	MainCamera->SetupAttachment(SpringArm);
-
+	
 	PlayerAttributeSet = CreateDefaultSubobject<UPlayerAttributeSet>(TEXT("PlayerAttributeSet"));
 }
 
@@ -61,7 +63,7 @@ void AMgbPlayerCharacter::PossessedBy(AController* NewController)
 	{
 		ASC->InitAbilityActorInfo(this, this);
 	}
-}
+} 
 
 void AMgbPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {

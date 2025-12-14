@@ -60,7 +60,7 @@ void AMgbGameStateBase::SpawnEnemy()
 			FVector2D Location = Dir * FMath::FRandRange(500.f, 1000.f);
 
 			// 스폰할 지점에서 또 작은 원을 기준으로 스폰할 마리수에 해당하는, 진짜 스폰 지점을 뽑아내서 그 지점에 스폰.
-			for (int i = 0; i < 2; ++i)
+			for (int i = 0; i < 3; ++i)
 			{
 				FVector2D SmallDir = FVector2D(cosf(rand()), sinf(rand()));
 				FVector2D SmallLocation = SmallDir * FMath::FRandRange(300.f, 500.f);
@@ -105,8 +105,4 @@ void AMgbGameStateBase::SpawnEnemy()
 			}
 		}
 	}
-
-
-
-
 }

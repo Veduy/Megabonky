@@ -26,6 +26,22 @@ void AMgbCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// 애니메이션 테스트중.
+	USkeletalMeshComponent* MeshComp = GetMesh();
+	MeshComp->bEnableUpdateRateOptimizations = true;
+	MeshComp->AnimUpdateRateParams->bShouldUseLodMap = true;
+	MeshComp->ForcedLodModel = 2;
+	MeshComp->AnimUpdateRateParams->MaxEvalRateForInterpolation = 0;
+	MeshComp->AnimUpdateRateParams->LODToFrameSkipMap.Add(0, 10);
+	MeshComp->AnimUpdateRateParams->LODToFrameSkipMap.Add(1, 10);
+	MeshComp->AnimUpdateRateParams->LODToFrameSkipMap.Add(2, 10);
+	MeshComp->AnimUpdateRateParams->BaseNonRenderedUpdateRate = 6;
+
+	//MeshComp->AnimUpdateRateParams->bShouldUseLodMap = false;
+	//MeshComp->AnimUpdateRateParams->MaxEvalRateForInterpolation = 0;
+	//MeshComp->AnimUpdateRateParams->UpdateRate = 10;
+	MeshComp->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickPoseWhenRendered;
+
 }
 
 // Called every frame
