@@ -41,7 +41,7 @@ void UEnemyAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute
 	{
 		if (NewValue <= OldValue)
 		{
-			NET_LOG(FString::Printf(TEXT("%s CurHP: %f, IncomeDamage: %f"), *GetOwningActor()->GetName(), OldValue, NewValue - OldValue));	
+			//NET_LOG(FString::Printf(TEXT("%s CurHP: %f, IncomeDamage: %f"), *GetOwningActor()->GetName(), OldValue, NewValue - OldValue));	
 		}
 	}
 }
@@ -55,7 +55,7 @@ void UEnemyAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallb
 		if (GetHealth() <= 0)
 		{
 			// »ç¸Á Ã³¸®
-			NET_LOG("Death");
+			//NET_LOG("Death");
 			GetOwningActor()->Destroy();
 		}
 	}

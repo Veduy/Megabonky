@@ -27,10 +27,6 @@ protected:
 	virtual void OnUnPossess() override;
 
 public:
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void UpdateUI_XPBar();
-
-public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputMappingContext> InputMappingContext;
 

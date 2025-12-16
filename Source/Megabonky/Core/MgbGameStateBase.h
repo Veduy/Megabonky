@@ -23,22 +23,22 @@ public:
 	
 	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const;
 
+
 public:
 	void InitSpawnEnemyTimer();
 
 	void SpawnEnemy();
 
 public:
-	UFUNCTION()
-	void OnRep_XP();
-
-public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
 	TArray<TSubclassOf<AMgbEnemyCharacter>> EnemyClasses;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data", Replicated)
-	int32 Level = 1;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")
+	int32 CurrentLevel = 1;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data", ReplicatedUsing = OnRep_XP)
-	float XP = 0;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")
+	float RequiredXP = 100;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")
+	float CurrentXP = 0;
 };
