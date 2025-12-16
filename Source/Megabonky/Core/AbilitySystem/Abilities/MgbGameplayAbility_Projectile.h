@@ -25,7 +25,7 @@ public:
 	void RapidFire();
 
 public:
-	void SpawnProjectile(AActor* Owner, const FVector& InSpawnOrigin, const FVector& InSpawnDir);
+	void SpawnProjectile(AActor* Owner, const FVector& InSpawnOrigin, const FRotator& InSpawnDir);
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")

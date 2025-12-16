@@ -3,11 +3,13 @@
 
 #include "MgbGameplayAbility_Projectile.h"
 #include "Kismet/GameplayStatics.h"
+#include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemComponent.h"
+#include "Kismet/KismetMathLibrary.h"
+
 #include "../../../Actors/MgbProjectileActor.h"
 #include "../../../Util/NetworkLog.h"
 #include "../../Characters/MgbPlayerCharacter.h"
-#include "AbilitySystemBlueprintLibrary.h"
-#include "AbilitySystemComponent.h"
 #include "../AttributeSet/WeaponAttributeSet.h"
 #include "../AttributeSet/PlayerAttributeSet.h"
 
@@ -18,9 +20,9 @@ void UMgbGameplayAbility_Projectile::ActivateAbility(const FGameplayAbilitySpecH
 
 }
 
-void UMgbGameplayAbility_Projectile::SpawnProjectile(AActor* Owner, const FVector& InSpawnOrigin, const FVector& InSpawnDir)
+void UMgbGameplayAbility_Projectile::SpawnProjectile(AActor* Owner, const FVector& InSpawnOrigin, const FRotator& InSpawnDir)
 {
-	FTransform SpawnTransform = FTransform(InSpawnDir.Rotation(), InSpawnOrigin, FVector(1.f, 1.f, 1.f));
+	FTransform SpawnTransform = FTransform(InSpawnDir, InSpawnOrigin, FVector(1.f, 1.f, 1.f));
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = Owner;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -53,8 +55,24 @@ void UMgbGameplayAbility_Projectile::RapidFire()
 	GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle,
 		[this, PlayerActor, WeaponActor]()
 		{
+			AActor* TargetActor = nullptr;
 			// 스폰 방향을 PrimaryTarget 으로 수정.
-			SpawnProjectile(WeaponActor, PlayerActor->GetActorLocation(), PlayerActor->GetActorForwardVector());
+			AMgbPlayerCharacter* PlayerCharacter = Cast<AMgbPlayerCharacter>(PlayerActor);
+			if (PlayerCharacter)
+			{
+				PlayerCharacter->FindPrimaryTargetByCondition(TargetActor);
+			}
+
+			if (TargetActor)
+			{
+				FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(PlayerActor->GetActorLocation(), TargetActor->GetActorLocation());
+
+				SpawnProjectile(WeaponActor, PlayerActor->GetActorLocation(), TargetRotation);
+			}
+			else
+			{
+				TempSpawnCount++;
+			}
 
 			if (TempSpawnCount >= SpawnProjectileCount)
 			{

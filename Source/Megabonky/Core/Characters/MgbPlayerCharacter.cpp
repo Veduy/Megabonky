@@ -94,7 +94,7 @@ bool AMgbPlayerCharacter::FindPrimaryTargetByCondition(AActor*& OutPrimaryTarget
 	TArray<FHitResult> Hits;
 
 	bool bResult = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(),
-		Start, End, 1000.f, ObjectTypes, false, ActorsToIgnore,
+		Start, End, 2000.f, ObjectTypes, false, ActorsToIgnore,
 		EDrawDebugTrace::ForDuration, Hits, true, FLinearColor::Red, FLinearColor::Green, 2.f);
 
 	if (bResult)
