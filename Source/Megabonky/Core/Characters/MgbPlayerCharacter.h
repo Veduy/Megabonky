@@ -34,7 +34,7 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 public:
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	bool FindPrimaryTargetByCondition(AActor*& OutPrimaryTarget);
 
 	UFUNCTION()
@@ -42,9 +42,6 @@ public:
 
 	UFUNCTION()
 	void ActivateWeaponsAbility();
-
-	//UFUNCTION()
-	//void ActivateWeapons();
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")

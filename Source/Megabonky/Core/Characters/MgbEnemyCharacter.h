@@ -7,7 +7,7 @@
 #include "MgbEnemyCharacter.generated.h"
 
 
-class UCharacterAttributeSet;
+class UEnemyAttributeSet;
 /**
  * 
  */
@@ -34,7 +34,7 @@ public:
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
-	TObjectPtr<UCharacterAttributeSet> CharacterAttributeSet;
+	TObjectPtr<UEnemyAttributeSet> CharacterAttributeSet;
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")

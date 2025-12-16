@@ -4,7 +4,7 @@
 #include "MgbEffectExecutionCalculation.h"
 
 #include "../AbilitySystem/MgbAbilitySystemComponent.h"
-#include "AttributeSet/CharacterAttributeSet.h"
+#include "AttributeSet/EnemyAttributeSet.h"
 #include "AttributeSet/PlayerAttributeSet.h"
 #include "AttributeSet/WeaponAttributeSet.h"
 
@@ -22,7 +22,7 @@ UMgbEffectExecutionCalculation::UMgbEffectExecutionCalculation(const FObjectInit
 	DEFINE_ATTRIBUTE_CAPTUREDEF(UWeaponAttributeSet, CritDamage, Source, false);
 	
 	// Target (EnemyCharacter)
-	DEFINE_ATTRIBUTE_CAPTUREDEF(UCharacterAttributeSet, Health, Target, false);
+	DEFINE_ATTRIBUTE_CAPTUREDEF(UEnemyAttributeSet, Health, Target, false);
 
 	RelevantAttributesToCapture.Add(DamageDef);
 	RelevantAttributesToCapture.Add(CritChanceDef);
@@ -93,5 +93,5 @@ void UMgbEffectExecutionCalculation::Execute_Implementation(const FGameplayEffec
 	UE_LOG(LogTemp, Warning, TEXT("TotalDamage: %f"), TotalDamage);
 
 	return OutExecutionOutput.AddOutputModifier(
-		FGameplayModifierEvaluatedData(UCharacterAttributeSet::GetHealthAttribute(), EGameplayModOp::Additive, -TotalDamage));
+		FGameplayModifierEvaluatedData(UEnemyAttributeSet::GetHealthAttribute(), EGameplayModOp::Additive, -TotalDamage));
 }

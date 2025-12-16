@@ -31,7 +31,10 @@ void AMgbWeapon::BeginPlay()
 		FGameplayAbilitySpec AbilitySpec = AbilitySystemComponent->BuildAbilitySpecFromClass(AbilityClass);
 		AbilitySystemComponent->GiveAbility(AbilitySpec);
 
-		//AbilitySystemComponent->TryActivateAbilityByClass(AbilityClass);
+		FGameplayEffectContextHandle ContextHandle = AbilitySystemComponent->MakeEffectContext();
+		FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(InitAttributeEffectClass, 1.f, ContextHandle);
+		
+		AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 	}
 }
 

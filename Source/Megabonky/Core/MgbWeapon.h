@@ -13,6 +13,7 @@ class UAbilitySystemComponent;
 class UAttributeSet;
 class UGameplayAbility;
 class UGameplayEffect;
+class UWeaponAttributeSet;
 
 UCLASS()
 class MEGABONKY_API AMgbWeapon : public AActor, public IAbilitySystemInterface
@@ -35,11 +36,11 @@ public:
 	TSubclassOf<UGameplayAbility> AbilityClass;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
-	TObjectPtr<UAttributeSet> WeaponAttributeSet;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "AbilitySystem")
-	TSubclassOf<UGameplayEffect> DamageEffectClass;
+	TObjectPtr<UWeaponAttributeSet> WeaponAttributeSet;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
-	TSubclassOf<UGameplayEffect> InitAttributeEffect;
+	TSubclassOf<UGameplayEffect> DamageEffectClass;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
+	TSubclassOf<UGameplayEffect> InitAttributeEffectClass;
 };

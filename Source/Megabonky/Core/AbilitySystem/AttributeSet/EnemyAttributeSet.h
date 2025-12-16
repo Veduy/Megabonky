@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "AttributeSet.h"
 #include "AbilitySystemComponent.h"
-#include "CharacterAttributeSet.generated.h"
+#include "EnemyAttributeSet.generated.h"
 
 #define ATTRIBUTE_ACCESSORS(ClassName, PropertyName) \
 	GAMEPLAYATTRIBUTE_PROPERTY_GETTER(ClassName, PropertyName) \
@@ -16,12 +16,12 @@
  * 
  */
 UCLASS()
-class MEGABONKY_API UCharacterAttributeSet : public UAttributeSet
+class MEGABONKY_API UEnemyAttributeSet : public UAttributeSet
 {
 	GENERATED_BODY()
 	
 public:
-	UCharacterAttributeSet();
+	UEnemyAttributeSet();
 
 public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -45,13 +45,13 @@ public:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_MaxHealth)
 	FGameplayAttributeData MaxHealth;
-	ATTRIBUTE_ACCESSORS(UCharacterAttributeSet, MaxHealth);
+	ATTRIBUTE_ACCESSORS(UEnemyAttributeSet, MaxHealth);
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_Health)
 	FGameplayAttributeData Health;
-	ATTRIBUTE_ACCESSORS(UCharacterAttributeSet, Health);
+	ATTRIBUTE_ACCESSORS(UEnemyAttributeSet, Health);
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_MovementSpeed)
 	FGameplayAttributeData MovementSpeed;
-	ATTRIBUTE_ACCESSORS(UCharacterAttributeSet, MovementSpeed);
+	ATTRIBUTE_ACCESSORS(UEnemyAttributeSet, MovementSpeed);
 };

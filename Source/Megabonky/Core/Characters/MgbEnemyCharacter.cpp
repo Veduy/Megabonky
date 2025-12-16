@@ -9,12 +9,12 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 
-#include "../AbilitySystem/AttributeSet/CharacterAttributeSet.h"
+#include "../AbilitySystem/AttributeSet/EnemyAttributeSet.h"
 #include "../../Util/NetworkLog.h"
 
 AMgbEnemyCharacter::AMgbEnemyCharacter()
 {
-	CharacterAttributeSet = CreateDefaultSubobject<UCharacterAttributeSet>(TEXT("CharacterAttributeSet"));
+	CharacterAttributeSet = CreateDefaultSubobject<UEnemyAttributeSet>(TEXT("EnemyAttributeSet"));
 	
 	bReplicates = true;
 

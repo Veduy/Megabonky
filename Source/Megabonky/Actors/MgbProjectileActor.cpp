@@ -8,7 +8,7 @@
 #include "AbilitySystemComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "../Core/Characters/MgbEnemyCharacter.h"
-
+#include "../Core/MgbWeapon.h"
 #include "../Util/NetworkLog.h"
 
 // Sets default values
@@ -48,7 +48,6 @@ void AMgbProjectileActor::BeginOverlap(AActor* OtherActor)
 	}
 
 	// GetOwner() = WeaponActor;
-
 	APlayerController* PlayerController = Cast<APlayerController>(GetOwner()->GetOwner()->GetOwner());
 
 	AMgbEnemyCharacter* Enemy = Cast<AMgbEnemyCharacter>(OtherActor);
@@ -56,9 +55,29 @@ void AMgbProjectileActor::BeginOverlap(AActor* OtherActor)
 	{
 		if (bRadialDamage == false)
 		{	
-			NET_LOG("ApplyDamage");
 			//static ENGINE_API float ApplyDamage(AActor * DamagedActor, float BaseDamage, AController * EventInstigator, AActor * DamageCauser, TSubclassOf<class UDamageType> DamageTypeClass);
-			UGameplayStatics::ApplyDamage(OtherActor, 1.f, PlayerController, GetOwner(), nullptr);
+			//UGameplayStatics::ApplyDamage(OtherActor, 1.f, PlayerController, GetOwner(), nullptr);
+
+			AMgbWeapon* Weapon = Cast<AMgbWeapon>(GetOwner());
+			AMgbCharacter* Character = Cast<AMgbCharacter>(Weapon->GetOwner());
+
+			if (Weapon)
+			{
+				FGameplayEffectContextHandle EffectContextHandle = Weapon->GetAbilitySystemComponent()->MakeEffectContext();
+				EffectContextHandle.AddSourceObject(Weapon);
+				EffectContextHandle.AddInstigator(Weapon, Weapon);
+
+				if (Weapon->DamageEffectClass)
+				{
+					// Spec을 생성한 컴포넌트가 ExecCalc의 Source로 설정.
+					FGameplayEffectSpecHandle EffectSpecHandle = Weapon->GetAbilitySystemComponent()->MakeOutgoingSpec(Weapon->DamageEffectClass, 1.f, EffectContextHandle);
+
+					//Target OhterActor의 ASC 
+					UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor);
+					Weapon->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*EffectSpecHandle.Data.Get(), TargetASC);
+				}
+			}
+
 		}
 		else if (bRadialDamage == true)
 		{
@@ -66,6 +85,9 @@ void AMgbProjectileActor::BeginOverlap(AActor* OtherActor)
 			//UGameplayStatics::ApplyRadialDamageWithFalloff();
 		}
 	}
+
+
+	Destroy();
 }
 
 void AMgbProjectileActor::ComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

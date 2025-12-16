@@ -127,7 +127,8 @@ void AMgbPlayerCharacter::SpawnDefaultWeapon()
 void AMgbPlayerCharacter::ActivateWeaponsAbility()
 {
 	// 모든 Weapon의 어빌리티 Activate
-	float AttackSpeed = GetAbilitySystemComponent()->GetNumericAttribute(UPlayerAttributeSet::GetAttackSpeedAttribute());
+	// PlayerAttackSpeed = 100% ~ x%;  Interval 2초,  (2 / PlayerAttackSpeed / 100)
+	float PlayerAttackSpeed = GetAbilitySystemComponent()->GetNumericAttribute(UPlayerAttributeSet::GetAttackSpeedAttribute());
 	// 	UE_API void GetAllAbilities(TArray<FGameplayAbilitySpecHandle>& OutAbilityHandles) const;
 	GetWorld()->GetTimerManager().SetTimer(ActivateAbilityHandle,
 		[this]()
@@ -137,7 +138,7 @@ void AMgbPlayerCharacter::ActivateWeaponsAbility()
 				Weapon->GetAbilitySystemComponent()->TryActivateAbilityByClass(Weapon->AbilityClass);
 			}
 		},
-		2.f,	//(AttackSpeed / 100.f) + 1,
+		2 / (PlayerAttackSpeed / 100),
 		true,
 		1.f);
 }
