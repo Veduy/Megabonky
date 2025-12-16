@@ -13,6 +13,7 @@
 
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "MgbEnemyCharacter.h"
 #include "../AbilitySystem/MgbAbilitySystemComponent.h"
 #include "../AbilitySystem/AttributeSet/PlayerAttributeSet.h"
 #include "../MgbWeapon.h"
@@ -86,32 +87,35 @@ void AMgbPlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 bool AMgbPlayerCharacter::FindPrimaryTargetByCondition(AActor*& OutPrimaryTarget)
 {
 	// 일정 범위내에 액터들 중에서 거리만 판별해서, 최단거리 액터를 타겟으로 설정.
-	FVector Start = GetActorLocation();
-	FVector End = Start;
+	FVector Origin = GetActorLocation();
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_GameTraceChannel1));
 	TArray<AActor*> ActorsToIgnore;
 	TArray<FHitResult> Hits;
+	TArray<AActor*> OutActors;
 
-	bool bResult = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(),
-		Start, End, 2000.f, ObjectTypes, false, ActorsToIgnore,
-		EDrawDebugTrace::None, Hits, true, FLinearColor::Red, FLinearColor::Green, 0.f);
+	UKismetSystemLibrary::SphereOverlapActors(GetWorld(), Origin, 2000.f,
+		ObjectTypes, AMgbEnemyCharacter::StaticClass(), 
+		ActorsToIgnore, OutActors);
 
-	if (bResult)
+	if (OutActors.IsEmpty())
 	{
-		float ClosestDistance = MAX_FLT;
-		for (const auto& Hit : Hits)
+		return false;
+	}
+	else
+	{
+		float ClosesetDistance = MAX_FLT;
+		for (const auto& Target : OutActors)
 		{
-			if (Hit.Distance < ClosestDistance)
+			float Distance = (Target->GetActorLocation() - Origin).Length();
+			if (Distance < ClosesetDistance)
 			{
-				ClosestDistance = Hit.Distance;
-				OutPrimaryTarget = Hit.GetActor();
+				ClosesetDistance = Distance;
+				OutPrimaryTarget = Target;
 			}
 		}
 		return true;
 	}
-
-	return false;
 }
 
 void AMgbPlayerCharacter::SpawnDefaultWeapon()
