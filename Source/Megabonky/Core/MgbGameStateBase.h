@@ -20,16 +20,23 @@ public:
 	AMgbGameStateBase();
 
 	virtual void BeginPlay() override;
+	
+	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const;
 
 public:
 	void InitSpawnEnemyTimer();
 
 	void SpawnEnemy();
 
+
+public:
+	UFUNCTION()
+	void OnRep_XP();
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
 	TArray<TSubclassOf<AMgbEnemyCharacter>> EnemyClasses;
 
-	UPROPERTY()
-	int32 MaxEnemyCount = 100;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data", ReplicatedUsing = OnRep_XP)
+	float XP = 0;
 };

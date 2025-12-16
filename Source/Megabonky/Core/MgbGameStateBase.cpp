@@ -3,10 +3,15 @@
 
 #include "MgbGameStateBase.h"
 
-#include "Characters/MgbEnemyCharacter.h"
-#include "../Util/NetworkLog.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/GameplayStatics.h"
 #include "Components/CapsuleComponent.h"
+#include "Net/UnrealNetwork.h"
+
+#include "Characters/MgbEnemyCharacter.h"
+#include "MgbPlayerController.h"
+
+#include "../Util/NetworkLog.h"
 
 AMgbGameStateBase::AMgbGameStateBase()
 {
@@ -16,6 +21,13 @@ void AMgbGameStateBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+}
+
+void AMgbGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AMgbGameStateBase, XP);
 }
 
 void AMgbGameStateBase::InitSpawnEnemyTimer()
@@ -104,5 +116,15 @@ void AMgbGameStateBase::SpawnEnemy()
 				}
 			}
 		}
+	}
+}
+
+void AMgbGameStateBase::OnRep_XP()
+{
+	AMgbPlayerController* PC = Cast<AMgbPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (PC)
+	{
+		// ListenServer는 OnRep_XP() 이벤트를 못받음.
+		PC->UpdateUI_XPBar();
 	}
 }

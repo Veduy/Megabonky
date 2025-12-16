@@ -10,6 +10,7 @@
 #include "../../../Actors/MgbProjectileActor.h"
 #include "../../../Util/NetworkLog.h"
 #include "../../Characters/MgbPlayerCharacter.h"
+#include "../../Characters/MgbEnemyCharacter.h"
 #include "../AttributeSet/WeaponAttributeSet.h"
 #include "../AttributeSet/PlayerAttributeSet.h"
 
@@ -63,7 +64,7 @@ void UMgbGameplayAbility_Projectile::RapidFire()
 				PlayerCharacter->FindPrimaryTargetByCondition(TargetActor);
 			}
 
-			if (TargetActor)
+			if (TargetActor && Cast<AMgbEnemyCharacter>(TargetActor)->bSpawnFinished)
 			{
 				FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(PlayerActor->GetActorLocation(), TargetActor->GetActorLocation());
 
