@@ -95,7 +95,7 @@ bool AMgbPlayerCharacter::FindPrimaryTargetByCondition(AActor*& OutPrimaryTarget
 
 	bool bResult = UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(),
 		Start, End, 2000.f, ObjectTypes, false, ActorsToIgnore,
-		EDrawDebugTrace::ForDuration, Hits, true, FLinearColor::Red, FLinearColor::Green, 0.f);
+		EDrawDebugTrace::None, Hits, true, FLinearColor::Red, FLinearColor::Green, 0.f);
 
 	if (bResult)
 	{
@@ -129,7 +129,6 @@ void AMgbPlayerCharacter::ActivateWeaponsAbility()
 	// 모든 Weapon의 어빌리티 Activate
 	// PlayerAttackSpeed = 100% ~ x%;  Interval 2초,  (2 / PlayerAttackSpeed / 100)
 	float PlayerAttackSpeed = GetAbilitySystemComponent()->GetNumericAttribute(UPlayerAttributeSet::GetAttackSpeedAttribute());
-	// 	UE_API void GetAllAbilities(TArray<FGameplayAbilitySpecHandle>& OutAbilityHandles) const;
 	GetWorld()->GetTimerManager().SetTimer(ActivateAbilityHandle,
 		[this]()
 		{

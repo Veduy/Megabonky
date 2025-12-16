@@ -100,7 +100,7 @@ void AMgbEnemyCharacter::MoveToTarget()
 		ObjectTypes,
 		false,
 		ActorsToIgnore,
-		EDrawDebugTrace::ForOneFrame,
+		EDrawDebugTrace::None,
 		Hit,
 		true);
 
@@ -128,7 +128,7 @@ void AMgbEnemyCharacter::MoveToTarget()
 			GroundCheckObjectTypes,
 			false,
 			GroundCheckActorsToIgnore,
-			EDrawDebugTrace::ForOneFrame,
+			EDrawDebugTrace::None,
 			GroundCheckHit,
 			true);
 

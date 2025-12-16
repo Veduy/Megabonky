@@ -121,10 +121,17 @@ void AMgbGameStateBase::SpawnEnemy()
 
 void AMgbGameStateBase::OnRep_XP()
 {
+	if (XP >= 100)
+	{
+		// 레벨업 로직
+		
+
+	}
+
 	AMgbPlayerController* PC = Cast<AMgbPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	if (PC)
 	{
-		// ListenServer는 OnRep_XP() 이벤트를 못받음.
+		// ListenServer는 OnRep_XP() 발생안함. 따로 처리 필요.
 		PC->UpdateUI_XPBar();
 	}
 }

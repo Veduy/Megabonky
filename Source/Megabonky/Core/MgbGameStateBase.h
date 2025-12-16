@@ -28,7 +28,6 @@ public:
 
 	void SpawnEnemy();
 
-
 public:
 	UFUNCTION()
 	void OnRep_XP();
@@ -36,6 +35,9 @@ public:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
 	TArray<TSubclassOf<AMgbEnemyCharacter>> EnemyClasses;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data", Replicated)
+	int32 Level = 1;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data", ReplicatedUsing = OnRep_XP)
 	float XP = 0;

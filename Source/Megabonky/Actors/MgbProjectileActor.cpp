@@ -48,16 +48,11 @@ void AMgbProjectileActor::BeginOverlap(AActor* OtherActor)
 	}
 
 	// GetOwner() = WeaponActor;
-	APlayerController* PlayerController = Cast<APlayerController>(GetOwner()->GetOwner()->GetOwner());
-
 	AMgbEnemyCharacter* Enemy = Cast<AMgbEnemyCharacter>(OtherActor);
 	if (Enemy)
 	{
 		if (bRadialDamage == false)
 		{	
-			//static ENGINE_API float ApplyDamage(AActor * DamagedActor, float BaseDamage, AController * EventInstigator, AActor * DamageCauser, TSubclassOf<class UDamageType> DamageTypeClass);
-			//UGameplayStatics::ApplyDamage(OtherActor, 1.f, PlayerController, GetOwner(), nullptr);
-
 			AMgbWeapon* Weapon = Cast<AMgbWeapon>(GetOwner());
 			AMgbCharacter* Character = Cast<AMgbCharacter>(Weapon->GetOwner());
 
