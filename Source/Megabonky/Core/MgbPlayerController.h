@@ -7,6 +7,8 @@
 #include "MgbPlayerController.generated.h"
 
 class UInputMappingContext;
+class UMgbWidgetInGame;
+
 /**
  * 
  */
@@ -27,7 +29,12 @@ protected:
 	virtual void OnUnPossess() override;
 
 public:
+
+
+public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputMappingContext> InputMappingContext;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widget")
+	TObjectPtr<UMgbWidgetInGame> InGameWidget;
 };

@@ -23,6 +23,22 @@ public:
 	
 	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const;
 
+public:
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void ServerAddXP(float InValue);
+	void ServerAddXP_Implementation(float InValue);
+	
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void MulticastUpdateUI_XP(float InPercent);
+	void MulticastUpdateUI_XP_Implementation(float InPercent);
+
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void MulticastSetPauseGame(bool bPause);
+	void MulticastSetPauseGame_Implementation(bool bPause);
+
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void MulticastShowUpgradeWidget(bool bShow);
+	void MulticastShowUpgradeWidget_Implementation(bool bShow);
 
 public:
 	void InitSpawnEnemyTimer();
@@ -41,4 +57,7 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")
 	float CurrentXP = 0;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")
+	int32 GameResumeRequestCount = 0;
 };

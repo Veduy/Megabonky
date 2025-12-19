@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "MgbUserWidget.generated.h"
+#include "MgbWidget.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MEGABONKY_API UMgbUserWidget : public UUserWidget
+class MEGABONKY_API UMgbWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	

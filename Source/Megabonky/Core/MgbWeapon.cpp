@@ -26,7 +26,7 @@ void AMgbWeapon::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (HasAuthority())
+	if (HasAuthority() && AbilityClass)
 	{
 		FGameplayAbilitySpec AbilitySpec = AbilitySystemComponent->BuildAbilitySpecFromClass(AbilityClass);
 		AbilitySystemComponent->GiveAbility(AbilitySpec);

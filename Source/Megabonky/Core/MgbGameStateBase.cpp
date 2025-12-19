@@ -12,6 +12,7 @@
 #include "MgbPlayerController.h"
 
 #include "../Util/NetworkLog.h"
+#include "../UI/MgbWidgetInGame.h"
 
 AMgbGameStateBase::AMgbGameStateBase()
 {
@@ -27,6 +28,59 @@ void AMgbGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+}
+
+
+void AMgbGameStateBase::ServerAddXP_Implementation(float InValue)
+{
+	CurrentXP += InValue;
+	float Percent = CurrentXP / RequiredXP;
+
+	MulticastUpdateUI_XP(Percent);
+
+	if (CurrentXP >= RequiredXP)
+	{
+		MulticastSetPauseGame(true);
+		MulticastShowUpgradeWidget(true);
+
+	}
+}
+
+void AMgbGameStateBase::MulticastUpdateUI_XP_Implementation(float InPercent)
+{
+	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (PC && PC->IsLocalPlayerController())
+	{
+		AMgbPlayerController* MgbPC = Cast<AMgbPlayerController>(PC);
+		if (MgbPC)
+		{
+			if (MgbPC->InGameWidget)
+			{
+				MgbPC->InGameWidget->SetXPBarPercent(InPercent);
+			}
+		}
+	}
+}
+
+void AMgbGameStateBase::MulticastSetPauseGame_Implementation(bool bPause)
+{
+	UGameplayStatics::SetGamePaused(GetWorld(), bPause);
+}
+
+void AMgbGameStateBase::MulticastShowUpgradeWidget_Implementation(bool bShow)
+{
+	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (PC && PC->IsLocalPlayerController())
+	{
+		AMgbPlayerController* MgbPC = Cast<AMgbPlayerController>(PC);
+		if (MgbPC)
+		{
+			if (MgbPC->InGameWidget)
+			{
+				MgbPC->InGameWidget->ShowUpgradeEvent(bShow);
+			}
+		}
+	}
 }
 
 void AMgbGameStateBase::InitSpawnEnemyTimer()

@@ -10,6 +10,7 @@
 
 AMgbPlayerController::AMgbPlayerController()
 {
+
 }
 
 void AMgbPlayerController::AcknowledgePossession(APawn* P)
