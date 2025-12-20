@@ -85,6 +85,11 @@ void AMgbGameStateBase::MulticastShowUpgradeWidget_Implementation(bool bShow)
 
 void AMgbGameStateBase::InitSpawnEnemyTimer()
 {
+	if (EnemyClasses.IsEmpty())
+	{
+		return;
+	}
+
 	FTimerHandle SpawnTimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(
 		SpawnTimerHandle,

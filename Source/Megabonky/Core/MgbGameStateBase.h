@@ -42,11 +42,10 @@ public:
 
 public:
 	void InitSpawnEnemyTimer();
-
 	void SpawnEnemy();
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
 	TArray<TSubclassOf<AMgbEnemyCharacter>> EnemyClasses;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")

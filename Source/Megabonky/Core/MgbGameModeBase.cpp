@@ -25,6 +25,9 @@ void AMgbGameModeBase::StartPlay()
 	AMgbGameStateBase* GS = GetGameState<AMgbGameStateBase>();
 	if (GS)
 	{
-		GS->InitSpawnEnemyTimer();
+		if (bSpawnEnemy)
+		{
+			GS->InitSpawnEnemyTimer();
+		}
 	}
 }

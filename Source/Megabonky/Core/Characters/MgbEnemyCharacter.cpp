@@ -14,10 +14,10 @@
 
 AMgbEnemyCharacter::AMgbEnemyCharacter()
 {
-	CharacterAttributeSet = CreateDefaultSubobject<UEnemyAttributeSet>(TEXT("EnemyAttributeSet"));
-	
 	bReplicates = true;
 
+	CharacterAttributeSet = CreateDefaultSubobject<UEnemyAttributeSet>(TEXT("EnemyAttributeSet"));
+	
 	// 스폰시 AIController가 있으면 유효한 위치로 강제 이동시킴.
 	// 스폰로직이 끝났을때, SpawnDefaultController(); 로 AIController 붙여줌.
 	AutoPossessAI = EAutoPossessAI::Disabled;
@@ -26,6 +26,14 @@ AMgbEnemyCharacter::AMgbEnemyCharacter()
 	GetCharacterMovement()->MaxAcceleration = 500.f;
 	GetCharacterMovement()->GroundFriction = 100.f;
 	GetCharacterMovement()->MaxStepHeight = 1000.f;
+
+	GetCapsuleComponent()->SetCapsuleHalfHeight(80.f);
+	GetCapsuleComponent()->SetCapsuleRadius(40.f);
+
+	GetMesh()->SetRelativeRotation(FRotator(0.0f, -90.f, 0.0f));
+	float Half = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -Half));
+	GetMesh()->SetRelativeScale3D(FVector(0.7f, 0.7f, 0.7f));
 
 }
 
@@ -71,6 +79,15 @@ void AMgbEnemyCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AMgbEnemyCharacter, TargetActor);
+}
+
+void AMgbEnemyCharacter::Destroyed()
+{
+	//서버일때만 XPCrystal Drop
+	if (HasAuthority())
+	{
+		GetWorld()->SpawnActor<AActor>(XPCrystalClass, GetActorTransform());
+	}
 }
 
 void AMgbEnemyCharacter::MoveToTarget()

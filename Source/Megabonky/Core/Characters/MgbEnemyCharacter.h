@@ -25,6 +25,8 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	virtual void Destroyed() override;
+
 public:
 	UFUNCTION()
 	void MoveToTarget();
@@ -37,11 +39,14 @@ public:
 	TObjectPtr<UEnemyAttributeSet> CharacterAttributeSet;
 
 public:
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite, Category = "Data")
+	TObjectPtr<AActor> TargetActor;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")
 	uint8 bSpawnFinished : 1 = false;
 
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite, Category = "Data")
-	TObjectPtr<AActor> TargetActor;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")
+	TSubclassOf<AActor> XPCrystalClass;
 
 	UPROPERTY()
 	float TargetSpawnHeight;

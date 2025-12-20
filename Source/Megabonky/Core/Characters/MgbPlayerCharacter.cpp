@@ -22,6 +22,11 @@
 
 AMgbPlayerCharacter::AMgbPlayerCharacter()
 {
+	bReplicates = true;
+
+	GetCapsuleComponent()->SetCapsuleHalfHeight(80.f);
+	GetCapsuleComponent()->SetCapsuleRadius(40.f);
+
 	GetCharacterMovement()->bUseControllerDesiredRotation = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->MaxWalkSpeed = 300.f;
@@ -32,6 +37,7 @@ AMgbPlayerCharacter::AMgbPlayerCharacter()
 	GetMesh()->SetRelativeRotation(FRotator(0.0f, -90.f, 0.0f));
 	float Half = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 	GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -Half));
+	GetMesh()->SetRelativeScale3D(FVector(0.7f, 0.7f, 0.7f));
 
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArm->SetupAttachment(RootComponent);
