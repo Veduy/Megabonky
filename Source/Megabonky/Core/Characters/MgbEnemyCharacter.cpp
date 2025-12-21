@@ -22,7 +22,7 @@ AMgbEnemyCharacter::AMgbEnemyCharacter()
 	// 스폰로직이 끝났을때, SpawnDefaultController(); 로 AIController 붙여줌.
 	AutoPossessAI = EAutoPossessAI::Disabled;
 
-	GetCharacterMovement()->MaxWalkSpeed = 200.f;
+	GetCharacterMovement()->MaxWalkSpeed = 100.f;
 	GetCharacterMovement()->MaxAcceleration = 500.f;
 	GetCharacterMovement()->GroundFriction = 100.f;
 	GetCharacterMovement()->MaxStepHeight = 1000.f;
@@ -34,7 +34,6 @@ AMgbEnemyCharacter::AMgbEnemyCharacter()
 	float Half = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 	GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -Half));
 	GetMesh()->SetRelativeScale3D(FVector(0.7f, 0.7f, 0.7f));
-
 }
 
 void AMgbEnemyCharacter::BeginPlay()

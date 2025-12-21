@@ -51,10 +51,10 @@ public:
 	TObjectPtr<UCameraComponent> MainCamera;
 
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Data")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
 	TSubclassOf<AMgbWeapon> DefaultWeaponClass;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Data")
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = "Data")
 	TArray<TObjectPtr<AMgbWeapon>> Weapons;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")

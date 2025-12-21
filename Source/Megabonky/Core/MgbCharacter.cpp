@@ -60,8 +60,6 @@ float AMgbCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEv
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 		
-	// 
-
 	NET_LOG(FString::Printf(TEXT("DamageCauser : %s"), *DamageCauser->GetName()));			// DamageCauser -> Weapon
 	NET_LOG(FString::Printf(TEXT("Weapon : %s"), *DamageCauser->GetName()));	
 	NET_LOG(FString::Printf(TEXT("EventInstigator : %s"), *EventInstigator->GetName()));	// PlayerController 

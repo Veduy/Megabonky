@@ -37,7 +37,7 @@ void AMgbPlayerController::OnPossess(APawn* aPawn)
 {
 	// 오직 서버에서만 호출됨.
 	Super::OnPossess(aPawn);
-	NET_LOG("");
+	
 
 	if (ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(GetLocalPlayer()))
 	{
@@ -47,12 +47,10 @@ void AMgbPlayerController::OnPossess(APawn* aPawn)
 		}
 	}
 	
-	// 임시 무기 생성 코드
 	AMgbPlayerCharacter* PlayerCharacter = Cast<AMgbPlayerCharacter>(aPawn);
 	if (PlayerCharacter)
 	{
 		PlayerCharacter->SpawnDefaultWeapon();
-
 		PlayerCharacter->ActivateWeaponsAbility();
 	}
 }
