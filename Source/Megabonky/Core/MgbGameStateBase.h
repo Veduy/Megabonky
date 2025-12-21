@@ -37,8 +37,8 @@ public:
 	void MulticastSetPauseGame_Implementation(bool bPause);
 
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
-	void MulticastShowUpgradeWidget(bool bShow);
-	void MulticastShowUpgradeWidget_Implementation(bool bShow);
+	void MulticastShowItemSelectWindow();
+	void MulticastShowItemSelectWindow_Implementation();
 
 public:
 	void InitSpawnEnemyTimer();

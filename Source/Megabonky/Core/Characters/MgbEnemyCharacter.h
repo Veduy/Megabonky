@@ -45,7 +45,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")
 	uint8 bSpawnFinished : 1 = false;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
 	TSubclassOf<AActor> XPCrystalClass;
 
 	UPROPERTY()

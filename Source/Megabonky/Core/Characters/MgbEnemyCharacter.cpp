@@ -27,9 +27,11 @@ AMgbEnemyCharacter::AMgbEnemyCharacter()
 	GetCharacterMovement()->GroundFriction = 100.f;
 	GetCharacterMovement()->MaxStepHeight = 1000.f;
 
+	GetCapsuleComponent()->SetCollisionProfileName(FName("Enemy"));
 	GetCapsuleComponent()->SetCapsuleHalfHeight(80.f);
 	GetCapsuleComponent()->SetCapsuleRadius(40.f);
 
+	GetMesh()->SetCollisionProfileName("NoCollision");
 	GetMesh()->SetRelativeRotation(FRotator(0.0f, -90.f, 0.0f));
 	float Half = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 	GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -Half));

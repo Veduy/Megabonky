@@ -34,6 +34,7 @@ AMgbPlayerCharacter::AMgbPlayerCharacter()
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
 
+	GetMesh()->SetCollisionProfileName("NoCollision");
 	GetMesh()->SetRelativeRotation(FRotator(0.0f, -90.f, 0.0f));
 	float Half = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 	GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -Half));

@@ -7,7 +7,7 @@
 #include "MgbPlayerController.generated.h"
 
 class UInputMappingContext;
-class UMgbWidgetInGame;
+class UInGame;
 
 /**
  * 
@@ -35,6 +35,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputMappingContext> InputMappingContext;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widget")
-	TObjectPtr<UMgbWidgetInGame> InGameWidget;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Widget")
+	TObjectPtr<UInGame> InGameWidget;
 };

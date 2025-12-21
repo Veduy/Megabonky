@@ -12,7 +12,7 @@
 #include "MgbPlayerController.h"
 
 #include "../Util/NetworkLog.h"
-#include "../UI/MgbWidgetInGame.h"
+#include "../UI/InGame/InGame.h"
 
 AMgbGameStateBase::AMgbGameStateBase()
 {
@@ -38,11 +38,17 @@ void AMgbGameStateBase::ServerAddXP_Implementation(float InValue)
 
 	MulticastUpdateUI_XP(Percent);
 
+	// 레벨업 작업
 	if (CurrentXP >= RequiredXP)
 	{
-		MulticastSetPauseGame(true);
-		MulticastShowUpgradeWidget(true);
+		float temp = CurrentXP - RequiredXP;
+		CurrentXP = 0;
+		RequiredXP = RequiredXP * (1.2f);
 
+		ServerAddXP(temp);
+
+		MulticastSetPauseGame(true);
+		MulticastShowItemSelectWindow();
 	}
 }
 
@@ -67,7 +73,7 @@ void AMgbGameStateBase::MulticastSetPauseGame_Implementation(bool bPause)
 	UGameplayStatics::SetGamePaused(GetWorld(), bPause);
 }
 
-void AMgbGameStateBase::MulticastShowUpgradeWidget_Implementation(bool bShow)
+void AMgbGameStateBase::MulticastShowItemSelectWindow_Implementation()
 {
 	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 	if (PC && PC->IsLocalPlayerController())
@@ -75,9 +81,9 @@ void AMgbGameStateBase::MulticastShowUpgradeWidget_Implementation(bool bShow)
 		AMgbPlayerController* MgbPC = Cast<AMgbPlayerController>(PC);
 		if (MgbPC)
 		{
-			if (MgbPC->InGameWidget)
+			if (MgbPC)
 			{
-				MgbPC->InGameWidget->ShowUpgradeEvent(bShow);
+				MgbPC->InGameWidget->ShowItemSelectWindow();
 			}
 		}
 	}

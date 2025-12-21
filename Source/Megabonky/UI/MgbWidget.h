@@ -6,12 +6,16 @@
 #include "Blueprint/UserWidget.h"
 #include "MgbWidget.generated.h"
 
-/**
- * 
- */
+
 UCLASS()
 class MEGABONKY_API UMgbWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
+public:
+	UFUNCTION(BlueprintCallable)
+	void HideWidget();
+
+	UFUNCTION(BlueprintCallable)
+	void ShowWidget();
 };
