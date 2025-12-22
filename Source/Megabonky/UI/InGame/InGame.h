@@ -29,6 +29,9 @@ public:
 	UFUNCTION()
 	void HideItemSelectWindow();
 
+	UFUNCTION()
+	void CompleteItemSelect();
+
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (BindWidget))
 	TObjectPtr<UProgressBar> XPBar;

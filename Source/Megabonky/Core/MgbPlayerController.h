@@ -29,7 +29,9 @@ protected:
 	virtual void OnUnPossess() override;
 
 public:
-
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void ServerResumeRequestCountIncrementAndCheck();
+	void ServerResumeRequestCountIncrementAndCheck_Implementation();
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")

@@ -5,7 +5,10 @@
 
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
+
+#include "MgbGameStateBase.h"
 #include "Characters/MgbPlayerCharacter.h"
+
 #include "../Util/NetworkLog.h"
 
 AMgbPlayerController::AMgbPlayerController()
@@ -58,4 +61,13 @@ void AMgbPlayerController::OnPossess(APawn* aPawn)
 void AMgbPlayerController::OnUnPossess()
 {
 	Super::OnUnPossess();
+}
+
+void AMgbPlayerController::ServerResumeRequestCountIncrementAndCheck_Implementation()
+{
+	AMgbGameStateBase* GS =	GetWorld()->GetGameState<AMgbGameStateBase>();
+	if (GS)
+	{
+		GS->HandleResumeRequest();
+	}
 }

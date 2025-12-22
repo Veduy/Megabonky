@@ -43,6 +43,8 @@ public:
 public:
 	void InitSpawnEnemyTimer();
 	void SpawnEnemy();
+	void HandleResumeRequest();
+	uint32 GetCurrentPlayerCount();
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
@@ -58,5 +60,5 @@ public:
 	float CurrentXP = 0;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")
-	int32 GameResumeRequestCount = 0;
+	int32 ResumeRequestCount = 0;
 };

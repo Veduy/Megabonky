@@ -22,6 +22,9 @@ public:
 	virtual void StartPlay() override;
 
 public:
+
+
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
 	uint8 bSpawnEnemy : 1 = false;
 };

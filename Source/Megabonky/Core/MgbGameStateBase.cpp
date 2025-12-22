@@ -16,6 +16,7 @@
 
 AMgbGameStateBase::AMgbGameStateBase()
 {
+	SetReplicates(true);
 }
 
 void AMgbGameStateBase::BeginPlay()
@@ -181,4 +182,30 @@ void AMgbGameStateBase::SpawnEnemy()
 			}
 		}
 	}
+}
+
+void AMgbGameStateBase::HandleResumeRequest()
+{
+	// PC의 Server RPC내에서 호출.
+	ResumeRequestCount++;
+	// NET_LOG(FString::Printf(TEXT("ResumeRequestCount: %d"), ResumeRequestCount));
+	//UE_LOG(LogTemp, Warning, TEXT("ResumeRequestCount: %d"), ResumeRequestCount);
+	
+	if (ResumeRequestCount == GetCurrentPlayerCount())
+	{	
+		ResumeRequestCount = 0;
+
+		MulticastSetPauseGame(false);
+	}
+}
+
+uint32 AMgbGameStateBase::GetCurrentPlayerCount()
+{
+	uint32 Count = 0;
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	{
+		NET_LOG(FString::Printf(TEXT("PlayerCount: %d"), Count));
+		Count++;
+	}
+	return Count;
 }

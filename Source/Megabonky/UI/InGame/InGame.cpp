@@ -5,9 +5,8 @@
 #include "Components/ProgressBar.h"
 #include "ItemSelectWindow.h"
 #include "ItemSelectButton.h"
+#include "../../Core/MgbPlayerController.h"
 
-//임시추가
-#include "Kismet/GameplayStatics.h"
 
 void UInGame::NativeOnInitialized()
 {
@@ -20,9 +19,9 @@ void UInGame::NativeOnInitialized()
 	{
 		ItemSelectWindow->HideWidget();
 
-		ItemSelectWindow->ItemA->OnItemSelected.AddDynamic(this, &UInGame::HideItemSelectWindow);
-		ItemSelectWindow->ItemB->OnItemSelected.AddDynamic(this, &UInGame::HideItemSelectWindow);
-		ItemSelectWindow->ItemC->OnItemSelected.AddDynamic(this, &UInGame::HideItemSelectWindow);
+		ItemSelectWindow->ItemA->OnItemSelected.AddDynamic(this, &UInGame::CompleteItemSelect);
+		ItemSelectWindow->ItemB->OnItemSelected.AddDynamic(this, &UInGame::CompleteItemSelect);
+		ItemSelectWindow->ItemC->OnItemSelected.AddDynamic(this, &UInGame::CompleteItemSelect);
 	}
 }
 
@@ -47,8 +46,18 @@ void UInGame::HideItemSelectWindow()
 	if (ItemSelectWindow)
 	{
 		ItemSelectWindow->HideWidget();
+	}
+}
 
-		//임시로 게임 진행시킴.
-		UGameplayStatics::SetGamePaused(GetWorld(), false);
+void UInGame::CompleteItemSelect()
+{
+	HideItemSelectWindow();
+	// PlayerController 에서 Server RPC 호출.
+	// Server의 GameState의 GameResumeRequestCount 변수 값 증가 후 
+	// 현재 게임중인 플레이어 수와 일치되는지 확인 한 다음에, Server에 SetGamepause(false) 호출.
+	AMgbPlayerController* PC = GetOwningLocalPlayer<AMgbPlayerController>();
+	if (PC)
+	{
+		PC->ServerResumeRequestCountIncrementAndCheck();
 	}
 }
