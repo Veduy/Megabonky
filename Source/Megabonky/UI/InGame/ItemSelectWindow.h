@@ -20,11 +20,11 @@ public:
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (BindWidget))
-	TObjectPtr<UItemSelectButton> ItemA;
+	TObjectPtr<UMgbWidget> ItemA;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (BindWidget))
-	TObjectPtr<UItemSelectButton> ItemB;
+	TObjectPtr<UMgbWidget> ItemB;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (BindWidget))
-	TObjectPtr<UItemSelectButton> ItemC;
+	TObjectPtr<UMgbWidget> ItemC;
 }; 

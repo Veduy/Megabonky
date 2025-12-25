@@ -42,7 +42,6 @@ void AMgbPlayerController::OnPossess(APawn* aPawn)
 	// 오직 서버에서만 호출됨.
 	Super::OnPossess(aPawn);
 	
-
 	if (ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(GetLocalPlayer()))
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* InputSubsystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())

@@ -14,6 +14,19 @@ class UInputAction;
 class UGameplayAbility;
 class AMgbWeapon;
 
+USTRUCT(BlueprintType)
+struct FTomes
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	FName Name;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	int32 Count;
+};
+
 /**
  * 
  */
@@ -56,6 +69,13 @@ public:
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = "Data")
 	TArray<TObjectPtr<AMgbWeapon>> Weapons;
+
+	/// <summary>
+	/// 비전서 (Tomes)
+	/// </summary>
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite, Category = "Data")
+	TArray<FTomes> Tomes;
+
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	TObjectPtr<UAttributeSet> PlayerAttributeSet;

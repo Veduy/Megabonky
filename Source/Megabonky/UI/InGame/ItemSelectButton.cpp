@@ -17,6 +17,5 @@ void UItemSelectButton::NativeOnInitialized()
 
 void UItemSelectButton::HandleButtonClicked()
 {
-	NET_LOG("");
 	OnItemSelected.Broadcast();
 }

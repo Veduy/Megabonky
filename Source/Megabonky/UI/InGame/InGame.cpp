@@ -18,11 +18,12 @@ void UInGame::NativeOnInitialized()
 
 	if (ItemSelectWindow)
 	{
-		ItemSelectWindow->HideWidget();
-
-		ItemSelectWindow->ItemA->OnItemSelected.AddDynamic(this, &UInGame::CompleteItemSelect);
-		ItemSelectWindow->ItemB->OnItemSelected.AddDynamic(this, &UInGame::CompleteItemSelect);
-		ItemSelectWindow->ItemC->OnItemSelected.AddDynamic(this, &UInGame::CompleteItemSelect);
+		UItemSelectWindow* Widget = Cast<UItemSelectWindow>(ItemSelectWindow);
+		Widget->HideWidget();
+		
+		Cast<UItemSelectButton>(Widget->ItemA)->OnItemSelected.AddDynamic(this, &UInGame::CompleteItemSelect);
+		Cast<UItemSelectButton>(Widget->ItemB)->OnItemSelected.AddDynamic(this, &UInGame::CompleteItemSelect);
+		Cast<UItemSelectButton>(Widget->ItemC)->OnItemSelected.AddDynamic(this, &UInGame::CompleteItemSelect);
 	}
 }
 

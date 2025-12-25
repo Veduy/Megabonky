@@ -28,7 +28,7 @@ void UWeaponAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 
 void UWeaponAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
 {
-
+	Super::PostGameplayEffectExecute(Data);
 }
 
 void UWeaponAttributeSet::OnRep_Damage(const FGameplayAttributeData& OldDamage)

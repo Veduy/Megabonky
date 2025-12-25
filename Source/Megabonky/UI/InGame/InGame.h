@@ -7,7 +7,7 @@
 #include "InGame.generated.h"
 
 class UProgressBar;
-class UItemSelectWindow;
+
 /**
  * 
  */
@@ -22,7 +22,7 @@ public:
 public:
 	UFUNCTION()
 	void SetXPBarPercent(float NewPercent);
-
+	
 	UFUNCTION()
 	void ShowItemSelectWindow();
 
@@ -37,6 +37,6 @@ public:
 	TObjectPtr<UProgressBar> XPBar;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (BindWidget))
-	TObjectPtr<UItemSelectWindow> ItemSelectWindow;
+	TObjectPtr<UMgbWidget> ItemSelectWindow;
 };
  
