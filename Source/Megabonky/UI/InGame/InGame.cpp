@@ -7,6 +7,7 @@
 #include "ItemSelectButton.h"
 #include "../../Core/MgbPlayerController.h"
 
+#include "../../Util/NetworkLog.h"
 
 void UInGame::NativeOnInitialized()
 {
@@ -55,9 +56,10 @@ void UInGame::CompleteItemSelect()
 	// PlayerController 에서 Server RPC 호출.
 	// Server의 GameState의 GameResumeRequestCount 변수 값 증가 후 
 	// 현재 게임중인 플레이어 수와 일치되는지 확인 한 다음에, Server에 SetGamepause(false) 호출.
-	AMgbPlayerController* PC = GetOwningLocalPlayer<AMgbPlayerController>();
+	AMgbPlayerController* PC = GetOwningPlayer<AMgbPlayerController>();
 	if (PC)
 	{
+		NET_LOG("");
 		PC->ServerResumeRequestCountIncrementAndCheck();
 	}
 }

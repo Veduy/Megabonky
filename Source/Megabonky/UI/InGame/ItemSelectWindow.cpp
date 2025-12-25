@@ -6,5 +6,5 @@
 
 void UItemSelectWindow::NativeOnInitialized()
 {
-	
+	Super::NativeOnInitialized();
 }

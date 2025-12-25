@@ -7,6 +7,7 @@
 #include "InputMappingContext.h"
 
 #include "MgbGameStateBase.h"
+#include "MgbGameModeBase.h"
 #include "Characters/MgbPlayerCharacter.h"
 
 #include "../Util/NetworkLog.h"
@@ -65,9 +66,10 @@ void AMgbPlayerController::OnUnPossess()
 
 void AMgbPlayerController::ServerResumeRequestCountIncrementAndCheck_Implementation()
 {
-	AMgbGameStateBase* GS =	GetWorld()->GetGameState<AMgbGameStateBase>();
+	AMgbGameStateBase* GS = Cast<AMgbGameStateBase>(GetWorld()->GetGameState());
 	if (GS)
 	{
+		NET_LOG("");
 		GS->HandleResumeRequest();
 	}
 }

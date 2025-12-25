@@ -4,8 +4,11 @@
 #include "ItemSelectButton.h"
 #include "Components/Button.h"
 
+#include "../../Util/NetworkLog.h"
 void UItemSelectButton::NativeOnInitialized()
 {
+	Super::NativeOnInitialized();
+
 	if (Button)
 	{
 		Button->OnClicked.AddDynamic(this, &UItemSelectButton::HandleButtonClicked);
@@ -14,5 +17,6 @@ void UItemSelectButton::NativeOnInitialized()
 
 void UItemSelectButton::HandleButtonClicked()
 {
+	NET_LOG("");
 	OnItemSelected.Broadcast();
 }

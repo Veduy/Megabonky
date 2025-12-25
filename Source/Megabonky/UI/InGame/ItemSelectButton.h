@@ -24,7 +24,7 @@ public:
 	virtual void NativeOnInitialized() override;
 
 public:
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void HandleButtonClicked();
 
 public:
