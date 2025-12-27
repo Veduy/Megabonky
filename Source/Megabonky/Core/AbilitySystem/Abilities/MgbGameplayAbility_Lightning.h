@@ -18,5 +18,10 @@ public:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 	
 public:
+	UFUNCTION()
+	void Lightning();
 
+public:
+	UPROPERTY()
+	uint8 LightingCount = 0;
 };

@@ -2,16 +2,84 @@
 
 
 #include "MgbGameplayAbility_Lightning.h"
+#include "AbilitySystemBlueprintLibrary.h"
+#include "Kismet/KismetSystemLibrary.h"
+
+#include "../AttributeSet/WeaponAttributeSet.h"
+#include "../AttributeSet/PlayerAttributeSet.h"
+#include "../../MgbWeapon.h"
 
 void UMgbGameplayAbility_Lightning::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	
-	/*
-		1.일정 범위 내 적 찾기.
-		2.적에게 데미지 effect 적용.
+	/* Info Caching*/
+	UAbilitySystemComponent* WeaponASC = GetAbilitySystemComponentFromActorInfo();
 
-	*/
+	GetActorInfo();
+	AActor* WeaponActor = GetCurrentActorInfo()->AvatarActor.Get();
+
+	// PlayerActor
+	AActor* PlayerActor = WeaponActor->GetOwner();
+
+	// Weapon ProjectileCount + Player ProjectileCount
+	uint8 WeaponProjectileCount = WeaponASC->GetNumericAttribute(UWeaponAttributeSet::GetProjectileCountAttribute());
+
+	UAbilitySystemComponent* PlayerASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(PlayerActor);
+	uint8 PlayerProjectileCount = PlayerASC->GetNumericAttribute(UPlayerAttributeSet::GetProjectileCountAttribute());
+
+	LightingCount = WeaponProjectileCount + PlayerProjectileCount;
+
+	/*Find Targets*/
+	TArray<AActor*>ActorsToIgnore;
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_GameTraceChannel1));
+	TArray<FHitResult>OutHits;
+	UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(),
+		PlayerActor->GetActorLocation(), PlayerActor->GetActorLocation(), 1500.f,
+		ObjectTypes, false, ActorsToIgnore, EDrawDebugTrace::ForDuration, OutHits, true,
+		FLinearColor::Red, FLinearColor::Green, 0.5f);
+	
+	TArray<AActor*> TargetActors;
+	for (const auto& hit : OutHits)
+	{
+		TargetActors.Add(hit.Component->GetOwner());
+		if (TargetActors.Num() >= LightingCount)
+		{
+			break;
+		}
+	}
+
+	/*Apply Damage Effect*/
+	AMgbWeapon* MgbWeapon = Cast<AMgbWeapon>(WeaponActor);
+	if (MgbWeapon)
+	{
+		FGameplayEffectContextHandle EffectContextHandle = WeaponASC->MakeEffectContext();
+		EffectContextHandle.AddSourceObject(WeaponActor);
+		EffectContextHandle.AddInstigator(WeaponActor, WeaponActor);
+
+		FGameplayEffectSpecHandle EffectSpecHandle = WeaponASC->MakeOutgoingSpec(MgbWeapon->DamageEffectClass, 1.f, EffectContextHandle);
+
+		for (const auto& target : TargetActors)
+		{
+			UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(target);
+			WeaponASC->ApplyGameplayEffectSpecToTarget(*EffectSpecHandle.Data.Get(), TargetASC);
+
+			/*Debuging용*/
+			{
+				FVector TargetLocation = target->GetActorLocation();
+				FVector Start = TargetLocation + FVector(0.f, 0.f, 100.f);
+				TArray<AActor*>ActorsToIgnoreTemp;
+				FHitResult OutHitTemp;
+				UKismetSystemLibrary::LineTraceSingle(GetWorld(),
+					Start, TargetLocation, ETraceTypeQuery::TraceTypeQuery1, false, ActorsToIgnoreTemp, EDrawDebugTrace::ForDuration, OutHitTemp, true,
+					FLinearColor::Red, FLinearColor::Green, 0.5f);
+			}
+		}
+	}
+}
+
+void UMgbGameplayAbility_Lightning::Lightning()
+{
 
 }

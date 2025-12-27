@@ -57,7 +57,7 @@ void AMgbPlayerController::OnPossess(APawn* aPawn)
 	AMgbPlayerCharacter* PlayerCharacter = Cast<AMgbPlayerCharacter>(aPawn);
 	if (PlayerCharacter)
 	{
-		PlayerCharacter->SpawnDefaultWeapon();
+		PlayerCharacter->EquipWeapon(PlayerCharacter->DefaultWeaponClass);
 		PlayerCharacter->ActivateWeaponsAbility();
 	}
 }

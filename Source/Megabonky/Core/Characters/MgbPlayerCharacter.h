@@ -52,7 +52,7 @@ public:
 	bool FindPrimaryTargetByCondition(AActor*& OutPrimaryTarget);
 
 	UFUNCTION()
-	void SpawnDefaultWeapon();
+	void EquipWeapon(TSubclassOf<AMgbWeapon> NewWeapon);
 
 	UFUNCTION()
 	void ActivateWeaponsAbility();
