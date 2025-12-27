@@ -6,7 +6,6 @@
 #include "AbilitySystem/MgbAbilitySystemComponent.h"
 #include "Engine/DamageEvents.h"
 #include "MgbWeapon.h"
-
 #include "../Util/NetworkLog.h"
 
 // Sets default values
@@ -72,9 +71,5 @@ float AMgbCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEv
 
 	}
 
-	
-	
-
 	return 0.0f;
 }
-

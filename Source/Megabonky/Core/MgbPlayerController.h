@@ -34,9 +34,17 @@ public:
 	void ServerResumeRequestCountIncrementAndCheck_Implementation();
 
 public:
+	UFUNCTION(Client, Unreliable)
+	void ClientSpawnDamageTextActor(FVector Location, float DamageValue);
+	void ClientSpawnDamageTextActor_Implementation(FVector Location, float DamageValue);
+
+public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputMappingContext> InputMappingContext;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Widget")
 	TObjectPtr<UInGame> InGameWidget;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
+	TSubclassOf<AActor> DamageTextActorClass;
 };

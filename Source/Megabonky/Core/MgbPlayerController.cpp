@@ -9,12 +9,16 @@
 #include "MgbGameStateBase.h"
 #include "MgbGameModeBase.h"
 #include "Characters/MgbPlayerCharacter.h"
-
+#include "../Actors/DamageTextActor.h"
 #include "../Util/NetworkLog.h"
 
 AMgbPlayerController::AMgbPlayerController()
 {
-
+	ConstructorHelpers::FClassFinder<AActor>BP_DamageTextActor(TEXT("/Game/Blueprints/Actors/BP_DamageTextActor.BP_DamageTextActor_C"));
+	if (BP_DamageTextActor.Succeeded())
+	{
+		DamageTextActorClass = BP_DamageTextActor.Class;
+	}
 }
 
 void AMgbPlayerController::AcknowledgePossession(APawn* P)
@@ -70,5 +74,16 @@ void AMgbPlayerController::ServerResumeRequestCountIncrementAndCheck_Implementat
 	{
 		NET_LOG("");
 		GS->HandleResumeRequest();
+	}
+}
+
+void AMgbPlayerController::ClientSpawnDamageTextActor_Implementation(FVector Location, float DamageValue)
+{
+	FTransform SpawnTransform = FTransform(FRotator(), Location, FVector::OneVector);
+	AActor* Actor = GetWorld()->SpawnActor<AActor>(DamageTextActorClass, SpawnTransform);
+
+	if (Actor)
+	{
+		Cast<ADamageTextActor>(Actor)->SetText(DamageValue);
 	}
 }

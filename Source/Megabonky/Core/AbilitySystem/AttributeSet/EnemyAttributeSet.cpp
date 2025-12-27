@@ -6,11 +6,14 @@
 #include "GameplayEffectExtension.h"
 #include "Net\UnrealNetwork.h"
 
+#include "../../MgbCharacter.h"
 #include "../../../Util/NetworkLog.h"
 
 UEnemyAttributeSet::UEnemyAttributeSet()
 {
-
+	InitMaxHealth(10.f);
+	InitHealth(10.f);
+	InitDamageTaken(0.f);
 }
 
 void UEnemyAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -36,6 +39,13 @@ void UEnemyAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute
 {
 	Super::PostAttributeChange(Attribute, OldValue, NewValue);
 
+	if (Attribute == GetHealthAttribute())
+	{
+		if (NewValue == 0.f)
+		{
+			GetOwningActor()->Destroy();
+		}
+	}
 }
 
 void UEnemyAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
@@ -51,19 +61,7 @@ void UEnemyAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallb
 		float NewHealth = FMath::Clamp(OldHealth - FinalDamage, 0.f, GetMaxHealth());
 
 		SetHealth(NewHealth);
-
-		// FinalDamage肺 UI Actor 积己.
-	}
-
-	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
-	{
-		if (GetHealth() <= 0)
-		{
-			// 荤噶 贸府
-			//NET_LOG("Death");
-			GetOwningActor()->Destroy();
-		}
-	}
+	} 
 }
 
 void UEnemyAttributeSet::OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth)

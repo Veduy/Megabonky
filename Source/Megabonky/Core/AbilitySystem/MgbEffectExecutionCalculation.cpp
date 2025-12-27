@@ -3,14 +3,14 @@
 
 #include "MgbEffectExecutionCalculation.h"
 
-#include "../AbilitySystem/MgbAbilitySystemComponent.h"
 #include "AttributeSet/EnemyAttributeSet.h"
 #include "AttributeSet/PlayerAttributeSet.h"
 #include "AttributeSet/WeaponAttributeSet.h"
 
+#include "../AbilitySystem/MgbAbilitySystemComponent.h"
 #include "../Characters/MgbPlayerCharacter.h"
 #include "../MgbWeapon.h"
-
+#include "../../Core/MgbPlayerController.h"
 #include "../../Util/NetworkLog.h"
 
 UMgbEffectExecutionCalculation::UMgbEffectExecutionCalculation(const FObjectInitializer& ObjectInitializer)
@@ -89,7 +89,15 @@ void UMgbEffectExecutionCalculation::Execute_Implementation(const FGameplayEffec
 	{
 		TotalDamage = WeaponDamage * PlayerDamage;
 	}
-	
+
+	// 데미지를 준 PlayerController에게만 데미지가 보이게 UI 처리
+	AMgbPlayerController* PC = Cast<AMgbPlayerController>(PlayerCharacter->GetOwner());
+	if (PC)
+	{
+		FVector Location = ExecutionParams.GetTargetAbilitySystemComponent()->GetAvatarActor()->GetActorLocation();
+		PC->ClientSpawnDamageTextActor(Location, TotalDamage);
+	}
+
 	return OutExecutionOutput.AddOutputModifier(
 		FGameplayModifierEvaluatedData(UEnemyAttributeSet::GetDamageTakenAttribute(), EGameplayModOp::Override, TotalDamage));
 }
