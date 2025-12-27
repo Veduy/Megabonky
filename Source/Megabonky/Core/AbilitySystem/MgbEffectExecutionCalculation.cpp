@@ -90,8 +90,6 @@ void UMgbEffectExecutionCalculation::Execute_Implementation(const FGameplayEffec
 		TotalDamage = WeaponDamage * PlayerDamage;
 	}
 	
-	UE_LOG(LogTemp, Warning, TEXT("TotalDamage: %f"), TotalDamage);
-
 	return OutExecutionOutput.AddOutputModifier(
-		FGameplayModifierEvaluatedData(UEnemyAttributeSet::GetHealthAttribute(), EGameplayModOp::Additive, -TotalDamage));
+		FGameplayModifierEvaluatedData(UEnemyAttributeSet::GetDamageTakenAttribute(), EGameplayModOp::Override, TotalDamage));
 }

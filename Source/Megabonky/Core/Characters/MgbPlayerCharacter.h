@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "../MgbCharacter.h"
 #include "GameplayAbilitySpec.h"
+#include "GameplayTagContainer.h"
 
 #include "MgbPlayerCharacter.generated.h"
 
@@ -21,16 +22,16 @@ struct FTomes
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	FName Name;
+	FGameplayTag Name;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	int32 Count;
+	int32 Level;
 };
 
 /**
  * 
  */
-UCLASS()
+UCLASS() 
 class MEGABONKY_API AMgbPlayerCharacter : public AMgbCharacter
 {
 	GENERATED_BODY()
@@ -70,12 +71,9 @@ public:
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = "Data")
 	TArray<TObjectPtr<AMgbWeapon>> Weapons;
 
-	/// <summary>
 	/// 비전서 (Tomes)
-	/// </summary>
-	UPROPERTY(VisibleAnywhere,BlueprintReadWrite, Category = "Data")
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite, Category = "Data", Replicated)
 	TArray<FTomes> Tomes;
-
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	TObjectPtr<UAttributeSet> PlayerAttributeSet;

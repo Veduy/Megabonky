@@ -29,7 +29,6 @@ void UEnemyAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute,
 	if (Attribute == GetHealthAttribute())
 	{
 		NewValue = FMath::Clamp(NewValue, 0, GetMaxHealth());
-
 	}
 }
 
@@ -37,18 +36,24 @@ void UEnemyAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute
 {
 	Super::PostAttributeChange(Attribute, OldValue, NewValue);
 
-	if (Attribute == GetHealthAttribute())
-	{
-		if (NewValue <= OldValue)
-		{
-			//NET_LOG(FString::Printf(TEXT("%s CurHP: %f, IncomeDamage: %f"), *GetOwningActor()->GetName(), OldValue, NewValue - OldValue));	
-		}
-	}
 }
 
 void UEnemyAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
 {
 	Super::PostGameplayEffectExecute(Data);
+
+	if (Data.EvaluatedData.Attribute == GetDamageTakenAttribute())
+	{
+		float FinalDamage = GetDamageTaken();
+		SetDamageTaken(0.f);
+
+		float OldHealth = GetHealth();
+		float NewHealth = FMath::Clamp(OldHealth - FinalDamage, 0.f, GetMaxHealth());
+
+		SetHealth(NewHealth);
+
+		// FinalDamage·Î UI Actor »ý¼º.
+	}
 
 	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
@@ -59,7 +64,6 @@ void UEnemyAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallb
 			GetOwningActor()->Destroy();
 		}
 	}
-
 }
 
 void UEnemyAttributeSet::OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth)

@@ -54,4 +54,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_MovementSpeed)
 	FGameplayAttributeData MovementSpeed;
 	ATTRIBUTE_ACCESSORS(UEnemyAttributeSet, MovementSpeed);
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FGameplayAttributeData DamageTaken;
+	ATTRIBUTE_ACCESSORS(UEnemyAttributeSet, DamageTaken);
 };
