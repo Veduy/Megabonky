@@ -34,7 +34,10 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data");
 	uint8 SpawnProjectileCount = 1;
 
-	uint8 TempSpawnCount = 0;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data");
+	uint8 ProjectileBounceCount = 0;
+
+	uint8 CurrentSpawnCount = 0;
 
 	FTimerHandle SpawnTimerHandle;
 };

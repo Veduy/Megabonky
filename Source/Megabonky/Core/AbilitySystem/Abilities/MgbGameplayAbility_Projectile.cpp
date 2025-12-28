@@ -29,28 +29,29 @@ void UMgbGameplayAbility_Projectile::SpawnProjectile(AActor* Owner, const FVecto
 	SpawnParams.Owner = Owner;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	GetWorld()->SpawnActor<AMgbProjectileActor>(ProjectileClass, SpawnTransform, SpawnParams);
-	TempSpawnCount++;
+	AMgbProjectileActor* Projectile = GetWorld()->SpawnActor<AMgbProjectileActor>(ProjectileClass, SpawnTransform, SpawnParams);
+	Projectile->BounceCount = ProjectileBounceCount;
+
+	CurrentSpawnCount++;
 }
 
 void UMgbGameplayAbility_Projectile::RapidFire()
 {
+	AActor* WeaponActor = GetCurrentActorInfo()->AvatarActor.Get(); // Avatar = Weapon Actor
 	UAbilitySystemComponent* WeaponASC = GetAbilitySystemComponentFromActorInfo();
 
-	// Avatar = Weapon Actor
-	GetActorInfo();
-	AActor* WeaponActor = GetCurrentActorInfo()->AvatarActor.Get();
-
-	// PlayerActor
-	AActor* PlayerActor = WeaponActor->GetOwner();
+	AActor* PlayerActor = WeaponActor->GetOwner(); // PlayerActor
+	UAbilitySystemComponent* PlayerASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(PlayerActor);
 
 	// Weapon ProjectileCount + Player ProjectileCount
 	uint8 WeaponProjectileCount = WeaponASC->GetNumericAttribute(UWeaponAttributeSet::GetProjectileCountAttribute());
-
-	UAbilitySystemComponent* PlayerASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(PlayerActor);
 	uint8 PlayerProjectileCount = PlayerASC->GetNumericAttribute(UPlayerAttributeSet::GetProjectileCountAttribute());
-
 	SpawnProjectileCount = WeaponProjectileCount + PlayerProjectileCount;
+
+	// Weapon ProjectileBounce + Player ProjectileBounce
+	uint8 WeaponProjectileBounce = WeaponASC->GetNumericAttribute(UWeaponAttributeSet::GetProjectileBouncesAttribute());
+	uint8 PlayerProjectileBounce = PlayerASC->GetNumericAttribute(UPlayerAttributeSet::GetProjectileBouncesAttribute());
+	ProjectileBounceCount = WeaponProjectileBounce + PlayerProjectileBounce;
 
 	float SpawnInterval = float(1) / float(SpawnProjectileCount);
 
@@ -73,12 +74,12 @@ void UMgbGameplayAbility_Projectile::RapidFire()
 			}
 			else
 			{
-				TempSpawnCount++;
+				CurrentSpawnCount++;
 			}
 
-			if (TempSpawnCount >= SpawnProjectileCount)
+			if (CurrentSpawnCount >= SpawnProjectileCount)
 			{
-				TempSpawnCount = 0;
+				CurrentSpawnCount = 0;
 				GetWorld()->GetTimerManager().ClearTimer(SpawnTimerHandle);
 
 				EndAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), false, false);
