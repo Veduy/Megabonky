@@ -24,7 +24,7 @@ AMgbEnemyCharacter::AMgbEnemyCharacter()
 
 	GetCharacterMovement()->MaxWalkSpeed = 100.f;
 	GetCharacterMovement()->MaxAcceleration = 500.f;
-	GetCharacterMovement()->GroundFriction = 100.f;
+	GetCharacterMovement()->GroundFriction = 1.f;
 	GetCharacterMovement()->MaxStepHeight = 1000.f;
 
 	GetCapsuleComponent()->SetCollisionProfileName(FName("Enemy"));

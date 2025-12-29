@@ -26,7 +26,7 @@ public:
 
 public:
 	UFUNCTION()
-	void OutBoundFlight();
+	void ThrowBananarang();
 
 	UFUNCTION()
 	void ReturnToPlayer();

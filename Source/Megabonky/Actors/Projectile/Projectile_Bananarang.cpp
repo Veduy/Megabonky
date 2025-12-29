@@ -28,7 +28,7 @@ void AProjectile_Bananarang::BeginPlay()
 	GetWorldTimerManager().SetTimer(
 		OutBoundTimer,
 		this,
-		&AProjectile_Bananarang::OutBoundFlight,
+		&AProjectile_Bananarang::ThrowBananarang,
 		OutBoundFlightTime,
 		false
 	);
@@ -45,7 +45,7 @@ void AProjectile_Bananarang::Tick(float DeltaTime)
 		AActor* PlayerActor = Weapon->GetOwner();
 		float Distance = FVector::DistSquared(PlayerActor->GetActorLocation(),GetActorLocation());
 
-		if (Distance <= 10.f)
+		if (Distance <= 1600.f)
 		{
 			Destroy();
 		}
@@ -55,51 +55,48 @@ void AProjectile_Bananarang::Tick(float DeltaTime)
 void AProjectile_Bananarang::BeginOverlap(AActor* OtherActor)
 {
 	// 서버에서만 충돌 검사.
-	if (HasAuthority())
+	if (!HasAuthority())
 	{
-		// GetOwner() = WeaponActor;
-		AMgbWeapon* Weapon = Cast<AMgbWeapon>(GetOwner());
-		if (bReturning && OtherActor == Weapon->GetOwner())
+		return;
+	}
+
+	// GetOwner() = WeaponActor;
+	AMgbWeapon* Weapon = Cast<AMgbWeapon>(GetOwner());
+	if (bReturning && OtherActor == Weapon->GetOwner())
+	{
+		Destroy();
+	}
+
+	AMgbEnemyCharacter* Enemy = Cast<AMgbEnemyCharacter>(OtherActor);
+	if (Enemy)
+	{
+		//
+
+
+
+
+		if (bRadialDamage == false)
 		{
-			Destroy();
-		}
-
-		AMgbEnemyCharacter* Enemy = Cast<AMgbEnemyCharacter>(OtherActor);
-		if (Enemy)
-		{
-			if (bRadialDamage == false)
+			if (Weapon)
 			{
-				if (Weapon)
+				FGameplayEffectContextHandle EffectContextHandle = Weapon->GetAbilitySystemComponent()->MakeEffectContext();
+				EffectContextHandle.AddSourceObject(Weapon);
+				EffectContextHandle.AddInstigator(Weapon, Weapon);
+
+				if (Weapon->DamageEffectClass)
 				{
-					FGameplayEffectContextHandle EffectContextHandle = Weapon->GetAbilitySystemComponent()->MakeEffectContext();
-					EffectContextHandle.AddSourceObject(Weapon);
-					EffectContextHandle.AddInstigator(Weapon, Weapon);
+					FGameplayEffectSpecHandle EffectSpecHandle = Weapon->GetAbilitySystemComponent()->MakeOutgoingSpec(Weapon->DamageEffectClass, 1.f, EffectContextHandle);
 
-					if (Weapon->DamageEffectClass)
-					{
-						// Spec을 생성한 컴포넌트가 ExecCalc의 Source로 설정.
-						FGameplayEffectSpecHandle EffectSpecHandle = Weapon->GetAbilitySystemComponent()->MakeOutgoingSpec(Weapon->DamageEffectClass, 1.f, EffectContextHandle);
-
-						UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor);
-						Weapon->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*EffectSpecHandle.Data.Get(), TargetASC);
-					}
-				}
-			}
-
-			// 처음 날라가는 중이었다면, 스탑.
-			if (OutBoundTimer.IsValid())
-			{
-				if (GetWorldTimerManager().TimerExists(OutBoundTimer))
-				{
-					GetWorldTimerManager().ClearTimer(OutBoundTimer);
-					OutBoundFlight();
+					UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor);
+					Weapon->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*EffectSpecHandle.Data.Get(), TargetASC);
 				}
 			}
 		}
 	}
+	
 }
 
-void AProjectile_Bananarang::OutBoundFlight()
+void AProjectile_Bananarang::ThrowBananarang()
 {
 	ProjectileMovement->StopMovementImmediately();
 	ProjectileMovement->Deactivate();
@@ -111,7 +108,7 @@ void AProjectile_Bananarang::OutBoundFlight()
 		StayTimer,
 		this,
 		&AProjectile_Bananarang::ReturnToPlayer,
-		1.f,
+		0.2f,
 		false
 	);
 }
