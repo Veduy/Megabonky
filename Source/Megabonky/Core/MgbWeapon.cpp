@@ -20,6 +20,13 @@ AMgbWeapon::AMgbWeapon()
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 
 	WeaponAttributeSet = CreateDefaultSubobject<UWeaponAttributeSet>(TEXT("WeaponAttributeSet"));
+
+	ConstructorHelpers::FClassFinder<UGameplayEffect>GE_DamageEffect(TEXT("/Game/Blueprints/AbilitySystem/GameplayEffects/GE_DamageEffect.GE_DamageEffect_C"));
+	if (GE_DamageEffect.Succeeded())
+	{
+		DamageEffectClass = GE_DamageEffect.Class;
+	}
+
 }
 
 void AMgbWeapon::BeginPlay()

@@ -24,13 +24,21 @@ void UMgbGameplayAbility_Projectile::ActivateAbility(const FGameplayAbilitySpecH
 
 void UMgbGameplayAbility_Projectile::SpawnProjectile(AActor* Owner, const FVector& InSpawnOrigin, const FRotator& InSpawnDir)
 {
-	FTransform SpawnTransform = FTransform(InSpawnDir, InSpawnOrigin, FVector(1.f, 1.f, 1.f));
+	FRotator Rotation = InSpawnDir;
+	Rotation.Roll = 0.f;
+	FTransform SpawnTransform = FTransform(Rotation, InSpawnOrigin, FVector(1.f, 1.f, 1.f));
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = Owner;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	AMgbProjectileActor* Projectile = GetWorld()->SpawnActor<AMgbProjectileActor>(ProjectileClass, SpawnTransform, SpawnParams);
-	Projectile->BounceCount = ProjectileBounceCount;
+	if (ProjectileClass)
+	{
+		AMgbProjectileActor* Projectile = GetWorld()->SpawnActor<AMgbProjectileActor>(ProjectileClass, SpawnTransform, SpawnParams);
+		if (Projectile)
+		{
+			Projectile->BounceCount = ProjectileBounceCount;
+		}
+	}
 
 	CurrentSpawnCount++;
 }

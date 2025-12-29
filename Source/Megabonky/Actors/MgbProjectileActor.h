@@ -29,14 +29,21 @@ public:
 	//FComponentBeginOverlapSignature, UPrimitiveComponent, OnComponentBeginOverlap, UPrimitiveComponent*, OverlappedComponent, AActor*, OtherActor, UPrimitiveComponent*, OtherComp, int32, OtherBodyIndex, bool, bFromSweep, const FHitResult&, SweepResult);
 
 	UFUNCTION(BlueprintCallable)
-	void BeginOverlap(AActor* OtherActor);
+	virtual void BeginOverlap(AActor* OtherActor);
 
 	UFUNCTION(BlueprintCallable)
 	void ComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 public:
+	UFUNCTION(BlueprintCallable)
+	void Bounce();
+
+public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")
+	TArray<TObjectPtr<AActor>> ActorsToIgnore;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
 	uint8 bRadialDamage : 1 = false;
@@ -44,6 +51,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
 	uint8 bBounce : 1 = false;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")
 	uint8 BounceCount = 0;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
+	float BounceRange = 500.f;
 };
