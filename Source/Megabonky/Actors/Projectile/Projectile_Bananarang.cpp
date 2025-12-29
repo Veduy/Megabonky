@@ -45,7 +45,7 @@ void AProjectile_Bananarang::Tick(float DeltaTime)
 		AActor* PlayerActor = Weapon->GetOwner();
 		float Distance = FVector::DistSquared(PlayerActor->GetActorLocation(),GetActorLocation());
 
-		if (Distance <= 100.f)
+		if (Distance <= 10.f)
 		{
 			Destroy();
 		}

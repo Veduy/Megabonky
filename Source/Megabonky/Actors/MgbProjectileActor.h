@@ -38,6 +38,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Bounce();
 
+
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
