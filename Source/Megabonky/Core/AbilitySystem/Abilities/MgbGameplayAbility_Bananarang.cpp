@@ -12,6 +12,5 @@ void UMgbGameplayAbility_Bananarang::ActivateAbility(const FGameplayAbilitySpecH
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	NET_LOG("");
 	RapidFire();
 }

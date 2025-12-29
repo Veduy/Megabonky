@@ -10,14 +10,18 @@
 #include "../../Core/MgbWeapon.h"
 #include "../../Core/Characters/MgbEnemyCharacter.h"
 
+AProjectile_Bananarang::AProjectile_Bananarang()
+{
+	PrimaryActorTick.bCanEverTick = true;
+
+	ProjectileMovement->SetIsReplicated(true);
+}
+
 void AProjectile_Bananarang::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (!HasAuthority())
-	{
-		return;
-	}
+	SetActorTickEnabled(false);
 
 	SetLifeSpan(0.f);
 
@@ -30,51 +34,66 @@ void AProjectile_Bananarang::BeginPlay()
 	);
 }
 
+
+void AProjectile_Bananarang::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (bReturning)
+	{
+		AMgbWeapon* Weapon = Cast<AMgbWeapon>(GetOwner());
+		AActor* PlayerActor = Weapon->GetOwner();
+		float Distance = FVector::DistSquared(PlayerActor->GetActorLocation(),GetActorLocation());
+
+		if (Distance <= 100.f)
+		{
+			Destroy();
+		}
+	}
+}
+
 void AProjectile_Bananarang::BeginOverlap(AActor* OtherActor)
 {
 	// 서버에서만 충돌 검사.
-	if (!HasAuthority())
+	if (HasAuthority())
 	{
-		return;
-	}
-
-	// GetOwner() = WeaponActor;
-	AMgbWeapon* Weapon = Cast<AMgbWeapon>(GetOwner());
-
-	if (bReturning && OtherActor == Weapon->GetOwner())
-	{
-		Destroy();
-	}
-
-	AMgbEnemyCharacter* Enemy = Cast<AMgbEnemyCharacter>(OtherActor);
-	if (Enemy)
-	{	
-		if (bRadialDamage == false)
+		// GetOwner() = WeaponActor;
+		AMgbWeapon* Weapon = Cast<AMgbWeapon>(GetOwner());
+		if (bReturning && OtherActor == Weapon->GetOwner())
 		{
-			if (Weapon)
-			{
-				FGameplayEffectContextHandle EffectContextHandle = Weapon->GetAbilitySystemComponent()->MakeEffectContext();
-				EffectContextHandle.AddSourceObject(Weapon);
-				EffectContextHandle.AddInstigator(Weapon, Weapon);
-
-				if (Weapon->DamageEffectClass)
-				{
-					// Spec을 생성한 컴포넌트가 ExecCalc의 Source로 설정.
-					FGameplayEffectSpecHandle EffectSpecHandle = Weapon->GetAbilitySystemComponent()->MakeOutgoingSpec(Weapon->DamageEffectClass, 1.f, EffectContextHandle);
-
-					UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor);
-					Weapon->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*EffectSpecHandle.Data.Get(), TargetASC);
-				}
-			}
+			Destroy();
 		}
 
-		// 처음 날라가는 중이었다면, 스탑.
-		if (OutBoundTimer.IsValid())
+		AMgbEnemyCharacter* Enemy = Cast<AMgbEnemyCharacter>(OtherActor);
+		if (Enemy)
 		{
-			if (GetWorldTimerManager().TimerExists(OutBoundTimer))
+			if (bRadialDamage == false)
 			{
-				GetWorldTimerManager().ClearTimer(OutBoundTimer);
-				OutBoundFlight();
+				if (Weapon)
+				{
+					FGameplayEffectContextHandle EffectContextHandle = Weapon->GetAbilitySystemComponent()->MakeEffectContext();
+					EffectContextHandle.AddSourceObject(Weapon);
+					EffectContextHandle.AddInstigator(Weapon, Weapon);
+
+					if (Weapon->DamageEffectClass)
+					{
+						// Spec을 생성한 컴포넌트가 ExecCalc의 Source로 설정.
+						FGameplayEffectSpecHandle EffectSpecHandle = Weapon->GetAbilitySystemComponent()->MakeOutgoingSpec(Weapon->DamageEffectClass, 1.f, EffectContextHandle);
+
+						UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor);
+						Weapon->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*EffectSpecHandle.Data.Get(), TargetASC);
+					}
+				}
+			}
+
+			// 처음 날라가는 중이었다면, 스탑.
+			if (OutBoundTimer.IsValid())
+			{
+				if (GetWorldTimerManager().TimerExists(OutBoundTimer))
+				{
+					GetWorldTimerManager().ClearTimer(OutBoundTimer);
+					OutBoundFlight();
+				}
 			}
 		}
 	}
@@ -82,13 +101,10 @@ void AProjectile_Bananarang::BeginOverlap(AActor* OtherActor)
 
 void AProjectile_Bananarang::OutBoundFlight()
 {
-	if (!HasAuthority())
-	{
-		return;
-	}
-
 	ProjectileMovement->StopMovementImmediately();
 	ProjectileMovement->Deactivate();
+
+	SetActorTickEnabled(true);
 
 	FTimerHandle StayTimer;
 	GetWorldTimerManager().SetTimer(
@@ -102,22 +118,19 @@ void AProjectile_Bananarang::OutBoundFlight()
 
 void AProjectile_Bananarang::ReturnToPlayer()
 {
-	if (HasAuthority())
+	bReturning = true;
+
+	ProjectileMovement->Activate();
+	ProjectileMovement->bIsHomingProjectile = true;
+
+	// GetOwner()->GetOwner() = PlayerCharacter;
+	if (IsValid(GetOwner()))
 	{
-		bReturning = true;
-
-		ProjectileMovement->Activate();
-		ProjectileMovement->bIsHomingProjectile = true;
-
-		// GetOwner()->GetOwner() = PlayerCharacter;
-		if (IsValid(GetOwner()))
+		ACharacter* PlayerCharacter = Cast<ACharacter>(GetOwner()->GetOwner());
+		if (PlayerCharacter)
 		{
-			ACharacter* PlayerCharacter = Cast<ACharacter>(GetOwner()->GetOwner());
-			if (PlayerCharacter)
-			{
-				ProjectileMovement->HomingTargetComponent = PlayerCharacter->GetRootComponent();
-				ProjectileMovement->HomingAccelerationMagnitude = 15000.f;
-			}
+			ProjectileMovement->HomingTargetComponent = PlayerCharacter->GetRootComponent();
+			ProjectileMovement->HomingAccelerationMagnitude = 15000.f;
 		}
 	}
 }

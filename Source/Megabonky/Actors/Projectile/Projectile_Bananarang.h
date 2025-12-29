@@ -15,9 +15,11 @@ class MEGABONKY_API AProjectile_Bananarang : public AMgbProjectileActor
 	GENERATED_BODY()
 	
 public:
+	AProjectile_Bananarang();
+
 	virtual void BeginPlay() override;
 
-	//virtual void Tick(float DeltaTime) override;
+	virtual void Tick(float DeltaTime) override;
 
 public:
 	virtual void BeginOverlap(AActor* OtherActor);
@@ -31,7 +33,7 @@ public:
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
-	float OutBoundFlightTime = 2.f;
+	float OutBoundFlightTime = 0.7f;
 
 	UPROPERTY()
 	uint8 bReturning : 1 = false;

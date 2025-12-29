@@ -69,12 +69,14 @@ void UMgbGameplayAbility_Projectile::RapidFire()
 			AActor* TargetActor = nullptr;
 			// 스폰 방향을 PrimaryTarget 으로 수정.
 			AMgbPlayerCharacter* PlayerCharacter = Cast<AMgbPlayerCharacter>(PlayerActor);
+
+			bool bFoundTarget = false;
 			if (PlayerCharacter)
 			{
-				PlayerCharacter->FindPrimaryTargetByCondition(TargetActor);
+				bFoundTarget = PlayerCharacter->FindPrimaryTargetByCondition(TargetActor);
 			}
 
-			if (TargetActor && Cast<AMgbEnemyCharacter>(TargetActor)->bSpawnFinished)
+			if (bFoundTarget && TargetActor && Cast<AMgbEnemyCharacter>(TargetActor)->bSpawnFinished)
 			{
 				FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(PlayerActor->GetActorLocation(), TargetActor->GetActorLocation());
 

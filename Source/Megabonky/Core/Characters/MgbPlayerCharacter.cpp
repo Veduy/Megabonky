@@ -10,6 +10,7 @@
 #include "InputAction.h"
 #include "EnhancedInputComponent.h"
 #include "Net/UnrealNetwork.h"
+#include "Algo/Sort.h"
 
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -94,7 +95,7 @@ void AMgbPlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 
 bool AMgbPlayerCharacter::FindPrimaryTargetByCondition(AActor*& OutPrimaryTarget)
 {
-	// 일정 범위내에 액터들 중에서 거리만 판별해서, 최단거리 액터를 타겟으로 설정.
+	// 일정 범위내에 액터들 중에서 거리만 판별해서, 가까운 3마리중 타겟 랜덤
 	FVector Origin = GetActorLocation();
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_GameTraceChannel1));
@@ -106,24 +107,40 @@ bool AMgbPlayerCharacter::FindPrimaryTargetByCondition(AActor*& OutPrimaryTarget
 		ObjectTypes, AMgbEnemyCharacter::StaticClass(), 
 		ActorsToIgnore, OutActors);
 
-	if (OutActors.IsEmpty())
+
+	if (!OutActors.IsEmpty())
 	{
-		return false;
-	}
-	else
-	{
-		float ClosesetDistance = MAX_FLT;
+		// 거리 오름차순(가까운순) 정렬 후 근거리 3마리에서 랜덤으로 PrimaryTargetSetting;
+		Algo::Sort(
+			OutActors,
+			[&](const AActor* A, const AActor* B)
+			{
+				return FVector::DistSquared(A->GetActorLocation(), Origin) < FVector::DistSquared(B->GetActorLocation(), Origin);
+			});
+
+		AActor* Targets[3] = { nullptr };
+		uint8 TargetCount = FMath::Min(OutActors.Num(), 3);
+		for (uint8 i = 0; i < TargetCount; ++i)
+		{	
+			OutActors.IsValidIndex(i) ? Targets[i] = OutActors[i] : nullptr;
+		}
+		OutPrimaryTarget = Targets[FMath::RandRange(0, TargetCount - 1)];
+		return true;
+
+		// 최단 거리 액터 찾는거.
+		/*float ClosesetDistance = MAX_FLT;
 		for (const auto& Target : OutActors)
 		{
 			float Distance = (Target->GetActorLocation() - Origin).Length();
 			if (Distance < ClosesetDistance)
-			{
+			{	
 				ClosesetDistance = Distance;
 				OutPrimaryTarget = Target;
 			}
-		}
-		return true;
+		}*/
 	}
+
+	return false;
 }
 
 void AMgbPlayerCharacter::EquipWeapon(TSubclassOf<AMgbWeapon> NewWeapon)
