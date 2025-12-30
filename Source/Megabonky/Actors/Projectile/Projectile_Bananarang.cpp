@@ -70,10 +70,6 @@ void AProjectile_Bananarang::BeginOverlap(AActor* OtherActor)
 	AMgbEnemyCharacter* Enemy = Cast<AMgbEnemyCharacter>(OtherActor);
 	if (Enemy)
 	{
-		//
-
-
-
 
 		if (bRadialDamage == false)
 		{

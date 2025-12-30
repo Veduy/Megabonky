@@ -100,30 +100,50 @@ void AMgbEnemyCharacter::MoveToTarget()
 
 	FVector Dir = TargetActor->GetActorLocation() - GetActorLocation();
 	Dir = Dir.GetSafeNormal2D();
-	AddMovementInput(Dir, 1.f);
+	AddMovementInput(Dir);
 
 	//bool UKismetSystemLibrary::LineTraceSingleForObjects(const UObject * WorldContextObject, const FVector Start, const FVector End, const TArray<TEnumAsByte<EObjectTypeQuery> > &ObjectTypes, bool bTraceComplex, const TArray<AActor*>&ActorsToIgnore, EDrawDebugTrace::Type DrawDebugType, FHitResult & OutHit, bool bIgnoreSelf, FLinearColor TraceColor, FLinearColor TraceHitColor, float DrawTime)
 
-	FVector Start = GetActorLocation() - FVector(0.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
-	FVector End = Start + GetActorForwardVector() * (GetCapsuleComponent()->GetScaledCapsuleRadius() * 1.5f);
+
+	/*===============================================수정 필요===============================================*/
+	// 발쪽, 몸통 살짝 위 전방 Trace.
+	FVector FootStart = GetActorLocation() - FVector(0.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
+	FVector FootEnd = FootStart + GetActorForwardVector() * (GetCapsuleComponent()->GetScaledCapsuleRadius() * 1.5f);
+
+	FVector BodyStart = GetActorLocation() + FVector(0.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 0.5f);
+	FVector BodyEnd = BodyStart + GetActorForwardVector() * (GetCapsuleComponent()->GetScaledCapsuleRadius() * 1.5f);
+
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldStatic));
-
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_GameTraceChannel1));
+	
 	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(this);
 	FHitResult Hit;
 
-	bool bResult = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(),
-		Start,
-		End,
+	bool bFootResult = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(),
+		FootStart,
+		FootEnd,
 		ObjectTypes,
 		false,
 		ActorsToIgnore,
-		EDrawDebugTrace::None,
+		EDrawDebugTrace::ForOneFrame,
 		Hit,
 		true);
 
+	bool bBodyResult = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(),
+		BodyStart,
+		BodyEnd,
+		ObjectTypes,
+		false,
+		ActorsToIgnore,
+		EDrawDebugTrace::ForOneFrame,
+		Hit,
+		true);
+
+
 	// 타겟과 벽을 사이에 두고있을 경우. 벽을 타고 올라가도록.
-	if (bResult)
+	if (bFootResult && bBodyResult)
 	{
 		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
 		AddMovementInput(GetActorUpVector());

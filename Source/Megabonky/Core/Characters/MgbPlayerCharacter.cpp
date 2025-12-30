@@ -63,6 +63,13 @@ void AMgbPlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 }
 
+void AMgbPlayerCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	UpdateCharacterPitch();
+}
+
 void AMgbPlayerCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
