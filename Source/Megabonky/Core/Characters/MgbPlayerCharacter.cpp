@@ -31,6 +31,11 @@ AMgbPlayerCharacter::AMgbPlayerCharacter()
 	GetCharacterMovement()->bUseControllerDesiredRotation = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->MaxWalkSpeed = 400.f;
+	GetCharacterMovement()->GroundFriction = 0.f;
+	GetCharacterMovement()->BrakingFrictionFactor = 0.f;
+	GetCharacterMovement()->RotationRate = FRotator(0.f, 0.f, 900.f);
+	
+	
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;

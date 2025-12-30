@@ -38,6 +38,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Bounce();
 
+	UFUNCTION(BlueprintCallable)
+	void Knockback();
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")

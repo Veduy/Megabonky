@@ -137,3 +137,8 @@ void AMgbProjectileActor::Bounce()
 
 	BounceCount--;
 }
+
+void AMgbProjectileActor::Knockback()
+{
+
+}
