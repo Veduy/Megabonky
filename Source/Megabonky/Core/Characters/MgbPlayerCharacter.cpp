@@ -30,7 +30,7 @@ AMgbPlayerCharacter::AMgbPlayerCharacter()
 
 	GetCharacterMovement()->bUseControllerDesiredRotation = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
-	GetCharacterMovement()->MaxWalkSpeed = 300.f;
+	GetCharacterMovement()->MaxWalkSpeed = 400.f;
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
@@ -67,7 +67,6 @@ void AMgbPlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	UpdateCharacterPitch();
 }
 
 void AMgbPlayerCharacter::PossessedBy(AController* NewController)

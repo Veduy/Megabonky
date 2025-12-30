@@ -18,8 +18,6 @@ AMgbEnemyCharacter::AMgbEnemyCharacter()
 
 	CharacterAttributeSet = CreateDefaultSubobject<UEnemyAttributeSet>(TEXT("EnemyAttributeSet"));
 	
-	// 스폰시 AIController가 있으면 유효한 위치로 강제 이동시킴.
-	// 스폰로직이 끝났을때, SpawnDefaultController(); 로 AIController 붙여줌.
 	AutoPossessAI = EAutoPossessAI::Disabled;
 
 	GetCharacterMovement()->MaxWalkSpeed = 100.f;
@@ -101,9 +99,6 @@ void AMgbEnemyCharacter::MoveToTarget()
 	FVector Dir = TargetActor->GetActorLocation() - GetActorLocation();
 	Dir = Dir.GetSafeNormal2D();
 	AddMovementInput(Dir);
-
-	//bool UKismetSystemLibrary::LineTraceSingleForObjects(const UObject * WorldContextObject, const FVector Start, const FVector End, const TArray<TEnumAsByte<EObjectTypeQuery> > &ObjectTypes, bool bTraceComplex, const TArray<AActor*>&ActorsToIgnore, EDrawDebugTrace::Type DrawDebugType, FHitResult & OutHit, bool bIgnoreSelf, FLinearColor TraceColor, FLinearColor TraceHitColor, float DrawTime)
-
 
 	/*===============================================수정 필요===============================================*/
 	// 발쪽, 몸통 살짝 위 전방 Trace.

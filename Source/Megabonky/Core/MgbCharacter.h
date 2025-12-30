@@ -30,7 +30,7 @@ public:
 
 public:
 	UFUNCTION()
-	void UpdateCharacterPitch();
+	void UpdateCharacterPitch(float DeltaTime);
 
 public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Components")

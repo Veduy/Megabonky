@@ -52,6 +52,7 @@ void AMgbCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	UpdateCharacterPitch(DeltaTime);
 }
 
 UAbilitySystemComponent* AMgbCharacter::GetAbilitySystemComponent() const
@@ -79,62 +80,81 @@ float AMgbCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEv
 	return 0.0f;
 }
 
-void AMgbCharacter::UpdateCharacterPitch()
+void AMgbCharacter::UpdateCharacterPitch(float DeltaTime)
 {
-	const FFindFloorResult& Floor = GetCharacterMovement()->CurrentFloor;
+	//const FFindFloorResult& Floor = GetCharacterMovement()->CurrentFloor;
 
-	if (Floor.bBlockingHit)
+	//if (Floor.bBlockingHit)
+	//{
+	//	FVector FloorNormal = Floor.HitResult.Normal;
+
+	//	FRotator RotationXZ = UKismetMathLibrary::MakeRotFromXZ(GetActorForwardVector(),FloorNormal);
+	//	FRotator RotationYZ = UKismetMathLibrary::MakeRotFromYZ(GetActorRightVector(),FloorNormal);
+	//	
+	//	FRotator CurrentRotation = GetMesh()->GetRelativeRotation();
+
+	//	FRotator TargetRotation;
+	//	TargetRotation.Pitch = RotationYZ.Pitch;
+	//	TargetRotation.Roll = RotationXZ.Roll;
+	//	
+	//	// Mesh가 기본으로 Yaw축으로 -90도 돌아가있어서 > 
+	//	CurrentRotation.Pitch = FMath::FInterpTo(CurrentRotation.Pitch, TargetRotation.Roll, DeltaTime, 5.f);
+	//	CurrentRotation.Roll = FMath::FInterpTo(CurrentRotation.Roll, -TargetRotation.Pitch, DeltaTime, 5.f);
+
+	//	GetMesh()->SetRelativeRotation(CurrentRotation);
+	//}
+	//else
+	//{
+	//	FRotator CurrentRotation = GetMesh()->GetRelativeRotation();
+	//	
+	//	CurrentRotation.Pitch = FMath::FInterpTo(CurrentRotation.Pitch, 0, DeltaTime, 5.f);
+	//	CurrentRotation.Roll = FMath::FInterpTo(CurrentRotation.Roll, 0, DeltaTime, 5.f);
+
+	//	GetMesh()->SetRelativeRotation(CurrentRotation);
+	//}
+
+	FVector Start = GetActorLocation() - FVector(0.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
+	FVector End = Start + (GetActorUpVector() * -500.f);
+
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldStatic));
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_GameTraceChannel1));
+
+	TArray<AActor*> ActorsToIgnore;
+	FHitResult Hit;
+
+	bool bResult = UKismetSystemLibrary::LineTraceSingle(GetWorld(),
+		Start, End,
+		UEngineTypes::ConvertToTraceType(ECC_Visibility), false,
+		ActorsToIgnore, EDrawDebugTrace::Type::ForOneFrame, Hit,
+		true);
+
+	if (bResult)
 	{
-		FVector FloorNormal = Floor.HitResult.Normal;
+		FVector FloorNormal = Hit.Normal;
 
-		FRotator SlopeRotation = UKismetMathLibrary::MakeRotFromXZ(GetActorForwardVector(),FloorNormal);
+		FRotator RotationXZ = UKismetMathLibrary::MakeRotFromXZ(GetActorForwardVector(), FloorNormal);
+		FRotator RotationYZ = UKismetMathLibrary::MakeRotFromYZ(GetActorRightVector(), FloorNormal);
 
-		// Right버전 따로 추가.
-		//FRotator SlopeRotation = UKismetMathLibrary::MakeRotFromXZ(GetActorRightVector(),FloorNormal);
-		
+		FRotator CurrentRotation = GetMesh()->GetRelativeRotation();
 
-		FRotator ActorRotation = GetActorRotation();
+		FRotator TargetRotation;
+		TargetRotation.Pitch = RotationYZ.Pitch;
+		TargetRotation.Roll = RotationXZ.Roll;
 
-		FRotator TargetRot;
-		TargetRot.Pitch = SlopeRotation.Pitch;
-		TargetRot.Roll = SlopeRotation.Roll;
-		TargetRot.Yaw = ActorRotation.Yaw;
+		// Mesh가 기본으로 Yaw축으로 -90도 돌아가있어서 
+		CurrentRotation.Pitch = FMath::FInterpTo(CurrentRotation.Pitch, TargetRotation.Roll, DeltaTime, 5.f);
+		CurrentRotation.Roll = FMath::FInterpTo(CurrentRotation.Roll, -TargetRotation.Pitch, DeltaTime, 5.f);
 
-		//FRotator SmoothRot = FMath::RInterpTo(ActorRotation, TargetRot, GetWorld()->GetDeltaSeconds(), 8.f);
-		//GetMesh()->SetRelativeRotation(SmoothRot);
-		SetActorRotation(TargetRot);
+		GetMesh()->SetRelativeRotation(CurrentRotation);
 	}
 	else
 	{
-		FVector FloorNormal = FVector(0.f, 0.f, 1.f);
+		FRotator CurrentRotation = GetMesh()->GetRelativeRotation();
 
+		CurrentRotation.Pitch = FMath::FInterpTo(CurrentRotation.Pitch, 0, DeltaTime, 5.f);
+		CurrentRotation.Roll = FMath::FInterpTo(CurrentRotation.Roll, 0, DeltaTime, 5.f);
+
+		GetMesh()->SetRelativeRotation(CurrentRotation);
 	}
-
-	//FVector Start = GetActorLocation() - FVector(0.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
-	//FVector End = Start + (GetActorUpVector() * -25.f);
-
-	//TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-	//ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldStatic));
-	//ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_GameTraceChannel1));
-
-	//TArray<AActor*> ActorsToIgnore;
-	//FHitResult Hit;
-
-	//bool bResult = UKismetSystemLibrary::LineTraceSingle(GetWorld(),
-	//	Start, End,
-	//	UEngineTypes::ConvertToTraceType(ECC_Visibility), false,
-	//	ActorsToIgnore, EDrawDebugTrace::Type::ForOneFrame, Hit,
-	//	true);
-
-	//if (bResult)
-	//{
-	//	FVector Normal = Hit.Normal;
-	//	
-	//	UE_LOG(LogTemp, Warning, TEXT("Normal : %f"), Normal.Rotation().Pitch);
-
-	//	FRotator ActorRotation = GetActorRotation();
-	//	
-	//	//SetActorRelativeRotation()
-	//	
-	//}
 }
