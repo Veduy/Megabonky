@@ -6,8 +6,15 @@
 #include "../MgbCharacter.h"
 #include "MgbEnemyCharacter.generated.h"
 
-
 class UEnemyAttributeSet;
+
+UENUM(BlueprintType)
+enum class EMoveState : uint8
+{
+	Walking = 0		UMETA(DisplayName = "Walking"),
+	Climbing = 10   UMETA(DisplayName = "Climbing")
+};
+
 /**
  * 
  */

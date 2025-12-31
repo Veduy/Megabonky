@@ -92,88 +92,123 @@ void AMgbEnemyCharacter::Destroyed()
 void AMgbEnemyCharacter::MoveToTarget()
 {
 	if (!TargetActor)
-	{
 		return;
-	}
 
 	FVector Dir = TargetActor->GetActorLocation() - GetActorLocation();
-	Dir = Dir.GetSafeNormal2D();
-	AddMovementInput(Dir);
+	Dir = Dir.GetSafeNormal();
 
-	/*===============================================수정 필요===============================================*/
-	// 발쪽, 몸통 살짝 위 전방 Trace.
-	FVector FootStart = GetActorLocation() - FVector(0.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
-	FVector FootEnd = FootStart + GetActorForwardVector() * (GetCapsuleComponent()->GetScaledCapsuleRadius() * 1.5f);
-
-	FVector BodyStart = GetActorLocation() + FVector(0.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 0.5f);
-	FVector BodyEnd = BodyStart + GetActorForwardVector() * (GetCapsuleComponent()->GetScaledCapsuleRadius() * 1.5f);
+	FVector TraceStart = GetActorLocation() - FVector(0.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
+	FVector TraceEnd = TraceStart + GetActorForwardVector() * (GetCapsuleComponent()->GetScaledCapsuleRadius() * 1.5f);
 
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldStatic));
-	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_GameTraceChannel1));
 
 	TArray<AActor*> ActorsToIgnore;
 	ActorsToIgnore.Add(this);
-	FHitResult Hit;
+	FHitResult HitResult;
 
-	bool bFootResult = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(),
-		FootStart,
-		FootEnd,
-		ObjectTypes,
-		false,
-		ActorsToIgnore,
-		EDrawDebugTrace::ForOneFrame,
-		Hit,
-		true);
-
-	bool bBodyResult = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(),
-		BodyStart,
-		BodyEnd,
-		ObjectTypes,
-		false,
-		ActorsToIgnore,
-		EDrawDebugTrace::ForOneFrame,
-		Hit,
-		true);
-
-
-	// 타겟과 벽을 사이에 두고있을 경우. 벽을 타고 올라가도록.
-	if (bFootResult && bBodyResult)
+	bool bTraceResult = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(),
+		TraceStart,	TraceEnd, ObjectTypes, false,
+		ActorsToIgnore,	EDrawDebugTrace::ForOneFrame,HitResult,	true);
+	
+	if (bTraceResult)
 	{
-		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
-		AddMovementInput(GetActorUpVector());
-	}
-	else
-	{
-		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Falling);
+		//Slope나, 벽이 있다는뜻.
+		//Slope? or Wall? -> 각도로 계산할거임.
 
-		FVector GroundCheckStart = GetActorLocation() - FVector(0.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
-		FVector GroundCheckCheckEnd = GroundCheckStart + GetActorUpVector() * (GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * -0.1f);
-		TArray<TEnumAsByte<EObjectTypeQuery>> GroundCheckObjectTypes;
-		GroundCheckObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldStatic));
-
-		TArray<AActor*> GroundCheckActorsToIgnore;
-		FHitResult GroundCheckHit;
-
-		bool bGroundCheckResult = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(),
-			GroundCheckStart,
-			GroundCheckCheckEnd,
-			GroundCheckObjectTypes,
-			false,
-			GroundCheckActorsToIgnore,
-			EDrawDebugTrace::None,
-			GroundCheckHit,
-			true);
-
-		if (bGroundCheckResult)
+		FVector Forward = GetActorForwardVector();
+		FVector Result = Forward + HitResult.Normal;
+		if (Result.Size() <= 0.01)
 		{
-			GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+			//바로 앞에 수직 벽이 있는 상황
+			// FlyingMode로 변환, 
+			AddMovementInput(GetActorUpVector());
 		}
 		else
 		{
-			GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Falling);
+			//경사진 땅을 만남.
+
+
 		}
+
+
+
+		FVector Temp = (HitResult.Normal + GetActorForwardVector()).GetSafeNormal();
+
+		AddMovementInput(Temp);
 	}
+
+
+	
+	/*===============================================수정 필요===============================================*/
+	// 발쪽, 몸통 살짝 위 전방 Trace.
+	//FVector FootStart = GetActorLocation() - FVector(0.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
+	//FVector FootEnd = FootStart + GetActorForwardVector() * (GetCapsuleComponent()->GetScaledCapsuleRadius() * 1.5f);
+
+	//FVector BodyStart = GetActorLocation() + FVector(0.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 0.5f);
+	//FVector BodyEnd = BodyStart + GetActorForwardVector() * (GetCapsuleComponent()->GetScaledCapsuleRadius() * 1.5f);
+
+	//TArray<AActor*> ActorsToIgnore;
+	//ActorsToIgnore.Add(this);
+	//FHitResult Hit;
+
+	//bool bFootResult = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(),
+	//	FootStart,
+	//	FootEnd,
+	//	ObjectTypes,
+	//	false,
+	//	ActorsToIgnore,
+	//	EDrawDebugTrace::ForOneFrame,
+	//	Hit,
+	//	true);
+
+	//bool bBodyResult = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(),
+	//	BodyStart,
+	//	BodyEnd,
+	//	ObjectTypes,
+	//	false,
+	//	ActorsToIgnore,
+	//	EDrawDebugTrace::ForOneFrame,
+	//	Hit,
+	//	true);
+
+	// 타겟과 벽을 사이에 두고있을 경우. 벽을 타고 올라가도록.
+	//if (bFootResult && bBodyResult)
+	//{
+	//	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
+	//	AddMovementInput(GetActorUpVector());
+	//}
+	//else
+	//{
+	//	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Falling);
+
+	//	FVector GroundCheckStart = GetActorLocation() - FVector(0.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
+	//	FVector GroundCheckCheckEnd = GroundCheckStart + GetActorUpVector() * (GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * -0.1f);
+	//	TArray<TEnumAsByte<EObjectTypeQuery>> GroundCheckObjectTypes;
+	//	GroundCheckObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldStatic));
+
+	//	TArray<AActor*> GroundCheckActorsToIgnore;
+	//	FHitResult GroundCheckHit;
+
+	//	bool bGroundCheckResult = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(),
+	//		GroundCheckStart,
+	//		GroundCheckCheckEnd,
+	//		GroundCheckObjectTypes,
+	//		false,
+	//		GroundCheckActorsToIgnore,
+	//		EDrawDebugTrace::None,
+	//		GroundCheckHit,
+	//		true);
+
+	//	if (bGroundCheckResult)
+	//	{
+	//		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+	//	}
+	//	else
+	//	{
+	//		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Falling);
+	//	}
+	//}
 }
 
 void AMgbEnemyCharacter::LookTarget()
