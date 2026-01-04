@@ -33,7 +33,7 @@ AMgbPlayerCharacter::AMgbPlayerCharacter()
 	GetCharacterMovement()->MaxWalkSpeed = 400.f;
 	GetCharacterMovement()->GroundFriction = 0.f;
 	GetCharacterMovement()->BrakingFrictionFactor = 0.f;
-	GetCharacterMovement()->RotationRate = FRotator(0.f, 0.f, 900.f);
+	GetCharacterMovement()->RotationRate = FRotator(0.f, 900.f, 0.f);
 	
 	
 	bUseControllerRotationPitch = false;
@@ -56,6 +56,8 @@ AMgbPlayerCharacter::AMgbPlayerCharacter()
 	SpringArm->CameraLagMaxDistance = 0.f;
 	SpringArm->bClampToMaxPhysicsDeltaTime = false;
 	SpringArm->bUseCameraLagSubstepping = false;
+	SpringArm->bUsePawnControlRotation = true;
+	SpringArm->TargetArmLength = 1500.f;
 
 	MainCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	MainCamera->SetupAttachment(SpringArm);
@@ -66,11 +68,15 @@ AMgbPlayerCharacter::AMgbPlayerCharacter()
 void AMgbPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	MeshBaseQuat = GetMesh()->GetRelativeRotation().Quaternion();
 }
 
 void AMgbPlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	UpdateCharacterMeshRotation(DeltaTime);
 
 }
 
@@ -138,7 +144,7 @@ bool AMgbPlayerCharacter::FindPrimaryTargetByCondition(AActor*& OutPrimaryTarget
 		OutPrimaryTarget = Targets[FMath::RandRange(0, TargetCount - 1)];
 		return true;
 
-		// 최단 거리 액터 찾는거.
+		// 최단 거리 액터
 		/*float ClosesetDistance = MAX_FLT;
 		for (const auto& Target : OutActors)
 		{
@@ -180,6 +186,83 @@ void AMgbPlayerCharacter::ActivateWeaponsAbility()
 		2 / (PlayerAttackSpeed / 100),
 		true,
 		1.f);
+}
+
+void AMgbPlayerCharacter::UpdateCharacterMeshRotation(float DeltaTime)
+{
+	const FVector Start = GetActorLocation() - FVector(0.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
+	const FVector End = Start + (GetActorUpVector() * -500.f);
+
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldStatic));
+	//ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_GameTraceChannel1));
+
+	TArray<AActor*> ActorsToIgnore;
+	FHitResult Hit;
+
+	const bool bResult = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(),
+		Start, End,
+		ObjectTypes, false,
+		ActorsToIgnore, EDrawDebugTrace::Type::ForOneFrame, Hit,
+		true);
+
+	if (bResult)
+	{	
+		//FVector FloorNormal = Hit.Normal;
+
+		//FRotator RotationXZ = UKismetMathLibrary::MakeRotFromXZ(GetActorForwardVector(), FloorNormal);
+		//FRotator RotationYZ = UKismetMathLibrary::MakeRotFromYZ(GetActorRightVector(), FloorNormal);
+
+		//FRotator CurrentRotation = GetMesh()->GetRelativeRotation();
+
+		//FRotator TargetRotation;
+		//TargetRotation.Pitch = RotationYZ.Pitch;
+		//TargetRotation.Roll = RotationXZ.Roll;
+
+		//// Mesh가 기본으로 Yaw축으로 -90도 돌아가있어서 
+		//CurrentRotation.Pitch = FMath::FInterpTo(CurrentRotation.Pitch, TargetRotation.Roll, DeltaTime, 5.f);
+		//CurrentRotation.Roll = FMath::FInterpTo(CurrentRotation.Roll, -TargetRotation.Pitch, DeltaTime, 5.f);
+
+		//GetMesh()->SetRelativeRotation(CurrentRotation);
+
+		const FVector FloorNormal = Hit.ImpactNormal;
+		
+		FVector WorldSlopeForward = FVector::VectorPlaneProject(GetActorForwardVector(), FloorNormal);
+		WorldSlopeForward = WorldSlopeForward.GetSafeNormal();
+
+		const FQuat WorldSlopeQuat = FRotationMatrix::MakeFromZY(FloorNormal, WorldSlopeForward).ToQuat();
+
+		const FQuat ActorWorldQuat = GetActorQuat();
+
+		// 경사 회전을 Actor기준으로 
+		FQuat SlopeLocalQuat = ActorWorldQuat.Inverse() * WorldSlopeQuat;
+
+		//Yaw 제거
+		FQuat SlopeNoYawQuat;
+		{
+			FRotator R = SlopeLocalQuat.Rotator();
+			R.Yaw = 0.f;
+			SlopeNoYawQuat = R.Quaternion();
+		}
+
+		//기본 Mesh 회전과 합성 (Quat 곱)
+		const FQuat TargetMeshQuat = MeshBaseQuat * SlopeNoYawQuat;
+
+		const FQuat Current = GetMesh()->GetRelativeRotation().Quaternion();
+
+		//Interp 계열은 각도값 보간이라 복합 회전에 약하고, Slerp는 회전 자체를 보간해서 경사면·메쉬 정렬에 안정적이다.
+		const FQuat Smooth = FQuat::Slerp(Current, TargetMeshQuat, DeltaTime * 10.f);
+		GetMesh()->SetRelativeRotation(Smooth);
+	}
+	else
+	{
+		FRotator CurrentRotation = GetMesh()->GetRelativeRotation();
+
+		CurrentRotation.Pitch = FMath::FInterpTo(CurrentRotation.Pitch, 0, DeltaTime, 10.f);
+		CurrentRotation.Roll = FMath::FInterpTo(CurrentRotation.Roll, 0, DeltaTime, 10.f);
+
+		GetMesh()->SetRelativeRotation(CurrentRotation);
+	}
 }
 
 void AMgbPlayerCharacter::Move(const FInputActionValue& Value)

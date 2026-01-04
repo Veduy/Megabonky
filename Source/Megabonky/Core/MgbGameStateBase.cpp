@@ -149,8 +149,6 @@ void AMgbGameStateBase::SpawnEnemy()
 				FVector RealSpawnLocation = FVector(RealSpawn2D.X, RealSpawn2D.Y, 0);
 
 
-				/*bool UKismetSystemLibrary::LineTraceSingleForObjects(const UObject * WorldContextObject, const FVector Start, const FVector End, const TArray<TEnumAsByte<EObjectTypeQuery> > &ObjectTypes, bool bTraceComplex, const TArray<AActor*>&ActorsToIgnore, EDrawDebugTrace::Type DrawDebugType, FHitResult & OutHit, bool bIgnoreSelf, FLinearColor TraceColor, FLinearColor TraceHitColor, float DrawTime)*/
-
 				// 스폰할 높이는 LineTrace로 설정.
 				FVector Start = RealSpawnLocation + FVector(0.f, 0.f, 3000.f);
 				FVector End = RealSpawnLocation + FVector(0.f, 0.f, -3000.f);
@@ -165,6 +163,7 @@ void AMgbGameStateBase::SpawnEnemy()
 					ObjectTypes, false, ActorsToIgnore, EDrawDebugTrace::ForDuration, Hit, false, FLinearColor::Red,
 					FLinearColor::Green, 2.f);
 				
+				// 땅밑에서 스폰
 				if (bResult)
 				{
 					float CapsuleHeight = Cast<ACharacter>(Player)->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();

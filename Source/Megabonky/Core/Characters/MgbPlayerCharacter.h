@@ -58,6 +58,7 @@ public:
 	UFUNCTION()
 	void ActivateWeaponsAbility();
 
+	void UpdateCharacterMeshRotation(float DeltaTime);
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<USpringArmComponent> SpringArm;
@@ -80,6 +81,8 @@ public:
 	TObjectPtr<UAttributeSet> PlayerAttributeSet;
 
 	FTimerHandle ActivateAbilityHandle;
+	
+	FQuat MeshBaseQuat;
 
 public:
 	UFUNCTION()
