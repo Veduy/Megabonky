@@ -100,8 +100,6 @@ void AMgbEnemyCharacter::MoveToTarget()
 	Dir = Dir.GetSafeNormal2D();
 	AddMovementInput(Dir, 1.f);
 
-	//bool UKismetSystemLibrary::LineTraceSingleForObjects(const UObject * WorldContextObject, const FVector Start, const FVector End, const TArray<TEnumAsByte<EObjectTypeQuery> > &ObjectTypes, bool bTraceComplex, const TArray<AActor*>&ActorsToIgnore, EDrawDebugTrace::Type DrawDebugType, FHitResult & OutHit, bool bIgnoreSelf, FLinearColor TraceColor, FLinearColor TraceHitColor, float DrawTime)
-
 	FVector Start = GetActorLocation() - FVector(0.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
 	FVector End = Start + GetActorForwardVector() * (GetCapsuleComponent()->GetScaledCapsuleRadius() * 1.5f);
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
@@ -120,21 +118,24 @@ void AMgbEnemyCharacter::MoveToTarget()
 		Hit,
 		true);
 
-	// 타겟과 벽을 사이에 두고있을 경우. 벽을 타고 올라가도록.
 	if (bResult)
 	{
-		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
-		AddMovementInput(GetActorUpVector());
-	}
+		// 타겟과 벽을 사이에 두고있을 경우. 벽을 타고 올라가도록.
+		FVector Normal = Hit.ImpactNormal;
+		FVector Forward = GetActorForwardVector();
+		float value = FVector::DotProduct(Normal, Forward);
+		if (value <= -0.9f)
+		{
+			GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
+			AddMovementInput(GetActorUpVector());
+		}
+	} 
 	else
 	{
-		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Falling);
-
 		FVector GroundCheckStart = GetActorLocation() - FVector(0.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
-		FVector GroundCheckCheckEnd = GroundCheckStart + GetActorUpVector() * (GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * -0.1f);
+		FVector GroundCheckCheckEnd = GroundCheckStart + GetActorUpVector() * (GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * -0.5f);
 		TArray<TEnumAsByte<EObjectTypeQuery>> GroundCheckObjectTypes;
 		GroundCheckObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldStatic));
-		GroundCheckObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_GameTraceChannel1));
 
 		TArray<AActor*> GroundCheckActorsToIgnore;
 		FHitResult GroundCheckHit;
