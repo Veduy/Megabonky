@@ -1,6 +1,5 @@
 ﻿// Copyright is owned by Veduy.
 
-
 #include "MgbEnemyCharacter.h"
 
 #include "Components/CapsuleComponent.h"
@@ -9,6 +8,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 
+#include "../AbilitySystem/MgbAbilitySystemComponent.h"
 #include "../AbilitySystem/AttributeSet/EnemyAttributeSet.h"
 #include "../../Util/NetworkLog.h"
 
@@ -16,24 +16,32 @@ AMgbEnemyCharacter::AMgbEnemyCharacter()
 {
 	bReplicates = true;
 
-	CharacterAttributeSet = CreateDefaultSubobject<UEnemyAttributeSet>(TEXT("EnemyAttributeSet"));
-	
 	AutoPossessAI = EAutoPossessAI::Disabled;
 
-	GetCharacterMovement()->MaxWalkSpeed = 100.f;
-	GetCharacterMovement()->MaxAcceleration = 500.f;
-	GetCharacterMovement()->GroundFriction = 1.f;
-	GetCharacterMovement()->MaxStepHeight = 1000.f;
+	CharacterAttributeSet = CreateDefaultSubobject<UEnemyAttributeSet>(TEXT("EnemyAttributeSet"));
 
-	GetCapsuleComponent()->SetCollisionProfileName(FName("Enemy"));
-	GetCapsuleComponent()->SetCapsuleHalfHeight(80.f);
-	GetCapsuleComponent()->SetCapsuleRadius(40.f);
+	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleCollider"));
+	SetRootComponent(CapsuleComponent);
+	CapsuleComponent->SetCollisionProfileName(FName("Enemy"));
+	CapsuleComponent->SetCapsuleHalfHeight(80.f);
+	CapsuleComponent->SetCapsuleRadius(40.f);
 
-	GetMesh()->SetCollisionProfileName("NoCollision");
-	GetMesh()->SetRelativeRotation(FRotator(0.0f, -90.f, 0.0f));
+	SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh"));
+	SkeletalMeshComponent->SetupAttachment(CapsuleComponent);
+	SkeletalMeshComponent->SetCollisionProfileName("NoCollision");
+	SkeletalMeshComponent->SetRelativeRotation(FRotator(0.0f, -90.f, 0.0f));
 	float Half = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
-	GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -Half));
-	GetMesh()->SetRelativeScale3D(FVector(0.7f, 0.7f, 0.7f));
+	SkeletalMeshComponent->SetRelativeLocation(FVector(0.f, 0.f, -Half));
+	SkeletalMeshComponent->SetRelativeScale3D(FVector(0.7f, 0.7f, 0.7f));
+
+	AbilitySystemComponent = CreateDefaultSubobject<UMgbAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
+	AbilitySystemComponent->SetIsReplicated(true);
+	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
+
+	//GetCharacterMovement()->MaxWalkSpeed = 100.f;
+	//GetCharacterMovement()->MaxAcceleration = 500.f;
+	//GetCharacterMovement()->GroundFriction = 1.f;
+	//GetCharacterMovement()->MaxStepHeight = 1000.f;
 }
 
 void AMgbEnemyCharacter::BeginPlay()
@@ -47,13 +55,17 @@ void AMgbEnemyCharacter::BeginPlay()
 	{
 		ASC->InitAbilityActorInfo(this, this);
 	}
+
+	// WallChecking Timer
+
+
+
+
 }
 
 void AMgbEnemyCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	LookTarget();
 
 	if (bSpawnFinished == false)
 	{
@@ -67,9 +79,24 @@ void AMgbEnemyCharacter::Tick(float DeltaTime)
 		}
 	}
 
-	if (bSpawnFinished == true)
+	if (bSpawnFinished)
 	{
-		MoveToTarget();
+		switch (CurrentMoveState)
+		{
+		case EMoveState::Idle:
+			LookTarget();
+			break;
+		case EMoveState::Walk:
+			LookTarget();
+			MoveToTarget(DeltaTime);
+			break;
+		case EMoveState::Climb:
+			LookTarget();
+			ClimbWall(DeltaTime);
+			break;
+		default:
+			break;
+		}
 	}
 }
 
@@ -85,11 +112,26 @@ void AMgbEnemyCharacter::Destroyed()
 	//서버일때만 XPCrystal Drop
 	if (HasAuthority())
 	{
-		GetWorld()->SpawnActor<AActor>(XPCrystalClass, GetActorTransform());
+		//GetWorld()->SpawnActor<AActor>(XPCrystalClass, GetActorTransform());
 	}
 }
 
-void AMgbEnemyCharacter::MoveToTarget()
+UAbilitySystemComponent* AMgbEnemyCharacter::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComponent;
+}
+
+UCapsuleComponent* AMgbEnemyCharacter::GetCapsuleComponent()
+{
+	return CapsuleComponent;
+}
+
+USkeletalMeshComponent* AMgbEnemyCharacter::GetMesh()
+{
+	return SkeletalMeshComponent;
+}
+
+void AMgbEnemyCharacter::MoveToTarget(float DeltaTime)
 {
 	if(!TargetActor)
 	{
@@ -98,10 +140,26 @@ void AMgbEnemyCharacter::MoveToTarget()
 
 	FVector Dir = TargetActor->GetActorLocation() - GetActorLocation();
 	Dir = Dir.GetSafeNormal2D();
-	AddMovementInput(Dir, 1.f);
+	Dir.Z = 0;
+	AddActorWorldOffset(Dir * 200.f * DeltaTime);	
+}
 
+void AMgbEnemyCharacter::LookTarget()
+{
+	if (TargetActor)
+	{
+		FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetActor->GetActorLocation());
+		FRotator LookRotation = FRotator(GetActorRotation().Pitch, TargetRotation.Yaw, GetActorRotation().Roll);
+		SetActorRotation(LookRotation);
+	}
+}
+
+void AMgbEnemyCharacter::CheckWall()
+{
+	FVector Dir = TargetActor->GetActorLocation() - GetActorLocation();
+	Dir = Dir.GetSafeNormal();
 	FVector Start = GetActorLocation() - FVector(0.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
-	FVector End = Start + GetActorForwardVector() * (GetCapsuleComponent()->GetScaledCapsuleRadius() * 1.5f);
+	FVector End = Start + Dir * (GetCapsuleComponent()->GetScaledCapsuleRadius() * 2.0f);
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldStatic));
 
@@ -114,7 +172,7 @@ void AMgbEnemyCharacter::MoveToTarget()
 		ObjectTypes,
 		false,
 		ActorsToIgnore,
-		EDrawDebugTrace::None,
+		EDrawDebugTrace::ForOneFrame,
 		Hit,
 		true);
 
@@ -126,11 +184,16 @@ void AMgbEnemyCharacter::MoveToTarget()
 		float value = FVector::DotProduct(Normal, Forward);
 		if (value <= -0.9f)
 		{
-			GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
-			AddMovementInput(GetActorUpVector());
+			GetCapsuleComponent()->SetEnableGravity(false);
+			CurrentMoveState = EMoveState::Climb;
 		}
-	} 
+	}
 	else
+	{
+		GetCapsuleComponent()->SetEnableGravity(true);
+		CurrentMoveState = EMoveState::Walk;
+	}
+	/*else
 	{
 		FVector GroundCheckStart = GetActorLocation() - FVector(0.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
 		FVector GroundCheckCheckEnd = GroundCheckStart + GetActorUpVector() * (GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * -0.5f);
@@ -158,15 +221,11 @@ void AMgbEnemyCharacter::MoveToTarget()
 		{
 			GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Falling);
 		}
-	}
+	}*/
 }
 
-void AMgbEnemyCharacter::LookTarget()
+void AMgbEnemyCharacter::ClimbWall(float DeltaTime)
 {
-	if (TargetActor)
-	{
-		FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetActor->GetActorLocation());
-		FRotator LookRotation = FRotator(GetActorRotation().Pitch, TargetRotation.Yaw, GetActorRotation().Roll);
-		SetActorRotation(LookRotation);
-	}
+	FVector Dir = GetActorUpVector();
+	AddActorWorldOffset(Dir * 200 * DeltaTime);
 }

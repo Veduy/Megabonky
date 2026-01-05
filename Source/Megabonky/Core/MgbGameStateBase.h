@@ -50,6 +50,18 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
 	TArray<TSubclassOf<AMgbEnemyCharacter>> EnemyClasses;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
+	int32 MaxEnemyCount = 1000.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
+	float SpawnIntervalTime = 5.f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
+	float SpawnRange = 1000.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
+	int32 MonstersPerSpawn = 5;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")
 	int32 CurrentLevel = 1;
 

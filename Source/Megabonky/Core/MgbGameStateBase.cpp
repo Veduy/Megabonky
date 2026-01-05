@@ -8,6 +8,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Net/UnrealNetwork.h"
 
+#include "GameFramework/Character.h"
 #include "Characters/MgbEnemyCharacter.h"
 #include "MgbPlayerController.h"
 
@@ -104,7 +105,7 @@ void AMgbGameStateBase::InitSpawnEnemyTimer()
 		{
 			SpawnEnemy();   
 		},
-		5.0f,
+		SpawnIntervalTime,
 		true,
 		1.f
 	);
@@ -134,10 +135,10 @@ void AMgbGameStateBase::SpawnEnemy()
 			FVector2D Dir = FVector2D(x, y);
 
 			// 일정 Min~Max범위의 값을 곱함 -> 캐릭터 근처 에서 스폰될 거리 지정.
-			FVector2D Location = Dir * FMath::FRandRange(500.f, 1000.f);
+			FVector2D Location = Dir * FMath::FRandRange(SpawnRange - 300.f, SpawnRange + 300.f);
 
 			// 스폰할 지점에서 또 작은 원을 기준으로 스폰할 마리수에 해당하는, 진짜 스폰 지점을 뽑아내서 그 지점에 스폰.
-			for (int i = 0; i < 5; ++i)
+			for (int i = 0; i < MonstersPerSpawn; ++i)
 			{
 				FVector2D SmallDir = FVector2D(cosf(rand()), sinf(rand()));
 				FVector2D SmallLocation = SmallDir * FMath::FRandRange(300.f, 500.f);
