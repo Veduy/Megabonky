@@ -48,13 +48,16 @@ public:
 	void MoveToTarget(float DeltaTime);
 
 	UFUNCTION(BlueprintCallable)
-	void LookTarget();
+	void LookTarget(float DeltaTime);
 
 	UFUNCTION(BlueprintCallable)
 	void CheckWall();
 
 	UFUNCTION(BlueprintCallable)
 	void ClimbWall(float DeltaTime);
+
+	UFUNCTION(BlueprintCallable)
+	void CollisionHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Components")
@@ -65,6 +68,12 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
 	TObjectPtr<USkeletalMeshComponent> SkeletalMeshComponent;
+
+	//FComponentHitSignature OnComponentHit;
+
+	//FComponentHitSignature, UPrimitiveComponent, OnComponentHit, UPrimitiveComponent*, HitComponent, AActor*, OtherActor, UPrimitiveComponent*, OtherComp, FVector, NormalImpulse, const FHitResult&, Hit );
+	
+
 
 
 public:

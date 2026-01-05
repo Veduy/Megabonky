@@ -34,6 +34,7 @@ AMgbPlayerCharacter::AMgbPlayerCharacter()
 	GetCharacterMovement()->GroundFriction = 0.f;
 	GetCharacterMovement()->BrakingFrictionFactor = 0.f;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 900.f, 0.f);
+	GetCharacterMovement()->bIgnoreBaseRotation = true;
 	
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;

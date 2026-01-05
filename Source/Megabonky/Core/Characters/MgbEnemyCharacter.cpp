@@ -8,6 +8,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 
+#include "MgbPlayerCharacter.h"
 #include "../AbilitySystem/MgbAbilitySystemComponent.h"
 #include "../AbilitySystem/AttributeSet/EnemyAttributeSet.h"
 #include "../../Util/NetworkLog.h"
@@ -18,6 +19,7 @@ AMgbEnemyCharacter::AMgbEnemyCharacter()
 
 	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleCollider"));
 	RootComponent = CapsuleComponent;
+	CapsuleComponent->SetIsReplicated(true);
 	CapsuleComponent->SetCollisionProfileName(FName("Enemy"));
 	CapsuleComponent->SetCapsuleHalfHeight(80.f);
 	CapsuleComponent->SetCapsuleRadius(40.f);
@@ -38,11 +40,14 @@ AMgbEnemyCharacter::AMgbEnemyCharacter()
 	CharacterAttributeSet = CreateDefaultSubobject<UEnemyAttributeSet>(TEXT("EnemyAttributeSet"));
 
 	AutoPossessAI = EAutoPossessAI::Disabled;
+
+	CapsuleComponent->OnComponentHit.AddDynamic(this, &AMgbEnemyCharacter::CollisionHit);
 }
 
 void AMgbEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	CapsuleComponent->SetSimulatePhysics(false);
 
 	//서버일때만
 	if (!HasAuthority())
@@ -79,14 +84,14 @@ void AMgbEnemyCharacter::Tick(float DeltaTime)
 		switch (CurrentMoveState)
 		{
 		case EMoveState::Idle:
-			LookTarget();
+			LookTarget(DeltaTime);
 			break;
 		case EMoveState::Walk:
-			LookTarget();
+			LookTarget(DeltaTime);
 			MoveToTarget(DeltaTime);
 			break;
 		case EMoveState::Climb:
-			LookTarget();
+			LookTarget(DeltaTime);
 			ClimbWall(DeltaTime);
 			break;
 		default:
@@ -137,7 +142,7 @@ void AMgbEnemyCharacter::MoveToTarget(float DeltaTime)
 		return;
 	}
 
-	//경사면에서 일정한 속도값을 위해서.
+	// 경사면에서 일정한 속도값을 위해서. 
 	FVector Start = GetActorLocation();
 	FVector End = Start + (GetActorUpVector() * CapsuleComponent->GetScaledCapsuleHalfHeight() * -1.3f);
 	FHitResult Hit;
@@ -159,15 +164,18 @@ void AMgbEnemyCharacter::MoveToTarget(float DeltaTime)
 		Dir = Dir.GetSafeNormal2D();
 
 		Dir = -Hit.ImpactNormal + Dir;
+		//Dir = FVector::VectorPlaneProject(Dir, Hit.ImpactNormal).GetSafeNormal();
 		AddActorWorldOffset(Dir * 150.f * DeltaTime);
 	}
 }
 
-void AMgbEnemyCharacter::LookTarget()
+void AMgbEnemyCharacter::LookTarget(float DeltaTime)
 {
 	if (TargetActor)
 	{
 		FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetActor->GetActorLocation());
+
+		//TargetRotation.Yaw = FMath::Lerp(GetActorRotation().Yaw, TargetRotation.Yaw, 10.f * DeltaTime);
 		FRotator LookRotation = FRotator(GetActorRotation().Pitch, TargetRotation.Yaw, GetActorRotation().Roll);
 		SetActorRotation(LookRotation);
 	}
@@ -227,4 +235,18 @@ void AMgbEnemyCharacter::ClimbWall(float DeltaTime)
 	FVector Dir = TargetActor->GetActorLocation() - GetActorLocation();
 	Dir = Dir.GetSafeNormal();
 	AddActorWorldOffset(Dir * 150 * DeltaTime);
+}
+
+void AMgbEnemyCharacter::CollisionHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	if (AMgbPlayerCharacter* Player = Cast<AMgbPlayerCharacter>(OtherActor))
+	{
+		UCharacterMovementComponent* PlayerMove = Player->GetCharacterMovement();
+
+		FVector ImpulseDir = Player->GetActorLocation() - GetActorLocation();
+		ImpulseDir = ImpulseDir + FVector(0.f, 0.f, 100.f);
+		ImpulseDir = ImpulseDir.GetSafeNormal();
+		
+		PlayerMove->AddImpulse(ImpulseDir * 50000.f);
+	}
 }
