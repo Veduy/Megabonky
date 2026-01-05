@@ -138,8 +138,11 @@ void AMgbGameStateBase::SpawnEnemy()
 			FVector2D Location = Dir * FMath::FRandRange(SpawnRange - 300.f, SpawnRange + 300.f);
 
 			// 스폰할 지점에서 또 작은 원을 기준으로 스폰할 마리수에 해당하는, 진짜 스폰 지점을 뽑아내서 그 지점에 스폰.
-			for (int i = 0; i < MonstersPerSpawn; ++i)
+			for (int i = 0; i < EnemyPerSpawn; ++i)
 			{
+				if (CurrentEnemyCount >= MaxEnemyCount)
+					return;
+
 				FVector2D SmallDir = FVector2D(cosf(rand()), sinf(rand()));
 				FVector2D SmallLocation = SmallDir * FMath::FRandRange(300.f, 500.f);
 				// 플레이어 위치(x,y 좌표만 가져와야함).
@@ -178,6 +181,7 @@ void AMgbGameStateBase::SpawnEnemy()
 				if (Enemy)
 				{
 					Enemy->TargetActor = Player;
+					CurrentEnemyCount++;
 				}
 			}
 		}

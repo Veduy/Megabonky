@@ -47,11 +47,14 @@ public:
 	uint32 GetCurrentPlayerCount();
 
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
 	TArray<TSubclassOf<AMgbEnemyCharacter>> EnemyClasses;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
-	int32 MaxEnemyCount = 1000.f;
+	int32 MaxEnemyCount = 1000;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")
+	int32 CurrentEnemyCount = 0;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
 	float SpawnIntervalTime = 5.f;
@@ -60,7 +63,7 @@ public:
 	float SpawnRange = 1000.f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
-	int32 MonstersPerSpawn = 5;
+	int32 EnemyPerSpawn = 5;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")
 	int32 CurrentLevel = 1;

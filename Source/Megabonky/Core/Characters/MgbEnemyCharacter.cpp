@@ -16,18 +16,15 @@ AMgbEnemyCharacter::AMgbEnemyCharacter()
 {
 	bReplicates = true;
 
-	AutoPossessAI = EAutoPossessAI::Disabled;
-
-	CharacterAttributeSet = CreateDefaultSubobject<UEnemyAttributeSet>(TEXT("EnemyAttributeSet"));
-
 	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleCollider"));
-	SetRootComponent(CapsuleComponent);
+	RootComponent = CapsuleComponent;
 	CapsuleComponent->SetCollisionProfileName(FName("Enemy"));
 	CapsuleComponent->SetCapsuleHalfHeight(80.f);
 	CapsuleComponent->SetCapsuleRadius(40.f);
+	CapsuleComponent->SetSimulatePhysics(false);
 
 	SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh"));
-	SkeletalMeshComponent->SetupAttachment(CapsuleComponent);
+	SkeletalMeshComponent->SetupAttachment(RootComponent);
 	SkeletalMeshComponent->SetCollisionProfileName("NoCollision");
 	SkeletalMeshComponent->SetRelativeRotation(FRotator(0.0f, -90.f, 0.0f));
 	float Half = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
@@ -38,15 +35,18 @@ AMgbEnemyCharacter::AMgbEnemyCharacter()
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 
-	//GetCharacterMovement()->MaxWalkSpeed = 100.f;
-	//GetCharacterMovement()->MaxAcceleration = 500.f;
-	//GetCharacterMovement()->GroundFriction = 1.f;
-	//GetCharacterMovement()->MaxStepHeight = 1000.f;
+	CharacterAttributeSet = CreateDefaultSubobject<UEnemyAttributeSet>(TEXT("EnemyAttributeSet"));
+
+	AutoPossessAI = EAutoPossessAI::Disabled;
 }
 
 void AMgbEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	//서버일때만
+	if (!HasAuthority())
+		return;
 
 	TargetSpawnHeight = GetActorLocation().Z + GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 2.f;
 
@@ -55,12 +55,6 @@ void AMgbEnemyCharacter::BeginPlay()
 	{
 		ASC->InitAbilityActorInfo(this, this);
 	}
-
-	// WallChecking Timer
-
-
-
-
 }
 
 void AMgbEnemyCharacter::Tick(float DeltaTime)
@@ -75,6 +69,7 @@ void AMgbEnemyCharacter::Tick(float DeltaTime)
 		if (GetActorLocation().Z >= TargetSpawnHeight - 5.f)
 		{
 			bSpawnFinished = true;   
+			CapsuleComponent->SetSimulatePhysics(true);
 			SpawnDefaultController();
 		}
 	}
@@ -133,15 +128,39 @@ USkeletalMeshComponent* AMgbEnemyCharacter::GetMesh()
 
 void AMgbEnemyCharacter::MoveToTarget(float DeltaTime)
 {
+	//서버일때만
+	if (!HasAuthority())
+		return;
+
 	if(!TargetActor)
 	{
 		return;
 	}
 
-	FVector Dir = TargetActor->GetActorLocation() - GetActorLocation();
-	Dir = Dir.GetSafeNormal2D();
-	Dir.Z = 0;
-	AddActorWorldOffset(Dir * 200.f * DeltaTime);	
+	//경사면에서 일정한 속도값을 위해서.
+	FVector Start = GetActorLocation();
+	FVector End = Start + (GetActorUpVector() * CapsuleComponent->GetScaledCapsuleHalfHeight() * -1.3f);
+	FHitResult Hit;
+
+	// 추후에 디버깅할때 비용 확인할수 있음.
+	FCollisionQueryParams Params(SCENE_QUERY_STAT(GroundTrace), false);
+
+	bool bResult = GetWorld()->LineTraceSingleByChannel(
+		Hit,
+		Start,
+		End,
+		ECC_WorldStatic,
+		Params
+	);
+
+	if (bResult)
+	{
+		FVector Dir = TargetActor->GetActorLocation() - GetActorLocation();
+		Dir = Dir.GetSafeNormal2D();
+
+		Dir = -Hit.ImpactNormal + Dir;
+		AddActorWorldOffset(Dir * 150.f * DeltaTime);
+	}
 }
 
 void AMgbEnemyCharacter::LookTarget()
@@ -157,13 +176,15 @@ void AMgbEnemyCharacter::LookTarget()
 void AMgbEnemyCharacter::CheckWall()
 {
 	FVector Dir = TargetActor->GetActorLocation() - GetActorLocation();
-	Dir = Dir.GetSafeNormal();
-	FVector Start = GetActorLocation() - FVector(0.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
-	FVector End = Start + Dir * (GetCapsuleComponent()->GetScaledCapsuleRadius() * 2.0f);
+	Dir = Dir.GetSafeNormal2D();
+	FVector Start = GetActorLocation() - FVector(0.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 0.9f);
+	FVector End = Start + Dir * (GetCapsuleComponent()->GetScaledCapsuleRadius() * 1.5f);
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldStatic));
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_GameTraceChannel1));
 
 	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(this);
 	FHitResult Hit;
 
 	bool bResult = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(),
@@ -172,11 +193,11 @@ void AMgbEnemyCharacter::CheckWall()
 		ObjectTypes,
 		false,
 		ActorsToIgnore,
-		EDrawDebugTrace::ForOneFrame,
+		EDrawDebugTrace::None,
 		Hit,
 		true);
 
-	if (bResult)
+	if (bResult && CurrentMoveState != EMoveState::Climb)
 	{
 		// 타겟과 벽을 사이에 두고있을 경우. 벽을 타고 올라가도록.
 		FVector Normal = Hit.ImpactNormal;
@@ -187,45 +208,23 @@ void AMgbEnemyCharacter::CheckWall()
 			GetCapsuleComponent()->SetEnableGravity(false);
 			CurrentMoveState = EMoveState::Climb;
 		}
+		else if (Cast<AMgbEnemyCharacter>(Hit.GetActor()))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Enemy Climb"));
+			GetCapsuleComponent()->SetEnableGravity(false);
+			CurrentMoveState = EMoveState::Climb;
+		}
 	}
-	else
+	else if(!bResult && CurrentMoveState != EMoveState::Walk)
 	{
 		GetCapsuleComponent()->SetEnableGravity(true);
 		CurrentMoveState = EMoveState::Walk;
 	}
-	/*else
-	{
-		FVector GroundCheckStart = GetActorLocation() - FVector(0.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
-		FVector GroundCheckCheckEnd = GroundCheckStart + GetActorUpVector() * (GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * -0.5f);
-		TArray<TEnumAsByte<EObjectTypeQuery>> GroundCheckObjectTypes;
-		GroundCheckObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldStatic));
-
-		TArray<AActor*> GroundCheckActorsToIgnore;
-		FHitResult GroundCheckHit;
-
-		bool bGroundCheckResult = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(),
-			GroundCheckStart,
-			GroundCheckCheckEnd,
-			GroundCheckObjectTypes,
-			false,
-			GroundCheckActorsToIgnore,
-			EDrawDebugTrace::None,
-			GroundCheckHit,
-			true);
-
-		if (bGroundCheckResult)
-		{
-			GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-		}
-		else
-		{
-			GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Falling);
-		}
-	}*/
 }
 
 void AMgbEnemyCharacter::ClimbWall(float DeltaTime)
 {
-	FVector Dir = GetActorUpVector();
-	AddActorWorldOffset(Dir * 200 * DeltaTime);
+	FVector Dir = TargetActor->GetActorLocation() - GetActorLocation();
+	Dir = Dir.GetSafeNormal();
+	AddActorWorldOffset(Dir * 150 * DeltaTime);
 }

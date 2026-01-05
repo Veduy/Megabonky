@@ -18,7 +18,7 @@ AMgbCharacter::AMgbCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	SetNetUpdateFrequency(100.f);
+	SetNetUpdateFrequency(30.f);
 
 	GetCharacterMovement()->bIgnoreBaseRotation = true;
 
