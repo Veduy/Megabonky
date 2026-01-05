@@ -69,17 +69,13 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
 	TObjectPtr<USkeletalMeshComponent> SkeletalMeshComponent;
 
-	//FComponentHitSignature OnComponentHit;
-
-	//FComponentHitSignature, UPrimitiveComponent, OnComponentHit, UPrimitiveComponent*, HitComponent, AActor*, OtherActor, UPrimitiveComponent*, OtherComp, FVector, NormalImpulse, const FHitResult&, Hit );
-	
-
-
-
 public:
 	// 초기 Attribute 값 적용할 GameplayEffect.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
 	TSubclassOf<UGameplayEffect> InitAttributeEffect;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
+	TSubclassOf<UGameplayEffect> HitDamageEffectClass;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
 	TObjectPtr<UEnemyAttributeSet> CharacterAttributeSet;
@@ -98,4 +94,6 @@ public:
 
 	UPROPERTY()
 	float TargetSpawnHeight;
+
+	FTimerHandle CheckWallTimer;
 };

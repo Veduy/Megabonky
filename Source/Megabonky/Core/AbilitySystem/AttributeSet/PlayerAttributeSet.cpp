@@ -8,7 +8,7 @@
 
 UPlayerAttributeSet::UPlayerAttributeSet()
 {
-
+	InitHealth(50.f);
 }
 
 void UPlayerAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

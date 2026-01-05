@@ -40,14 +40,14 @@ AMgbEnemyCharacter::AMgbEnemyCharacter()
 	CharacterAttributeSet = CreateDefaultSubobject<UEnemyAttributeSet>(TEXT("EnemyAttributeSet"));
 
 	AutoPossessAI = EAutoPossessAI::Disabled;
-
-	CapsuleComponent->OnComponentHit.AddDynamic(this, &AMgbEnemyCharacter::CollisionHit);
 }
 
 void AMgbEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
 	CapsuleComponent->SetSimulatePhysics(false);
+	CapsuleComponent->OnComponentHit.AddDynamic(this, &AMgbEnemyCharacter::CollisionHit);
 
 	//서버일때만
 	if (!HasAuthority())
@@ -60,6 +60,8 @@ void AMgbEnemyCharacter::BeginPlay()
 	{
 		ASC->InitAbilityActorInfo(this, this);
 	}
+
+	GetWorld()->GetTimerManager().SetTimer(CheckWallTimer, this, &AMgbEnemyCharacter::CheckWall, 0.5f, true, 2.f);
 }
 
 void AMgbEnemyCharacter::Tick(float DeltaTime)
@@ -218,7 +220,7 @@ void AMgbEnemyCharacter::CheckWall()
 		}
 		else if (Cast<AMgbEnemyCharacter>(Hit.GetActor()))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Enemy Climb"));
+			//UE_LOG(LogTemp, Warning, TEXT("Enemy Climb"));
 			GetCapsuleComponent()->SetEnableGravity(false);
 			CurrentMoveState = EMoveState::Climb;
 		}
@@ -241,12 +243,20 @@ void AMgbEnemyCharacter::CollisionHit(UPrimitiveComponent* HitComponent, AActor*
 {
 	if (AMgbPlayerCharacter* Player = Cast<AMgbPlayerCharacter>(OtherActor))
 	{
+		// Knockback
 		UCharacterMovementComponent* PlayerMove = Player->GetCharacterMovement();
 
 		FVector ImpulseDir = Player->GetActorLocation() - GetActorLocation();
-		ImpulseDir = ImpulseDir + FVector(0.f, 0.f, 100.f);
 		ImpulseDir = ImpulseDir.GetSafeNormal();
 		
-		PlayerMove->AddImpulse(ImpulseDir * 50000.f);
+		PlayerMove->AddImpulse(ImpulseDir * 15000.f);
+		PlayerMove->AddImpulse(FVector(0.f, 0.f, 1.f) * 10000.f);
+
+		// ApplyDamage By GameplayEffect
+		UAbilitySystemComponent* PlayerASC = Player->GetAbilitySystemComponent();
+
+		FGameplayEffectContextHandle ContextHandle = AbilitySystemComponent->MakeEffectContext();
+		FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(HitDamageEffectClass, 1.f, ContextHandle);
+		AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), PlayerASC);
 	}
 }
