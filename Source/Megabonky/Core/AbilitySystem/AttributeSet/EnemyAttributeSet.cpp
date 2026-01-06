@@ -6,7 +6,7 @@
 #include "GameplayEffectExtension.h"
 #include "Net\UnrealNetwork.h"
 
-#include "../../MgbCharacter.h"
+#include "../../Characters/MgbEnemyCharacter.h"
 #include "../../../Util/NetworkLog.h"
 
 UEnemyAttributeSet::UEnemyAttributeSet()
@@ -72,6 +72,15 @@ void UEnemyAttributeSet::OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHea
 void UEnemyAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UEnemyAttributeSet, Health, OldHealth);
+
+	if (GetHealth() <= OldHealth.GetCurrentValue())
+	{
+		// 클라이언트에서만, 데미지 이펙트 처리.
+		if (AMgbEnemyCharacter* Character = Cast<AMgbEnemyCharacter>(GetOwningActor()))
+		{
+			Character->OnDamaged.ExecuteIfBound();
+		}
+	}
 }
 
 void UEnemyAttributeSet::OnRep_MovementSpeed(const FGameplayAttributeData& OldMovementSpeed)

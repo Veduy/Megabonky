@@ -7,6 +7,9 @@
 #include "AbilitySystemInterface.h"
 #include "MgbEnemyCharacter.generated.h"
 
+//DECLARE_MULTICAST_DELEGATE()
+DECLARE_DELEGATE(FOnDamaged);
+
 class UEnemyAttributeSet;
 class UCapsuleComponent;
 class USkeletalMeshComponent;
@@ -20,7 +23,6 @@ enum class EMoveState : uint8
 	Walk		= 5		UMETA(DisplayName = "Walk"),
 	Climb		= 10	UMETA(DisplayName = "Climb")
 };
-
 
 UCLASS()
 class MEGABONKY_API AMgbEnemyCharacter : public APawn, public IAbilitySystemInterface
@@ -59,6 +61,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void CollisionHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
+	UFUNCTION(BlueprintCallable)
+	void HandleDamageEvents();
+
 public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
@@ -96,4 +101,5 @@ public:
 	float TargetSpawnHeight;
 
 	FTimerHandle CheckWallTimer;
+	FOnDamaged OnDamaged;
 };

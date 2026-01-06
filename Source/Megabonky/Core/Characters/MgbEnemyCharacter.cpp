@@ -9,6 +9,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 
 #include "MgbPlayerCharacter.h"
+#include "../MgbGameplayTags.h"
 #include "../AbilitySystem/MgbAbilitySystemComponent.h"
 #include "../AbilitySystem/AttributeSet/EnemyAttributeSet.h"
 #include "../../Util/NetworkLog.h"
@@ -247,8 +248,9 @@ void AMgbEnemyCharacter::CollisionHit(UPrimitiveComponent* HitComponent, AActor*
 	if (AMgbPlayerCharacter* Player = Cast<AMgbPlayerCharacter>(OtherActor))
 	{
 		// ApplyDamage By GameplayEffect
-		UAbilitySystemComponent* PlayerASC = Player->GetAbilitySystemComponent();
-		bool bInvincible = PlayerASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(FName("Player.State.Invincible")));
+		UAbilitySystemComponent* PlayerASC = Player->GetAbilitySystemComponent(); 
+		//bool bInvincible = PlayerASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(FName("Player.State.Invincible")));
+		bool bInvincible = PlayerASC->HasMatchingGameplayTag(TAG_Character_State_Invincible);
 		if (bInvincible)
 			return;
 
@@ -265,4 +267,9 @@ void AMgbEnemyCharacter::CollisionHit(UPrimitiveComponent* HitComponent, AActor*
 		FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(HitDamageEffectClass, 1.f, ContextHandle);
 		AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), PlayerASC);
 	}
+}
+
+void AMgbEnemyCharacter::HandleDamageEvents()
+{
+
 }
