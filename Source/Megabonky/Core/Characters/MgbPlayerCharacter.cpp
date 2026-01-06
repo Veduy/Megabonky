@@ -88,6 +88,10 @@ void AMgbPlayerCharacter::PossessedBy(AController* NewController)
 	if (IsValid(ASC))
 	{
 		ASC->InitAbilityActorInfo(this, this);
+	
+		auto ContextHandle = ASC->MakeEffectContext();
+		auto SpecHandle = ASC->MakeOutgoingSpec(InitAttributeEffect, 1.f, ContextHandle);
+		ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 	}
 } 
 

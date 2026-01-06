@@ -241,8 +241,17 @@ void AMgbEnemyCharacter::ClimbWall(float DeltaTime)
 
 void AMgbEnemyCharacter::CollisionHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	if (!HasAuthority())
+		return;
+
 	if (AMgbPlayerCharacter* Player = Cast<AMgbPlayerCharacter>(OtherActor))
 	{
+		// ApplyDamage By GameplayEffect
+		UAbilitySystemComponent* PlayerASC = Player->GetAbilitySystemComponent();
+		bool bInvincible = PlayerASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(FName("Player.State.Invincible")));
+		if (bInvincible)
+			return;
+
 		// Knockback
 		UCharacterMovementComponent* PlayerMove = Player->GetCharacterMovement();
 
@@ -251,9 +260,6 @@ void AMgbEnemyCharacter::CollisionHit(UPrimitiveComponent* HitComponent, AActor*
 		
 		PlayerMove->AddImpulse(ImpulseDir * 15000.f);
 		PlayerMove->AddImpulse(FVector(0.f, 0.f, 1.f) * 10000.f);
-
-		// ApplyDamage By GameplayEffect
-		UAbilitySystemComponent* PlayerASC = Player->GetAbilitySystemComponent();
 
 		FGameplayEffectContextHandle ContextHandle = AbilitySystemComponent->MakeEffectContext();
 		FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(HitDamageEffectClass, 1.f, ContextHandle);
