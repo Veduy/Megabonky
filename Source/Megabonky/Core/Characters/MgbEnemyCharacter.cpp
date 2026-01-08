@@ -19,33 +19,28 @@ AMgbEnemyCharacter::AMgbEnemyCharacter()
 {
 	bReplicates = true;
 
-	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleCollider"));
-	RootComponent = CapsuleComponent;
-	CapsuleComponent->SetIsReplicated(true);
-	CapsuleComponent->SetCollisionProfileName(FName("Enemy"));
-	CapsuleComponent->SetCapsuleHalfHeight(80.f);
-	CapsuleComponent->SetCapsuleRadius(40.f);
-	CapsuleComponent->SetSimulatePhysics(false);
+	GetCapsuleComponent()->SetIsReplicated(true);
+	GetCapsuleComponent()->SetCollisionProfileName(FName("Enemy"));
+	GetCapsuleComponent()->SetCapsuleHalfHeight(80.f);
+	GetCapsuleComponent()->SetCapsuleRadius(40.f);
+	GetCapsuleComponent()->SetSimulatePhysics(false);
 
-	SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh"));
-	SkeletalMeshComponent->SetupAttachment(RootComponent);
-	SkeletalMeshComponent->SetCollisionProfileName("NoCollision");
-	SkeletalMeshComponent->SetRelativeRotation(FRotator(0.0f, -90.f, 0.0f));
+	GetMesh()->SetupAttachment(RootComponent);
+	GetMesh()->SetCollisionProfileName("NoCollision");
+	GetMesh()->SetRelativeRotation(FRotator(0.0f, -90.f, 0.0f));
 	float Half = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
-	SkeletalMeshComponent->SetRelativeLocation(FVector(0.f, 0.f, -Half));
-	SkeletalMeshComponent->SetRelativeScale3D(FVector(0.7f, 0.7f, 0.7f));
+	GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -Half));
+	GetMesh()->SetRelativeScale3D(FVector(0.7f, 0.7f, 0.7f));
 
-	AbilitySystemComponent = CreateDefaultSubobject<UMgbAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
-	AbilitySystemComponent->SetIsReplicated(true);
-	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
+	GetCharacterMovement()->bUseControllerDesiredRotation = false;
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->MaxWalkSpeed = 200.f;
+	GetCharacterMovement()->GroundFriction = 0.f;
+	GetCharacterMovement()->BrakingFrictionFactor = 0.f;
+	GetCharacterMovement()->RotationRate = FRotator(0.f, 900.f, 0.f);
+	GetCharacterMovement()->bIgnoreBaseRotation = true;
 
-	FloatingPawnMovement = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("FloatingPawnMovement"));
-	FloatingPawnMovement->MaxSpeed = 300.f;
-	FloatingPawnMovement->Acceleration = 100.f;
-	FloatingPawnMovement->Deceleration = 100.f;
-	FloatingPawnMovement->TurningBoost = 100.f;
-
-	CharacterAttributeSet = CreateDefaultSubobject<UEnemyAttributeSet>(TEXT("EnemyAttributeSet"));
+	EnemyAttributeSet = CreateDefaultSubobject<UEnemyAttributeSet>(TEXT("EnemyAttributeSet"));
 
 	AutoPossessAI = EAutoPossessAI::Disabled;
 }
@@ -58,8 +53,10 @@ void AMgbEnemyCharacter::BeginPlay()
 	if (!HasAuthority())
 		return;
 
-	CapsuleComponent->SetSimulatePhysics(false);
-	CapsuleComponent->OnComponentHit.AddDynamic(this, &AMgbEnemyCharacter::CollisionHit);
+	AutoPossessAI = EAutoPossessAI::Disabled;
+
+	GetCapsuleComponent()->SetSimulatePhysics(false);
+	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &AMgbEnemyCharacter::CollisionHit);
 
 	TargetSpawnHeight = GetActorLocation().Z + GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 2.f;
 
@@ -76,6 +73,10 @@ void AMgbEnemyCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//서버일때만
+	if (!HasAuthority())
+		return;
+
 	if (bSpawnFinished == false)
 	{
 		float Height = FMath::FInterpTo(GetActorLocation().Z, TargetSpawnHeight, DeltaTime, 1.5f);
@@ -84,30 +85,33 @@ void AMgbEnemyCharacter::Tick(float DeltaTime)
 		if (GetActorLocation().Z >= TargetSpawnHeight - 5.f)
 		{
 			bSpawnFinished = true;   
-			CapsuleComponent->SetSimulatePhysics(true);
 			SpawnDefaultController();
 		}
+
+		return;
 	}
 
-	if (bSpawnFinished)
+	switch (CurrentMoveState)
 	{
-		switch (CurrentMoveState)
-		{
-		case EMoveState::Idle:
-			LookTarget(DeltaTime);
-			break;
-		case EMoveState::Walk:
-			LookTarget(DeltaTime);
-			MoveToTarget(DeltaTime);
-			break;
-		case EMoveState::Climb:
-			LookTarget(DeltaTime);
-			ClimbWall(DeltaTime);
-			break;
-		default:
-			break;
-		}
+	case EMoveState::Idle:
+		LookTarget(DeltaTime);
+		break;
+	case EMoveState::Walk:
+		LookTarget(DeltaTime);
+		MoveToTarget(DeltaTime);
+		break;
+	case EMoveState::Climb:
+		LookTarget(DeltaTime);
+		ClimbWall(DeltaTime);
+		break;
+	default:
+		break;
 	}
+
+	/*if (!GetCharacterMovement()->IsMovingOnGround())
+	{
+		
+	}*/
 }
 
 void AMgbEnemyCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -126,21 +130,6 @@ void AMgbEnemyCharacter::Destroyed()
 	}
 }
 
-UAbilitySystemComponent* AMgbEnemyCharacter::GetAbilitySystemComponent() const
-{
-	return AbilitySystemComponent;
-}
-
-UCapsuleComponent* AMgbEnemyCharacter::GetCapsuleComponent()
-{
-	return CapsuleComponent;
-}
-
-USkeletalMeshComponent* AMgbEnemyCharacter::GetMesh()
-{
-	return SkeletalMeshComponent;
-}
-
 void AMgbEnemyCharacter::MoveToTarget(float DeltaTime)
 {
 	//서버일때만
@@ -154,7 +143,7 @@ void AMgbEnemyCharacter::MoveToTarget(float DeltaTime)
 
 	// 경사면에서 일정한 속도값을 위해서. 
 	FVector Start = GetActorLocation();
-	FVector End = Start + (GetActorUpVector() * CapsuleComponent->GetScaledCapsuleHalfHeight() * -1.3f);
+	FVector End = Start + (GetActorUpVector() * GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * -1.3f);
 	FHitResult Hit;
 
 	// 추후에 디버깅할때 비용 확인할수 있음.
@@ -173,11 +162,9 @@ void AMgbEnemyCharacter::MoveToTarget(float DeltaTime)
 		FVector Dir = TargetActor->GetActorLocation() - GetActorLocation();
 		Dir = Dir.GetSafeNormal2D();
 
-		Dir = -Hit.ImpactNormal + Dir;
-		//Dir = FVector::VectorPlaneProject(Dir, Hit.ImpactNormal).GetSafeNormal();
-		//AddActorWorldOffset(Dir * 150.f * DeltaTime);
+		Dir = -Hit.ImpactNormal + Dir;		
 
-		FloatingPawnMovement->AddInputVector(Dir * 150);
+		AddMovementInput(Dir);
 	}
 }
 
@@ -195,6 +182,9 @@ void AMgbEnemyCharacter::LookTarget(float DeltaTime)
 
 void AMgbEnemyCharacter::CheckWall()
 {
+	if (!bSpawnFinished)
+		return;
+	
 	FVector Dir = TargetActor->GetActorLocation() - GetActorLocation();
 	Dir = Dir.GetSafeNormal2D();
 	FVector Start = GetActorLocation() - FVector(0.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 0.9f);
@@ -225,20 +215,25 @@ void AMgbEnemyCharacter::CheckWall()
 		float value = FVector::DotProduct(Normal, Forward);
 		if (value <= -0.9f)
 		{
-			GetCapsuleComponent()->SetEnableGravity(false);
 			CurrentMoveState = EMoveState::Climb;
+			GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
 		}
 		else if (Cast<AMgbEnemyCharacter>(Hit.GetActor()))
 		{
-			//UE_LOG(LogTemp, Warning, TEXT("Enemy Climb"));
-			GetCapsuleComponent()->SetEnableGravity(false);
 			CurrentMoveState = EMoveState::Climb;
+			UE_LOG(LogTemp, Warning, TEXT("Enemy Climb Start"));
+			GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
 		}
 	}
 	else if(!bResult && CurrentMoveState != EMoveState::Walk)
 	{
-		GetCapsuleComponent()->SetEnableGravity(true);
 		CurrentMoveState = EMoveState::Walk;
+		GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+
+		if (Cast<AMgbEnemyCharacter>(GetCharacterMovement()->CurrentFloor.HitResult.GetActor()))
+		{
+			GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+		}
 	}
 }
 
@@ -249,11 +244,10 @@ void AMgbEnemyCharacter::ClimbWall(float DeltaTime)
 		return;
 
 	FVector Up = GetActorUpVector();
-	FVector Dir = TargetActor->GetActorLocation() - GetActorLocation();
+	FVector Dir = (TargetActor->GetActorLocation() - GetActorLocation()).GetSafeNormal2D();
 	Dir = (Dir + Up).GetSafeNormal();
-	//AddActorWorldOffset(Dir * 150 * DeltaTime);
 
-	FloatingPawnMovement->AddInputVector(Dir * 150);
+	AddMovementInput(Dir * DeltaTime * 10.f);
 }
 
 void AMgbEnemyCharacter::CollisionHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)

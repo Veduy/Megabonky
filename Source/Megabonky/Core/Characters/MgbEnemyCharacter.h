@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Pawn.h"
+#include "../MgbCharacter.h"
 #include "AbilitySystemInterface.h"
 #include "MgbEnemyCharacter.generated.h"
 
@@ -26,7 +26,7 @@ enum class EMoveState : uint8
 };
 
 UCLASS()
-class MEGABONKY_API AMgbEnemyCharacter : public APawn, public IAbilitySystemInterface
+class MEGABONKY_API AMgbEnemyCharacter : public AMgbCharacter
 {
 	GENERATED_BODY()
 
@@ -38,15 +38,7 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void Destroyed() override;
 
-	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
-
 public:
-	UFUNCTION(BlueprintCallable)
-	UCapsuleComponent* GetCapsuleComponent();
-
-	UFUNCTION(BlueprintCallable)
-	USkeletalMeshComponent* GetMesh();
-
 	UFUNCTION(BlueprintCallable)
 	void MoveToTarget(float DeltaTime);
 
@@ -66,28 +58,11 @@ public:
 	void HandleDamageEvents();
 
 public:
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Components")
-	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
-	TObjectPtr<UCapsuleComponent> CapsuleComponent;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
-	TObjectPtr<USkeletalMeshComponent> SkeletalMeshComponent;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
-	TObjectPtr<UFloatingPawnMovement> FloatingPawnMovement;
-
-public:
-	// 초기 Attribute 값 적용할 GameplayEffect.
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
-	TSubclassOf<UGameplayEffect> InitAttributeEffect;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
 	TSubclassOf<UGameplayEffect> HitDamageEffectClass;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")
-	TObjectPtr<UEnemyAttributeSet> CharacterAttributeSet;
+	TObjectPtr<UEnemyAttributeSet> EnemyAttributeSet;
 
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite, Category = "Data")
 	TObjectPtr<AActor> TargetActor;
