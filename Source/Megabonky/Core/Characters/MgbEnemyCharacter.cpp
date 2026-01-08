@@ -4,6 +4,7 @@
 
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/FloatingPawnMovement.h"
 #include "Net/UnrealNetwork.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -38,6 +39,12 @@ AMgbEnemyCharacter::AMgbEnemyCharacter()
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 
+	FloatingPawnMovement = CreateDefaultSubobject<UFloatingPawnMovement>(TEXT("FloatingPawnMovement"));
+	FloatingPawnMovement->MaxSpeed = 300.f;
+	FloatingPawnMovement->Acceleration = 100.f;
+	FloatingPawnMovement->Deceleration = 100.f;
+	FloatingPawnMovement->TurningBoost = 100.f;
+
 	CharacterAttributeSet = CreateDefaultSubobject<UEnemyAttributeSet>(TEXT("EnemyAttributeSet"));
 
 	AutoPossessAI = EAutoPossessAI::Disabled;
@@ -47,12 +54,12 @@ void AMgbEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	CapsuleComponent->SetSimulatePhysics(false);
-	CapsuleComponent->OnComponentHit.AddDynamic(this, &AMgbEnemyCharacter::CollisionHit);
-
 	//서버일때만
 	if (!HasAuthority())
 		return;
+
+	CapsuleComponent->SetSimulatePhysics(false);
+	CapsuleComponent->OnComponentHit.AddDynamic(this, &AMgbEnemyCharacter::CollisionHit);
 
 	TargetSpawnHeight = GetActorLocation().Z + GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 2.f;
 
@@ -115,7 +122,7 @@ void AMgbEnemyCharacter::Destroyed()
 	//서버일때만 XPCrystal Drop
 	if (HasAuthority())
 	{
-		//GetWorld()->SpawnActor<AActor>(XPCrystalClass, GetActorTransform());
+		GetWorld()->SpawnActor<AActor>(XPCrystalClass, GetActorTransform());
 	}
 }
 
@@ -168,7 +175,9 @@ void AMgbEnemyCharacter::MoveToTarget(float DeltaTime)
 
 		Dir = -Hit.ImpactNormal + Dir;
 		//Dir = FVector::VectorPlaneProject(Dir, Hit.ImpactNormal).GetSafeNormal();
-		AddActorWorldOffset(Dir * 150.f * DeltaTime);
+		//AddActorWorldOffset(Dir * 150.f * DeltaTime);
+
+		FloatingPawnMovement->AddInputVector(Dir * 150);
 	}
 }
 
@@ -235,9 +244,16 @@ void AMgbEnemyCharacter::CheckWall()
 
 void AMgbEnemyCharacter::ClimbWall(float DeltaTime)
 {
+	//서버일때만
+	if (!HasAuthority())
+		return;
+
+	FVector Up = GetActorUpVector();
 	FVector Dir = TargetActor->GetActorLocation() - GetActorLocation();
-	Dir = Dir.GetSafeNormal();
-	AddActorWorldOffset(Dir * 150 * DeltaTime);
+	Dir = (Dir + Up).GetSafeNormal();
+	//AddActorWorldOffset(Dir * 150 * DeltaTime);
+
+	FloatingPawnMovement->AddInputVector(Dir * 150);
 }
 
 void AMgbEnemyCharacter::CollisionHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)

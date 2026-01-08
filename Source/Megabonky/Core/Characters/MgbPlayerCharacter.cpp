@@ -6,6 +6,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/SphereComponent.h"
 #include "Camera/CameraComponent.h"
 #include "InputAction.h"
 #include "EnhancedInputComponent.h"
@@ -18,6 +19,7 @@
 #include "../AbilitySystem/MgbAbilitySystemComponent.h"
 #include "../AbilitySystem/AttributeSet/PlayerAttributeSet.h"
 #include "../MgbWeapon.h"
+#include "../../Actors/MgbItemActor.h"
 
 #include "../../Util/NetworkLog.h"
 
@@ -62,6 +64,11 @@ AMgbPlayerCharacter::AMgbPlayerCharacter()
 	MainCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	MainCamera->SetupAttachment(SpringArm);
 	
+	PickupSphere = CreateDefaultSubobject<USphereComponent>(TEXT("PickupRange"));
+	PickupSphere->SetupAttachment(RootComponent);
+	PickupSphere->SetSphereRadius(300.f);
+	PickupSphere->SetCollisionProfileName(FName("PickupDetector"));
+
 	PlayerAttributeSet = CreateDefaultSubobject<UPlayerAttributeSet>(TEXT("PlayerAttributeSet"));
 }
 
@@ -70,6 +77,13 @@ void AMgbPlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	MeshBaseQuat = GetMesh()->GetRelativeRotation().Quaternion();
+
+	if (HasAuthority())
+	{
+		check(PickupSphere);
+
+		PickupSphere->OnComponentBeginOverlap.AddDynamic(this, &AMgbPlayerCharacter::PickupBeginOverlap);
+	}
 }
 
 void AMgbPlayerCharacter::Tick(float DeltaTime)
@@ -77,7 +91,6 @@ void AMgbPlayerCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	UpdateCharacterMeshRotation(DeltaTime);
-
 }
 
 void AMgbPlayerCharacter::PossessedBy(AController* NewController)
@@ -266,6 +279,14 @@ void AMgbPlayerCharacter::UpdateCharacterMeshRotation(float DeltaTime)
 		CurrentRotation.Roll = FMath::FInterpTo(CurrentRotation.Roll, 0, DeltaTime, 10.f);
 
 		GetMesh()->SetRelativeRotation(CurrentRotation);
+	}
+}
+
+void AMgbPlayerCharacter::PickupBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (AMgbItemActor* Item = Cast<AMgbItemActor>(OtherActor))
+	{
+		Item->OnAction.Broadcast();
 	}
 }
 

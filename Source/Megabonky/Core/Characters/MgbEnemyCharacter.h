@@ -12,6 +12,7 @@ DECLARE_DELEGATE(FOnDamaged);
 
 class UEnemyAttributeSet;
 class UCapsuleComponent;
+class UFloatingPawnMovement;
 class USkeletalMeshComponent;
 class UGameplayEffect;
 class UAbilitySystemComponent;
@@ -73,6 +74,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
 	TObjectPtr<USkeletalMeshComponent> SkeletalMeshComponent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Components")
+	TObjectPtr<UFloatingPawnMovement> FloatingPawnMovement;
 
 public:
 	// 초기 Attribute 값 적용할 GameplayEffect.

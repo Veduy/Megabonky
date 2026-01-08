@@ -11,6 +11,7 @@
 
 class USpringArmComponent;
 class UCameraComponent;
+class USphereComponent;
 class UInputAction;
 class UGameplayAbility;
 class AMgbWeapon;
@@ -52,19 +53,28 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool FindPrimaryTargetByCondition(AActor*& OutPrimaryTarget);
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void EquipWeapon(TSubclassOf<AMgbWeapon> NewWeapon);
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void ActivateWeaponsAbility();
 
 	void UpdateCharacterMeshRotation(float DeltaTime);
+
+	//UPrimitiveComponent, OnComponentBeginOverlap, UPrimitiveComponent*, OverlappedComponent, AActor*, OtherActor, UPrimitiveComponent*, OtherComp, int32, OtherBodyIndex, bool, bFromSweep, const FHitResult&, SweepResult)
+
+	UFUNCTION(BlueprintCallable)
+	void PickupBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<USpringArmComponent> SpringArm;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UCameraComponent> MainCamera;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<USphereComponent> PickupSphere;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
