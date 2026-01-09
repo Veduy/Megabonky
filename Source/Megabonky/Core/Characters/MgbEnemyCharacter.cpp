@@ -49,6 +49,8 @@ void AMgbEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	bSpawnFinished = false;
+
 	//서버일때만
 	if (!HasAuthority())
 		return;

@@ -7,6 +7,7 @@
 #include "InGame.generated.h"
 
 class UProgressBar;
+class UTextBlock;
 
 /**
  * 
@@ -38,5 +39,30 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (BindWidget))
 	TObjectPtr<UMgbWidget> ItemSelectWindow;
+
+	/// <summary>
+	/// StateInfoBox
+	/// </summary>
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (BindWidget))
+	TObjectPtr<UTextBlock> PassedTime;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (BindWidget))
+	TObjectPtr<UTextBlock> Silver;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (BindWidget))
+	TObjectPtr<UTextBlock> Gold;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (BindWidget))
+	TObjectPtr<UTextBlock> TotalKill;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (BindWidget))
+	TObjectPtr<UTextBlock> RemainingTime;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (BindWidget))
+	TObjectPtr<UTextBlock> NextBoxGold;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (BindWidget))
+	TObjectPtr<UTextBlock> Level;
+
 };
  

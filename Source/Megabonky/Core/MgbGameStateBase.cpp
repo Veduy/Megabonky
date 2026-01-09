@@ -24,12 +24,21 @@ void AMgbGameStateBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (HasAuthority())
+	{
+		GameStartTime = GetWorld()->GetTimeSeconds();
+	}
 }
 
 void AMgbGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	DOREPLIFETIME(AMgbGameStateBase, GameStartTime);
+	DOREPLIFETIME(AMgbGameStateBase, CurrentLevel);
+	DOREPLIFETIME(AMgbGameStateBase, Gold);
+	DOREPLIFETIME(AMgbGameStateBase, TotalKill);
+	DOREPLIFETIME(AMgbGameStateBase, TotalKill);
 }
 
 
@@ -137,6 +146,10 @@ void AMgbGameStateBase::SpawnEnemy()
 			// 일정 Min~Max범위의 값을 곱함 -> 캐릭터 근처 에서 스폰될 거리 지정.
 			FVector2D Location = Dir * FMath::FRandRange(SpawnRange - 300.f, SpawnRange + 300.f);
 
+			// 스폰할 EnemyClass 선택
+			// 일단 가지고 있는 몬스터 중에서 랜덤으로 스폰중
+			UClass* EnemyClass = EnemyClasses[FMath::RandRange(0, EnemyClasses.Num() - 1)];
+
 			// 스폰할 지점에서 또 작은 원을 기준으로 스폰할 마리수에 해당하는, 진짜 스폰 지점을 뽑아내서 그 지점에 스폰.
 			for (int i = 0; i < EnemyPerSpawn; ++i)
 			{
@@ -171,10 +184,16 @@ void AMgbGameStateBase::SpawnEnemy()
 					float CapsuleHeight = Cast<ACharacter>(Player)->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 					RealSpawnLocation = FVector(Hit.Location.X, Hit.Location.Y, Hit.Location.Z - CapsuleHeight);
 				}
+				
+				// 적들이 몰려온다(이벤트) 발생
+				// 게임 시간이 1분 지날때 몬스터 종류가 추가됨.
+				// 가끔 엘리트 몬스터가 출현함.
+				
 
+				// 스폰
 				FActorSpawnParameters Params;
 				Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-				AActor* SpawnedActor = GetWorld()->SpawnActor<AActor>(EnemyClasses[0], RealSpawnLocation, FRotator::ZeroRotator, Params);
+				AActor* SpawnedActor = GetWorld()->SpawnActor<AActor>(EnemyClass, RealSpawnLocation, FRotator::ZeroRotator, Params);
 				AMgbEnemyCharacter* Enemy = Cast<AMgbEnemyCharacter>(SpawnedActor);
 				if (Enemy)
 				{

@@ -22,6 +22,9 @@ void AMgbGameModeBase::StartPlay()
 {
 	Super::StartPlay();
 
+	// 게임이 시작됬을때 행해져야하는것들;
+	//1.EnemySpawn
+	//2.스테이지 Timer 동작
 	AMgbGameStateBase* GS = GetGameState<AMgbGameStateBase>();
 	if (GS)
 	{
@@ -29,5 +32,7 @@ void AMgbGameModeBase::StartPlay()
 		{
 			GS->InitSpawnEnemyTimer();
 		}
+
+		
 	}
 }

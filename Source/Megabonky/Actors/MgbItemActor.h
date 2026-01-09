@@ -25,6 +25,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+
 public:
 	UPROPERTY(BlueprintAssignable, Category = "Item")
 	FOnItemAction OnAction;
