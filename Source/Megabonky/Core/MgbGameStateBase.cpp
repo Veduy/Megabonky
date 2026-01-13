@@ -48,18 +48,13 @@ void AMgbGameStateBase::ServerAddXP_Implementation(float InValue)
 
 	MulticastUpdateUI_XP(Percent);
 
-	// TODO:레벨업 작업
-
-	// 일단 데이터 테이블에서 플레이어가 가진 장비랑, 테이블에 있는것중에 골라서 최대3개
-	// 여기서 UI 정보를 던져줘야함.
-	// 레벨업시. 업그레이드 정보 구조체 3개 만들어서, 이건 각 플레이어마다 다르게.
-
-
+	// TODO:레벨업시 발동 이벤트
 	if (CurrentXP >= RequiredXP)
 	{
 		float temp = CurrentXP - RequiredXP;
 		CurrentXP = 0;
 		RequiredXP = RequiredXP * (1.2f);
+		CurrentLevel += 1;
 
 		ServerAddXP(temp);
 

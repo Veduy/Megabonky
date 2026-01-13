@@ -50,13 +50,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
 	TArray<TSubclassOf<AMgbEnemyCharacter>> EnemyClasses;
 
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data", Replicated)
 	float GameStartTime = 0.f;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")
 	int32 ResumeRequestCount = 0;
-
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
 	int32 MaxEnemyCount = 1000;
@@ -81,7 +79,6 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data", Replicated)
 	int32 CurrentLevel = 0;
-
 
 	// 클라이언트에서 서버에서 받은 StartTime - GetWorld()->GetTimeSeconds() 뺀값을 저장.
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")

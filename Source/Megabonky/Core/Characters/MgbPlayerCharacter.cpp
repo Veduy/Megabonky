@@ -80,8 +80,6 @@ void AMgbPlayerCharacter::BeginPlay()
 
 	if (HasAuthority())
 	{
-		check(PickupSphere);
-
 		PickupSphere->OnComponentBeginOverlap.AddDynamic(this, &AMgbPlayerCharacter::PickupBeginOverlap);
 	}
 }
@@ -284,9 +282,12 @@ void AMgbPlayerCharacter::UpdateCharacterMeshRotation(float DeltaTime)
 
 void AMgbPlayerCharacter::PickupBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (AMgbItemActor* Item = Cast<AMgbItemActor>(OtherActor))
+	if (HasAuthority())
 	{
-		Item->OnAction.Broadcast();
+		if (AMgbItemActor* Item = Cast<AMgbItemActor>(OtherActor))
+		{
+			Item->OnAction.Broadcast(this);
+		}
 	}
 }
 

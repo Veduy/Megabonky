@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "MgbItemActor.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnItemAction);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemAction, AActor*, TargetActor);
 
 UCLASS()
 class MEGABONKY_API AMgbItemActor : public AActor
@@ -24,7 +24,6 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
 
 public:
 	UPROPERTY(BlueprintAssignable, Category = "Item")
