@@ -48,7 +48,6 @@ void AMgbGameStateBase::ServerAddXP_Implementation(float InValue)
 
 	MulticastUpdateUI_XP(Percent);
 
-	// TODO:레벨업시 발동 이벤트
 	if (CurrentXP >= RequiredXP)
 	{
 		float temp = CurrentXP - RequiredXP;
@@ -58,8 +57,10 @@ void AMgbGameStateBase::ServerAddXP_Implementation(float InValue)
 
 		ServerAddXP(temp);
 
-		MulticastSetPauseGame(true);
+		// TODO:레벨업시 발동 이벤트
+
 		MulticastShowItemSelectWindow();
+		MulticastSetPauseGame(true);
 	}
 }
 
