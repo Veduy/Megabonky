@@ -18,6 +18,9 @@ class MEGABONKY_API UItemSelectWindow : public UMgbWidget
 public:
 	virtual void NativeOnInitialized() override;
 
+	//UFUNCTION(BlueprintCallable)
+	//void SetItemButtonInfo(int Num, /*Info Struct*/);
+
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (BindWidget))
 	TObjectPtr<UMgbWidget> ItemA;

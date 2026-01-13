@@ -29,6 +29,9 @@ public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
+	FName WeaponName;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 

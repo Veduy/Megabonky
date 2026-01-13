@@ -21,3 +21,14 @@ UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Character_State_Invincible);
 //UE_DECLARE_G
 
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Event_Weapon_FireStaff);
+
+// GE_WeaponUpgrade 적용시킬때, SetbyCaller로 값 설정해줄건데, 태그가 필요함
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Attribute_Weapon_Damage);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Attribute_Weapon_CritChance);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Attribute_Weapon_CritDamage);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Attribute_Weapon_ProjectileCount);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Attribute_Weapon_ProjectileSpeed);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Attribute_Weapon_ProjectileBounces);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Attribute_Weapon_Size);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Attribute_Weapon_Knockback);
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Attribute_Weapon_Duration);
