@@ -80,11 +80,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
 	TSubclassOf<AMgbWeapon> DefaultWeaponClass;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite, Category = "Data")
 	TArray<TObjectPtr<AMgbWeapon>> Weapons;
 
 	/// 비전서 (Tomes)
-	UPROPERTY(VisibleAnywhere,BlueprintReadWrite, Category = "Data", Replicated)
+	UPROPERTY(Replicated, VisibleAnywhere,BlueprintReadWrite, Category = "Data")
 	TArray<FTomes> Tomes;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Data")

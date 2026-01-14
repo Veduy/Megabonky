@@ -11,6 +11,7 @@
 #include "GameFramework/Character.h"
 #include "Characters/MgbEnemyCharacter.h"
 #include "MgbPlayerController.h"
+#include "Data/WeaponInfo.h"
 
 #include "../Util/NetworkLog.h"
 #include "../UI/InGame/InGame.h"
@@ -101,6 +102,28 @@ void AMgbGameStateBase::MulticastShowItemSelectWindow_Implementation()
 	}
 }
 
+void AMgbGameStateBase::GenerateUpgradeInfo()
+{
+	// 2분의 1확률로 무기/비전서.
+	bool bWeapon = FMath::RandBool();
+	if (bWeapon)
+	{
+		//무기 칸이 남아있다면 데이터테이블에 있는 무기들중에서 랜덤으로 선택. >> (가지고있는 무기에 추가 확률 부여)
+		//무기 칸이 없다면, 플레이어가 가지고 있는 무기들 중에서 선택.
+		TArray<FName> WeaponNames;
+		WeaponNames = DT_Weapon->GetRowNames();
+
+		int RandomNum = FMath::RandRange(0, WeaponNames.Num() - 1);
+		FName RandomWeaponName = WeaponNames[RandomNum];
+
+		FMgbWeaponInfo* WeaponInfo = DT_Weapon->FindRow<FMgbWeaponInfo>(RandomWeaponName, FString("Find Weapon"));
+	}
+	else
+	{
+
+	}
+}
+
 void AMgbGameStateBase::InitSpawnEnemyTimer()
 {
 	if (EnemyClasses.IsEmpty())
@@ -146,7 +169,7 @@ void AMgbGameStateBase::SpawnEnemy()
 
 			// 일정 Min~Max범위의 값을 곱함 -> 캐릭터 근처 에서 스폰될 거리 지정.
 			FVector2D Location = Dir * FMath::FRandRange(SpawnRange - 300.f, SpawnRange + 300.f);
-
+			
 			// 스폰할 EnemyClass 선택
 			// 일단 가지고 있는 몬스터 중에서 랜덤으로 스폰중
 			UClass* EnemyClass = EnemyClasses[FMath::RandRange(0, EnemyClasses.Num() - 1)];
@@ -190,7 +213,6 @@ void AMgbGameStateBase::SpawnEnemy()
 				// 게임 시간이 1분 지날때 몬스터 종류가 추가됨.
 				// 가끔 엘리트 몬스터가 출현함.
 				
-
 				// 스폰
 				FActorSpawnParameters Params;
 				Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;

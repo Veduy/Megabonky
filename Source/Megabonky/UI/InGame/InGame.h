@@ -4,10 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "../MgbWidget.h"
+#include "../../Core/Data/WeaponInfo.h"
 #include "InGame.generated.h"
 
 class UProgressBar;
 class UTextBlock;
+class UTexture2D;
 
 /**
  * 
@@ -32,6 +34,9 @@ public:
 
 	UFUNCTION()
 	void CompleteItemSelect();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void SetItemUpgradeSlot(const int32 SlotNum, const FName ItemName, const TArray<FWeaponUpgradeOption>& UpgradeStat);
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (BindWidget))

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "WeaponInfo.generated.h" 
 
 class UTexture2D;
@@ -21,4 +22,41 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UTexture2D> Icon;
+};
+
+UENUM(BlueprintType)
+enum class EWeaponUpgradeStat : uint8
+{
+	Damage,
+	CritChance,
+	CritDamage,
+	ProjectileCount,
+	ProjectileSpeed,
+	ProjectileBounce,
+	Size,
+	Knockback,
+	Duration
+};
+
+USTRUCT(BlueprintType)
+struct FWeaponUpgradeOption
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	EWeaponUpgradeStat StatType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float IncreaseValue; // 증가 수치
+};
+
+USTRUCT(BlueprintType)
+struct FMgbWeaponUpgradeBonus : public FTableRowBase
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TArray<FWeaponUpgradeOption> UpgradeOptions;
 };

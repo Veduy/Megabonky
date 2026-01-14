@@ -38,6 +38,9 @@ public:
 	void ClientSpawnDamageTextActor(FVector Location, float DamageValue);
 	void ClientSpawnDamageTextActor_Implementation(FVector Location, float DamageValue);
 
+	UFUNCTION(BlueprintCallable)
+	void GenerateUpgradeInfo();
+
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputMappingContext> InputMappingContext;

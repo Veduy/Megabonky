@@ -40,7 +40,8 @@ public:
 	void MulticastShowItemSelectWindow();
 	void MulticastShowItemSelectWindow_Implementation();
 	
-
+	UFUNCTION()
+	void GenerateUpgradeInfo();
 
 public:
 	void InitSpawnEnemyTimer();
@@ -97,4 +98,11 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data", Replicated)
 	int32 NextBoxGold = 30;
+
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Data")
+	TObjectPtr<UDataTable> DT_Weapon;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Data")
+	TObjectPtr<UDataTable> DT_WeaponUpgradeBonus;
 };

@@ -123,6 +123,7 @@ void AMgbPlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AMgbPlayerCharacter, Tomes);
+	DOREPLIFETIME(AMgbPlayerCharacter, Weapons);
 }
 
 bool AMgbPlayerCharacter::FindPrimaryTargetByCondition(AActor*& OutPrimaryTarget)
