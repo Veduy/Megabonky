@@ -96,31 +96,10 @@ void AMgbGameStateBase::MulticastShowItemSelectWindow_Implementation()
 		{
 			if (MgbPC)
 			{
+				MgbPC->GenerateUpgradeInfo(); //임시로 여기 위치.
 				MgbPC->InGameWidget->ShowItemSelectWindow();
 			}
 		}
-	}
-}
-
-void AMgbGameStateBase::GenerateUpgradeInfo()
-{
-	// 2분의 1확률로 무기/비전서.
-	bool bWeapon = FMath::RandBool();
-	if (bWeapon)
-	{
-		//무기 칸이 남아있다면 데이터테이블에 있는 무기들중에서 랜덤으로 선택. >> (가지고있는 무기에 추가 확률 부여)
-		//무기 칸이 없다면, 플레이어가 가지고 있는 무기들 중에서 선택.
-		TArray<FName> WeaponNames;
-		WeaponNames = DT_Weapon->GetRowNames();
-
-		int RandomNum = FMath::RandRange(0, WeaponNames.Num() - 1);
-		FName RandomWeaponName = WeaponNames[RandomNum];
-
-		FMgbWeaponInfo* WeaponInfo = DT_Weapon->FindRow<FMgbWeaponInfo>(RandomWeaponName, FString("Find Weapon"));
-	}
-	else
-	{
-
 	}
 }
 

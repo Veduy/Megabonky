@@ -40,9 +40,6 @@ public:
 	void MulticastShowItemSelectWindow();
 	void MulticastShowItemSelectWindow_Implementation();
 	
-	UFUNCTION()
-	void GenerateUpgradeInfo();
-
 public:
 	void InitSpawnEnemyTimer();
 	void SpawnEnemy();
