@@ -13,7 +13,6 @@ class UImage;
 class UButton;
 class UTextBlock;
 class URichTextBlock;
-class UGameplayEffect;
 /**
  * 
  */
@@ -30,9 +29,6 @@ public:
 	void HandleButtonClicked();
 
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
-	TSubclassOf<UGameplayEffect> GE_WeaponUpgradeDefaultClass;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
 	TArray<FWeaponUpgradeOption> Upgrades;
 

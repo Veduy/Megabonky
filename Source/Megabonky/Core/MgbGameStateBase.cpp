@@ -83,7 +83,21 @@ void AMgbGameStateBase::MulticastUpdateUI_XP_Implementation(float InPercent)
 
 void AMgbGameStateBase::MulticastSetPauseGame_Implementation(bool bPause)
 {
-	UGameplayStatics::SetGamePaused(GetWorld(), bPause);
+	//UGameplayStatics::SetGamePaused(GetWorld(), bPause);
+	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (PC && PC->IsLocalPlayerController())
+	{
+		PC->SetIgnoreLookInput(bPause);
+		PC->SetIgnoreMoveInput(bPause);
+	}
+	if (bPause)
+	{
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.01f);
+	}
+	else
+	{
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.0f);
+	}
 }
 
 void AMgbGameStateBase::MulticastShowItemSelectWindow_Implementation()

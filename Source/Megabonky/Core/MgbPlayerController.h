@@ -4,10 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "Data/WeaponInfo.h"
 #include "MgbPlayerController.generated.h"
 
 class UInputMappingContext;
 class UInGame;
+class UGameplayEffect;
 
 /**
  * 
@@ -33,9 +35,9 @@ public:
 	void ServerResumeRequestCountIncrementAndCheck();
 	void ServerResumeRequestCountIncrementAndCheck_Implementation();
 
-	/*UFUNCTION(Server, Reliable, BlueprintCallable)
-	void ServerApplyWeaponUpgradeEffect();
-	void ServerApplyWeaponUpgradeEffect_Implementation();*/
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void ServerApplyWeaponUpgradeEffect(const TArray<FWeaponUpgradeOption>& UpgradeData);
+	void ServerApplyWeaponUpgradeEffect_Implementation(const TArray<FWeaponUpgradeOption>& UpgradeData);
 
 public:
 	UFUNCTION(Client, Unreliable)
@@ -54,4 +56,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
 	TSubclassOf<AActor> DamageTextActorClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
+	TSubclassOf<UGameplayEffect> GE_WeaponUpgradeDefaultClass;
 };
