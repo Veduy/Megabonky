@@ -33,6 +33,10 @@ public:
 	void ServerResumeRequestCountIncrementAndCheck();
 	void ServerResumeRequestCountIncrementAndCheck_Implementation();
 
+	/*UFUNCTION(Server, Reliable, BlueprintCallable)
+	void ServerApplyWeaponUpgradeEffect();
+	void ServerApplyWeaponUpgradeEffect_Implementation();*/
+
 public:
 	UFUNCTION(Client, Unreliable)
 	void ClientSpawnDamageTextActor(FVector Location, float DamageValue);

@@ -26,7 +26,7 @@ public:
 	FGameplayTag Name;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	int32 Level;
+	int32 Level = 0;
 };
 
 /**

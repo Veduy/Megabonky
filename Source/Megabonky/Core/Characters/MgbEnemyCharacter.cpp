@@ -223,7 +223,6 @@ void AMgbEnemyCharacter::CheckWall()
 		else if (Cast<AMgbEnemyCharacter>(Hit.GetActor()))
 		{
 			CurrentMoveState = EMoveState::Climb;
-			UE_LOG(LogTemp, Warning, TEXT("Enemy Climb Start"));
 			GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Flying);
 		}
 	}

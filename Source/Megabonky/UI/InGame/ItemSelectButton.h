@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "../MgbWidget.h"
+#include "../../Core/Data/WeaponInfo.h"
 #include "ItemSelectButton.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnItemSelected);
@@ -12,6 +13,7 @@ class UImage;
 class UButton;
 class UTextBlock;
 class URichTextBlock;
+class UGameplayEffect;
 /**
  * 
  */
@@ -28,6 +30,12 @@ public:
 	void HandleButtonClicked();
 
 public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
+	TSubclassOf<UGameplayEffect> GE_WeaponUpgradeDefaultClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
+	TArray<FWeaponUpgradeOption> Upgrades;
+
 	UPROPERTY()
 	FOnItemSelected OnItemSelected;
 

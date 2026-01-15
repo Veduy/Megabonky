@@ -45,10 +45,10 @@ struct FWeaponUpgradeOption
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	EWeaponUpgradeStat StatType;
+	EWeaponUpgradeStat StatType = EWeaponUpgradeStat::Damage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float IncreaseValue; // 증가 수치
+	float IncreaseValue = 0.f; // 증가 수치
 };
 
 USTRUCT(BlueprintType)
