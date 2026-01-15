@@ -32,6 +32,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
 	TArray<FWeaponUpgradeOption> Upgrades;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")
+	FName UpgradeItemName;
+
 	UPROPERTY()
 	FOnItemSelected OnItemSelected;
 

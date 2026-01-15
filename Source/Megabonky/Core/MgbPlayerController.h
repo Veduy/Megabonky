@@ -10,6 +10,7 @@
 class UInputMappingContext;
 class UInGame;
 class UGameplayEffect;
+class UDataTable;
 
 /**
  * 
@@ -36,8 +37,8 @@ public:
 	void ServerResumeRequestCountIncrementAndCheck_Implementation();
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void ServerApplyWeaponUpgradeEffect(const TArray<FWeaponUpgradeOption>& UpgradeData);
-	void ServerApplyWeaponUpgradeEffect_Implementation(const TArray<FWeaponUpgradeOption>& UpgradeData);
+	void ServerApplyWeaponUpgradeEffect(FName InWeaponName, const TArray<FWeaponUpgradeOption>& UpgradeData);
+	void ServerApplyWeaponUpgradeEffect_Implementation(FName InWeaponName, const TArray<FWeaponUpgradeOption>& UpgradeData);
 
 public:
 	UFUNCTION(Client, Unreliable)
@@ -59,4 +60,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
 	TSubclassOf<UGameplayEffect> GE_WeaponUpgradeDefaultClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
+	TObjectPtr<UDataTable> DT_Weapons;
 };

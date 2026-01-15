@@ -21,7 +21,7 @@ void UItemSelectButton::HandleButtonClicked()
 	APlayerController* PC = GetOwningPlayer();
 	if (AMgbPlayerController* MgbPC = Cast<AMgbPlayerController>(PC))
 	{
-		MgbPC->ServerApplyWeaponUpgradeEffect(Upgrades);
+		MgbPC->ServerApplyWeaponUpgradeEffect(UpgradeItemName, Upgrades);
 	}
 
 	OnItemSelected.Broadcast();

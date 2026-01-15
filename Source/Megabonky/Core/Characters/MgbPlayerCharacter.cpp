@@ -178,10 +178,21 @@ bool AMgbPlayerCharacter::FindPrimaryTargetByCondition(AActor*& OutPrimaryTarget
 
 void AMgbPlayerCharacter::EquipWeapon(TSubclassOf<AMgbWeapon> NewWeapon)
 {
+	if (!HasAuthority())
+	{
+		return;
+	}
+
+	if (Weapons.Num() >= 4)
+	{
+		return;
+	}
+
 	if (NewWeapon)
 	{
 		AMgbWeapon* SpawnedWeapon = Cast<AMgbWeapon>(GetWorld()->SpawnActor(NewWeapon));
 		SpawnedWeapon->SetOwner(this);
+
 		Weapons.Add(SpawnedWeapon);
 	}
 }

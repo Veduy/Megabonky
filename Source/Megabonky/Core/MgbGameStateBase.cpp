@@ -59,7 +59,7 @@ void AMgbGameStateBase::ServerAddXP_Implementation(float InValue)
 		ServerAddXP(temp);
 
 		// TODO:레벨업시 발동 이벤트
-
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.0001f); //서버도 똑같이
 		MulticastShowItemSelectWindow();
 		MulticastSetPauseGame(true);
 	}
@@ -92,7 +92,7 @@ void AMgbGameStateBase::MulticastSetPauseGame_Implementation(bool bPause)
 	}
 	if (bPause)
 	{
-		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.01f);
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.0001f);
 	}
 	else
 	{
@@ -230,6 +230,7 @@ void AMgbGameStateBase::HandleResumeRequest()
 		NET_LOG("");
 		ResumeRequestCount = 0;
 
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.0f); //서버도 똑같이
 		MulticastSetPauseGame(false);
 	}
 }

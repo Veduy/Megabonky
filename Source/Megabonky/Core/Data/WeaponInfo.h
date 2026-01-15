@@ -6,6 +6,7 @@
 #include "GameplayTagContainer.h"
 #include "WeaponInfo.generated.h" 
 
+class AMgbWeapon;
 class UTexture2D;
 
 USTRUCT(BlueprintType)
@@ -16,6 +17,9 @@ struct FMgbWeaponInfo : public FTableRowBase
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName Name;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<AMgbWeapon> WeaponClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString Description;
