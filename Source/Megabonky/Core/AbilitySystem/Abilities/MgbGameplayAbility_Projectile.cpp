@@ -26,7 +26,17 @@ void UMgbGameplayAbility_Projectile::SpawnProjectile(AActor* Owner, const FVecto
 {
 	FRotator Rotation = InSpawnDir;
 	Rotation.Roll = 0.f;
-	FTransform SpawnTransform = FTransform(Rotation, InSpawnOrigin, FVector(1.f, 1.f, 1.f));
+
+	// 무기의 사이즈 배율 + 캐릭터 사이즈 배율
+	UAbilitySystemComponent* WeaponASC = GetAbilitySystemComponentFromActorInfo();
+	auto WeaponSize = WeaponASC->GetNumericAttribute(UWeaponAttributeSet::GetSizeAttribute()) / 100;
+
+	UAbilitySystemComponent* PlayerASC = GetPlayerASC();
+	auto PlayerSize = PlayerASC->GetNumericAttribute(UPlayerAttributeSet::GetSizeAttribute()) / 100;
+
+	auto Size = WeaponSize * PlayerSize;
+
+	FTransform SpawnTransform = FTransform(Rotation, InSpawnOrigin, FVector(1, 1, 1));
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = Owner;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -36,6 +46,7 @@ void UMgbGameplayAbility_Projectile::SpawnProjectile(AActor* Owner, const FVecto
 		AMgbProjectileActor* Projectile = GetWorld()->SpawnActor<AMgbProjectileActor>(ProjectileClass, SpawnTransform, SpawnParams);
 		if (Projectile)
 		{
+			Projectile->SetActorScale3D(FVector(Size, Size, Size));
 			Projectile->BounceCount = ProjectileBounceCount;
 		}
 	}

@@ -152,138 +152,158 @@ public:
 	FGameplayAttributeData Health;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, Health);
 
+	// Value
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_HealthRegen)
 	FGameplayAttributeData HealthRegen;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, HealthRegen);
 
+	// Value
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_OverHeal)
 	FGameplayAttributeData OverHeal;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, OverHeal);
 		
+	// Value
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_MaxShield)
 	FGameplayAttributeData MaxShield;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, MaxShield);
 
+	// Value
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_Shield)
 	FGameplayAttributeData Shield;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, Shield);
 
+	// Value
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_Armor)
 	FGameplayAttributeData Armor;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, Armor);
 
+	// Percent
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_Evasion)
 	FGameplayAttributeData Evasion;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, Evasion);
 
+	// Percent
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_LifeSteal)
 	FGameplayAttributeData LifeSteal;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, LifeSteal);
 
+	// Value
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_Thorns)
 	FGameplayAttributeData Thorns;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, Thorns);
 
+	// Percent
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_Damage)
 	FGameplayAttributeData Damage;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, Damage);
 
+	// Percent
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_CritChance)
 	FGameplayAttributeData CritChance;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, CritChance);
 
+	// Percent
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_CritDamage)
 	FGameplayAttributeData CritDamage;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, CritDamage);
 
+	// Percent
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_AttackSpeed)
 	FGameplayAttributeData AttackSpeed;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, AttackSpeed);
 
+	// Value
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_ProjectileCount)
 	FGameplayAttributeData ProjectileCount;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, ProjectileCount);
 
+	// Value
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_ProjectileBounces)
 	FGameplayAttributeData ProjectileBounces;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, ProjectileBounces);
 
-	/// <summary>
-	/// 
-	/// </summary>
-
+	// Percent
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_Size)
 	FGameplayAttributeData Size;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, Size);
 
+	// Percent
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_ProjectileSpeed)
 	FGameplayAttributeData ProjectileSpeed;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, ProjectileSpeed);
 
+	// Percent
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_Duration)
 	FGameplayAttributeData Duration;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, Duration);
 
+	// Percent
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_DamageToElites)
 	FGameplayAttributeData DamageToElites;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, DamageToElites);
 
+	// Percent
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_Knockback)
 	FGameplayAttributeData Knockback;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, Knockback);
 
+	// Percent
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_MovementSpeed)
 	FGameplayAttributeData MovementSpeed;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, MovementSpeed);
 
-	/// <summary>
-	/// 
-	/// </summary>
 
+	// Value
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_ExtraJumps)
 	FGameplayAttributeData ExtraJumps;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, ExtraJumps);
 
+	// Percent
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_JumpHeight)
 	FGameplayAttributeData JumpHeight;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, JumpHeight);
 
+	// Percent
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_Luck)
 	FGameplayAttributeData Luck;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, Luck);
 
+	// Percent
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_Difficulty)
 	FGameplayAttributeData Difficulty;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, Difficulty);
 
-	/// <summary>
-	/// 
-	/// </summary>
-
+	// Percent
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_Pickup)
 	FGameplayAttributeData Pickup;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, Pickup);
 
+	// Percent
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_XPGain)
 	FGameplayAttributeData XPGain;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, XPGain);
 
+	// Percent
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_GoldGain)
 	FGameplayAttributeData GoldGain;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, GoldGain);
 
+	// Percent
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_SilverGain)
 	FGameplayAttributeData SilverGain;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, SilverGain);
 
+	// Percent
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_EliteSpawnIncrease)
 	FGameplayAttributeData EliteSpawnIncrease;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, EliteSpawnIncrease);
 
+	// Percent
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_PowerupMultiplier)
 	FGameplayAttributeData PowerupMultiplier;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, PowerupMultiplier);
 
+	// Percent
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_PowerupDropChance)
 	FGameplayAttributeData PowerupDropChance;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, PowerupDropChance);

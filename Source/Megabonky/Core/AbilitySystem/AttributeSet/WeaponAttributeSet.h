@@ -56,40 +56,48 @@ public:
 	virtual void OnRep_Duration(const FGameplayAttributeData& OldDuration);
 
 public:
+	// Value
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_Damage)
 	FGameplayAttributeData Damage;
-	ATTRIBUTE_ACCESSORS(UWeaponAttributeSet, Damage);
+	ATTRIBUTE_ACCESSORS(UWeaponAttributeSet, Damage); 
 
+	// Percent
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_CritChance)
 	FGameplayAttributeData CritChance;
 	ATTRIBUTE_ACCESSORS(UWeaponAttributeSet, CritChance);
 
+	// Percent
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_CritDamage)
 	FGameplayAttributeData CritDamage;
 	ATTRIBUTE_ACCESSORS(UWeaponAttributeSet, CritDamage);
 
+	// Value
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_ProjectileCount)
 	FGameplayAttributeData ProjectileCount;
 	ATTRIBUTE_ACCESSORS(UWeaponAttributeSet, ProjectileCount);
 
+	// Value
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_ProjectileSpeed)
 	FGameplayAttributeData ProjectileSpeed;
 	ATTRIBUTE_ACCESSORS(UWeaponAttributeSet, ProjectileSpeed);
 
+	// Value
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_ProjectileBounces)
 	FGameplayAttributeData ProjectileBounces;
 	ATTRIBUTE_ACCESSORS(UWeaponAttributeSet, ProjectileBounces);
 
+	// Percent
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_Size)
 	FGameplayAttributeData Size;
 	ATTRIBUTE_ACCESSORS(UWeaponAttributeSet, Size);
 
+	// Value
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_Knockback)
 	FGameplayAttributeData Knockback;
 	ATTRIBUTE_ACCESSORS(UWeaponAttributeSet, Knockback);
 
+	// Value
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_Duration)
 	FGameplayAttributeData Duration;
 	ATTRIBUTE_ACCESSORS(UWeaponAttributeSet, Duration);
-	
 };

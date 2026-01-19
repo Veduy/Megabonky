@@ -45,7 +45,7 @@ void UMgbEffectExecutionCalculation::Execute_Implementation(const FGameplayEffec
 	float WeaponDamage = 0.f; 
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageDef, EvaluatedParams, WeaponDamage);
 
-	float WeaponCritChance = 0.f; //%퍼센트
+	float WeaponCritChance = 0.f; // %퍼센트
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(CritChanceDef, EvaluatedParams, WeaponCritChance);
 
 	float WeaponCritDamage = 0.f; // %퍼센트
@@ -53,16 +53,16 @@ void UMgbEffectExecutionCalculation::Execute_Implementation(const FGameplayEffec
 
 	float PlayerDamage = 0.f; // x배율 최종적으로 계산된 데미지에 곱해줄 값 1.00 ~ 1.xx 
 	UAbilitySystemComponent* ASC = PlayerCharacter->GetAbilitySystemComponent();
-	PlayerDamage = PlayerCharacter->GetAbilitySystemComponent()->GetNumericAttribute(UPlayerAttributeSet::GetDamageAttribute());
+	PlayerDamage = PlayerCharacter->GetAbilitySystemComponent()->GetNumericAttribute(UPlayerAttributeSet::GetDamageAttribute()) / 100;
 
 	float PlayerCritChance = 0.f; // %퍼센트
-	PlayerCritChance = PlayerCharacter->GetAbilitySystemComponent()->GetNumericAttribute(UPlayerAttributeSet::GetCritChanceAttribute());
+	PlayerCritChance = PlayerCharacter->GetAbilitySystemComponent()->GetNumericAttribute(UPlayerAttributeSet::GetCritChanceAttribute()) / 100;
 	
 	float PlayerCritDamage = 0.f; // x배율
-	PlayerCritDamage = PlayerCharacter->GetAbilitySystemComponent()->GetNumericAttribute(UPlayerAttributeSet::GetCritDamageAttribute());
+	PlayerCritDamage = PlayerCharacter->GetAbilitySystemComponent()->GetNumericAttribute(UPlayerAttributeSet::GetCritDamageAttribute()) / 100;
 
 	float PlayerDamageToElite = 0.f;// x배율
-	PlayerDamageToElite = PlayerCharacter->GetAbilitySystemComponent()->GetNumericAttribute(UPlayerAttributeSet::GetDamageToElitesAttribute());
+	PlayerDamageToElite = PlayerCharacter->GetAbilitySystemComponent()->GetNumericAttribute(UPlayerAttributeSet::GetDamageToElitesAttribute()) / 100;
 
 	// 1.Crit Chance 검사
 	// WeaponCritChance + PlayerCritChance
