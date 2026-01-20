@@ -6,6 +6,7 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 
 #include "../../../Actors/MgbProjectileActor.h"
 #include "../../../Util/NetworkLog.h"
@@ -30,11 +31,14 @@ void UMgbGameplayAbility_Projectile::SpawnProjectile(AActor* Owner, const FVecto
 	// 무기의 사이즈 배율 + 캐릭터 사이즈 배율
 	UAbilitySystemComponent* WeaponASC = GetAbilitySystemComponentFromActorInfo();
 	auto WeaponSize = WeaponASC->GetNumericAttribute(UWeaponAttributeSet::GetSizeAttribute()) / 100;
+	auto WeaponProjSpeed = WeaponASC->GetNumericAttribute(UWeaponAttributeSet::GetProjectileSpeedAttribute());
 
 	UAbilitySystemComponent* PlayerASC = GetPlayerASC();
 	auto PlayerSize = PlayerASC->GetNumericAttribute(UPlayerAttributeSet::GetSizeAttribute()) / 100;
+	auto PlayerProjSpeed = PlayerASC->GetNumericAttribute(UPlayerAttributeSet::GetProjectileSpeedAttribute()) / 100;
 
 	auto Size = WeaponSize * PlayerSize;
+	auto ProjSpeed = WeaponProjSpeed * PlayerProjSpeed;
 
 	FTransform SpawnTransform = FTransform(Rotation, InSpawnOrigin, FVector(1, 1, 1));
 	FActorSpawnParameters SpawnParams;
@@ -48,6 +52,7 @@ void UMgbGameplayAbility_Projectile::SpawnProjectile(AActor* Owner, const FVecto
 		{
 			Projectile->SetActorScale3D(FVector(Size, Size, Size));
 			Projectile->BounceCount = ProjectileBounceCount;
+			Projectile->ProjectileMovement->MaxSpeed = ProjSpeed;
 		}
 	}
 
