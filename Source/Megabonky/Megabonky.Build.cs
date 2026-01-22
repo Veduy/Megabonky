@@ -11,7 +11,8 @@ public class Megabonky : ModuleRules
 	
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore",
 		"EnhancedInput",
-		"GameplayAbilities","GameplayTags", "GameplayTasks", });
+		"GameplayAbilities","GameplayTags", "GameplayTasks",
+		"HTTP", "Json", "JsonUtilities"});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });
 
