@@ -47,8 +47,8 @@ void UMgbSubsystem::Login()
 
 	FString ID = "admin";
 	FString Passwd = "1234";
-	FString URL = FString::Printf(TEXT("http://127.0.0.1:8080/api/login?user_id=%s&passwd=%s"), ID, Passwd);
-
+	FString URL = FString::Printf(TEXT("http://127.0.0.1:8080/api/login?user_id=%s&passwd=%s"), *ID, *Passwd);
+	
 	Request->SetURL(URL);
 	Request->SetVerb(TEXT("GET"));
 
