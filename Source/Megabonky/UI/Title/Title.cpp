@@ -10,10 +10,20 @@ void UTitle::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
+	if (PlayBtn)
+	{
+		PlayBtn->OnClicked.AddDynamic(this, &UTitle::HandlePlayBtnClicked);
+	}
+
 	if (DuoBtn)
 	{
 		DuoBtn->OnClicked.AddDynamic(this, &UTitle::HandleDuoBtnClicked);
 	}
+}
+
+void UTitle::HandlePlayBtnClicked()
+{
+	UGameplayStatics::OpenLevel(GetWorld(), FName("Game"));
 }
 
 void UTitle::HandleDuoBtnClicked()

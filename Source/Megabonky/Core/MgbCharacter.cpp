@@ -32,20 +32,32 @@ void AMgbCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// “LOD에 따라 애니메이션 평가 빈도를 조절하는 Unreal의 Update Rate Optimization 시스템 사용 모든 LOD에서 애니메이션 프레임 스킵을 적용.
-	USkeletalMeshComponent* MeshComp = GetMesh();
-	MeshComp->bEnableUpdateRateOptimizations = true;
-	MeshComp->AnimUpdateRateParams->bShouldUseLodMap = true;
-	MeshComp->AnimUpdateRateParams->MaxEvalRateForInterpolation = 0;
-	MeshComp->AnimUpdateRateParams->LODToFrameSkipMap.Add(0, 10);
-	MeshComp->AnimUpdateRateParams->LODToFrameSkipMap.Add(1, 10);
-	MeshComp->AnimUpdateRateParams->LODToFrameSkipMap.Add(2, 10);
-	MeshComp->AnimUpdateRateParams->LODToFrameSkipMap.Add(3, 10);
-	MeshComp->AnimUpdateRateParams->BaseNonRenderedUpdateRate = 6;
+	// 애니메이션 뚝뚝끊기게 테스트.
+	auto MeshComp = GetMesh();
+	if (MeshComp)
+	{
+		MeshComp->bEnableUpdateRateOptimizations = true;
 
-	MeshComp->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickPoseWhenRendered;
+		// 보간 비활성
+		MeshComp->AnimUpdateRateParams->bInterpolateSkippedFrames = false;
 
-	MeshComp->SetForcedLOD(0);
+		MeshComp->AnimUpdateRateParams->bSkipUpdate = true;
+		MeshComp->AnimUpdateRateParams->bSkipEvaluation = true;
+		MeshComp->AnimUpdateRateParams->bShouldUseLodMap = true;
+
+		// Reset and add frame skips. 
+		// A skip of 10 means it ticks every 11th frame (~5.4 FPS at 60 FPS).
+		MeshComp->AnimUpdateRateParams->LODToFrameSkipMap.Empty();
+		MeshComp->AnimUpdateRateParams->LODToFrameSkipMap.Add(0, 10);
+		MeshComp->AnimUpdateRateParams->LODToFrameSkipMap.Add(1, 10);
+		MeshComp->AnimUpdateRateParams->LODToFrameSkipMap.Add(2, 10);
+		MeshComp->AnimUpdateRateParams->LODToFrameSkipMap.Add(3, 10);
+
+		MeshComp->AnimUpdateRateParams->BaseNonRenderedUpdateRate = 2; // Very low rate when not visible
+
+		MeshComp->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickPoseWhenRendered;
+		MeshComp->SetForcedLOD(0);
+	}
 }
 
 // Called every frame

@@ -5,6 +5,7 @@
 
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Components/CapsuleComponent.h"
 #include "Net/UnrealNetwork.h"
 
@@ -208,8 +209,11 @@ void AMgbGameStateBase::SpawnEnemy()
 				
 				// 스폰
 				FActorSpawnParameters Params;
+				FRotator SpawnRotation = UKismetMathLibrary::FindLookAtRotation(RealSpawnLocation, Player->GetActorLocation());
+				SpawnRotation.Pitch = 0.f;
+				SpawnRotation.Roll = 0.f;
 				Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-				AActor* SpawnedActor = GetWorld()->SpawnActor<AActor>(EnemyClass, RealSpawnLocation, FRotator::ZeroRotator, Params);
+				AActor* SpawnedActor = GetWorld()->SpawnActor<AActor>(EnemyClass, RealSpawnLocation, SpawnRotation, Params);
 				AMgbEnemyCharacter* Enemy = Cast<AMgbEnemyCharacter>(SpawnedActor);
 				if (Enemy)
 				{

@@ -81,10 +81,11 @@ void AMgbEnemyCharacter::Tick(float DeltaTime)
 
 	if (bSpawnFinished == false)
 	{
-		float Height = FMath::FInterpTo(GetActorLocation().Z, TargetSpawnHeight, DeltaTime, 1.5f);
+		//float Height = FMath::FInterpTo(GetActorLocation().Z, TargetSpawnHeight, DeltaTime, 3.f);
+		float Height = FMath::Lerp(GetActorLocation().Z, TargetSpawnHeight, DeltaTime * 5.f);
 		SetActorLocation(FVector(GetActorLocation().X, GetActorLocation().Y, Height));
 		
-		if (GetActorLocation().Z >= TargetSpawnHeight - 5.f)
+		if (GetActorLocation().Z >= TargetSpawnHeight - 1.f)
 		{
 			bSpawnFinished = true;   
 			SpawnDefaultController();
