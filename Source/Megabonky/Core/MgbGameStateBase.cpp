@@ -26,9 +26,26 @@ void AMgbGameStateBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//진짜 게임이 시작됫을떄 시간으로 나중에 설정(맵 이동 컷신 끝난후로)
 	if (HasAuthority())
 	{
-		GameStartTime = GetWorld()->GetTimeSeconds();
+		GameStartTime = GetServerWorldTimeSeconds();
+	}
+}
+
+void AMgbGameStateBase::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (ElapsedTime < 1.f)
+	{
+		ElapsedTime += DeltaTime;
+		if (ElapsedTime >= 1.f)
+		{
+			PassedTimeSec = (int)(GetServerWorldTimeSeconds() - GameStartTime);
+			OnTimeChanged.Broadcast(PassedTimeSec);
+			ElapsedTime = 0.f;
+		}
 	}
 }
 
@@ -37,10 +54,11 @@ void AMgbGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AMgbGameStateBase, GameStartTime);
+	DOREPLIFETIME(AMgbGameStateBase, GameTimeSec);
 	DOREPLIFETIME(AMgbGameStateBase, CurrentLevel);
 	DOREPLIFETIME(AMgbGameStateBase, Gold);
 	DOREPLIFETIME(AMgbGameStateBase, TotalKill);
-	DOREPLIFETIME(AMgbGameStateBase, TotalKill);
+	DOREPLIFETIME(AMgbGameStateBase, NextBoxGold);
 }
 
 void AMgbGameStateBase::ServerAddXP_Implementation(float InValue)
@@ -54,8 +72,8 @@ void AMgbGameStateBase::ServerAddXP_Implementation(float InValue)
 	{
 		float temp = CurrentXP - RequiredXP;
 		CurrentXP = 0;
+		CurrentLevel++;
 		RequiredXP = RequiredXP * (1.2f);
-		CurrentLevel += 1;
 
 		ServerAddXP(temp);
 

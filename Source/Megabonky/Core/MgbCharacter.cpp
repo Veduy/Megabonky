@@ -48,10 +48,10 @@ void AMgbCharacter::BeginPlay()
 		// Reset and add frame skips. 
 		// A skip of 10 means it ticks every 11th frame (~5.4 FPS at 60 FPS).
 		MeshComp->AnimUpdateRateParams->LODToFrameSkipMap.Empty();
-		MeshComp->AnimUpdateRateParams->LODToFrameSkipMap.Add(0, 10);
-		MeshComp->AnimUpdateRateParams->LODToFrameSkipMap.Add(1, 10);
-		MeshComp->AnimUpdateRateParams->LODToFrameSkipMap.Add(2, 10);
-		MeshComp->AnimUpdateRateParams->LODToFrameSkipMap.Add(3, 10);
+		MeshComp->AnimUpdateRateParams->LODToFrameSkipMap.Add(0, 15);
+		MeshComp->AnimUpdateRateParams->LODToFrameSkipMap.Add(1, 15);
+		MeshComp->AnimUpdateRateParams->LODToFrameSkipMap.Add(2, 15);
+		MeshComp->AnimUpdateRateParams->LODToFrameSkipMap.Add(3, 15);
 
 		MeshComp->AnimUpdateRateParams->BaseNonRenderedUpdateRate = 2; // Very low rate when not visible
 

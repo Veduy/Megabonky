@@ -10,6 +10,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 
 #include "MgbPlayerCharacter.h"
+#include "../MgbGameStateBase.h"
 #include "../MgbGameplayTags.h"
 #include "../AbilitySystem/MgbAbilitySystemComponent.h"
 #include "../AbilitySystem/AttributeSet/EnemyAttributeSet.h"
@@ -129,6 +130,11 @@ void AMgbEnemyCharacter::Destroyed()
 	//서버일때만 XPCrystal Drop
 	if (HasAuthority())
 	{
+		if (auto GS = Cast<AMgbGameStateBase>(GetWorld()->GetGameState()))
+		{
+			GS->TotalKill++;
+		}
+
 		GetWorld()->SpawnActor<AActor>(XPCrystalClass, GetActorTransform());
 	}
 }

@@ -6,6 +6,8 @@
 #include "GameFramework/GameStateBase.h"
 #include "MgbGameStateBase.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTimeChanged, int32, PassedTime);
+
 class AMgbEnemyCharacter;
 
 /**
@@ -21,6 +23,8 @@ public:
 
 	virtual void BeginPlay() override;
 	
+	virtual void Tick(float DeltaTime) override;
+
 	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const;
 
 public:
@@ -46,13 +50,23 @@ public:
 	void HandleResumeRequest();
 	uint32 GetCurrentPlayerCount();
 
+	UPROPERTY(VisibleAnywhere, BlueprintAssignable)
+	FOnTimeChanged OnTimeChanged;
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
 	TArray<TSubclassOf<AMgbEnemyCharacter>> EnemyClasses;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data", Replicated)
 	float GameStartTime = 0.f;
-	
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data", Replicated)
+	int32 GameTimeSec = 600;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")
+	int32 PassedTimeSec = 0;
+
+	float ElapsedTime = 0.f;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")
 	int32 ResumeRequestCount = 0;
 
@@ -80,18 +94,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data", Replicated)
 	int32 CurrentLevel = 0;
 
-	// 클라이언트에서 서버에서 받은 StartTime - GetWorld()->GetTimeSeconds() 뺀값을 저장.
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")
-	int32 PassedTime = 0;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data", Replicated)
 	int32 Gold = 0;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data", Replicated)
 	int64 TotalKill = 0;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data", Replicated)
-	int32 RemainingTime = 600;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data", Replicated)
 	int32 NextBoxGold = 30;
