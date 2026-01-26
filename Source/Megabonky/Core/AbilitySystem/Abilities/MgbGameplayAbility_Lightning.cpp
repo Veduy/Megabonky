@@ -37,8 +37,7 @@ void UMgbGameplayAbility_Lightning::ActivateAbility(const FGameplayAbilitySpecHa
 	TArray<FHitResult>OutHits;
 	UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(),
 		PlayerActor->GetActorLocation(), PlayerActor->GetActorLocation(), 1500.f,
-		ObjectTypes, false, ActorsToIgnore, EDrawDebugTrace::ForDuration, OutHits, true,
-		FLinearColor::Red, FLinearColor::Green, 0.5f);
+		ObjectTypes, false, ActorsToIgnore, EDrawDebugTrace::None, OutHits, true);
 	
 	TArray<AActor*> TargetActors;
 	for (const auto& hit : OutHits)
