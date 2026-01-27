@@ -13,7 +13,6 @@
 
 UPlayerAttributeSet::UPlayerAttributeSet()
 {
-	InitHealth(50.f);
 }
 
 void UPlayerAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -72,14 +71,28 @@ void UPlayerAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribut
 	// 서버에서만
 	if (Attribute == GetHealthAttribute())
 	{
-		if (auto PC = Cast<AMgbPlayerController>(Cast<AMgbPlayerCharacter>(GetOwningActor())->GetController()))
+		auto Character = Cast<AMgbPlayerCharacter>(GetOwningActor());
+		if (!Character)
+			return;
+
+		if (auto PC = Cast<AMgbPlayerController>(Character->GetController()))
 		{
+			if (!PC->IsLocalPlayerController())
+				return;
+
 			if (PC->InGameWidget)
 			{
 				PC->InGameWidget->UpdateHPBar(GetMaxHealth(), GetHealth());
 			}
-			
+
+			if (GetHealth() <= 0.f && !Character->bDeath)
+			{
+				Character->DeathFadeOut();
+				Character->bDeath = true;
+			}
 		}
+
+	
 	}
 }
 
@@ -104,9 +117,25 @@ void UPlayerAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth)
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UPlayerAttributeSet, Health, OldHealth);
 
 	// UI 업데이트(클라만, 서버일때 안됨)
-	if (auto PC = Cast<AMgbPlayerController>(Cast<AMgbPlayerCharacter>(GetOwningActor())->GetController()))
+	auto Character = Cast<AMgbPlayerCharacter>(GetOwningActor());
+	if (!Character)
+		return;
+
+	if (auto PC = Cast<AMgbPlayerController>(Character->GetController()))
 	{
-		PC->InGameWidget->UpdateHPBar(GetMaxHealth(), GetHealth());
+		if (!PC->IsLocalPlayerController())
+			return;
+
+		if (PC->InGameWidget)
+		{
+			PC->InGameWidget->UpdateHPBar(GetMaxHealth(), GetHealth());
+		}
+
+		if (GetHealth() <= 0.f && !Character->bDeath)
+		{
+			Cast<AMgbPlayerCharacter>(GetOwningActor())->DeathFadeOut();
+			Character->bDeath = true;
+		}
 	}
 }
 

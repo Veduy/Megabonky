@@ -292,6 +292,9 @@ void AMgbEnemyCharacter::CollisionHit(UPrimitiveComponent* HitComponent, AActor*
 
 	if (AMgbPlayerCharacter* Player = Cast<AMgbPlayerCharacter>(OtherActor))
 	{
+		if (Player->bDeath == true)
+			return;
+
 		// ApplyDamage By GameplayEffect
 		UAbilitySystemComponent* PlayerASC = Player->GetAbilitySystemComponent(); 
 		//bool bInvincible = PlayerASC->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag(FName("Player.State.Invincible")));

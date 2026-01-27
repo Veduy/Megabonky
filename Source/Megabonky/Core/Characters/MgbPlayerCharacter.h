@@ -59,7 +59,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ActivateWeaponsAbility();
 
+	UFUNCTION(BlueprintCallable)
 	void UpdateCharacterMeshRotation(float DeltaTime);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void DeathFadeOut();	
 
 	//UPrimitiveComponent, OnComponentBeginOverlap, UPrimitiveComponent*, OverlappedComponent, AActor*, OtherActor, UPrimitiveComponent*, OtherComp, int32, OtherBodyIndex, bool, bFromSweep, const FHitResult&, SweepResult)
 
@@ -76,9 +80,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<USphereComponent> PickupSphere;
 
-
-
 public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")
+	uint8 bDeath : 1 = false;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
 	TSubclassOf<AMgbWeapon> DefaultWeaponClass;
 
