@@ -87,8 +87,7 @@ void UPlayerAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribut
 
 			if (GetHealth() <= 0.f && !Character->bDeath)
 			{
-				Character->DeathFadeOut();
-				Character->bDeath = true;
+				Character->HandleDeath();
 			}
 		}
 
@@ -133,8 +132,7 @@ void UPlayerAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth)
 
 		if (GetHealth() <= 0.f && !Character->bDeath)
 		{
-			Cast<AMgbPlayerCharacter>(GetOwningActor())->DeathFadeOut();
-			Character->bDeath = true;
+			Character->HandleDeath();
 		}
 	}
 }

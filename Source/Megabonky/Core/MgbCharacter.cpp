@@ -41,6 +41,13 @@ void AMgbCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+void AMgbCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
+
+	Super::EndPlay(EndPlayReason);
+}
+
 UAbilitySystemComponent* AMgbCharacter::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;

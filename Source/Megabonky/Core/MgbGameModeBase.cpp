@@ -32,7 +32,12 @@ void AMgbGameModeBase::StartPlay()
 		{
 			GS->InitSpawnEnemyTimer();
 		}
-
-		
 	}
+}
+
+void AMgbGameModeBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
+
+	Super::EndPlay(EndPlayReason);
 }

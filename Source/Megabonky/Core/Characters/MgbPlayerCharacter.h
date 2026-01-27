@@ -63,7 +63,9 @@ public:
 	void UpdateCharacterMeshRotation(float DeltaTime);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void DeathFadeOut();	
+	void DeathFadeOut();
+
+	void HandleDeath();
 
 	//UPrimitiveComponent, OnComponentBeginOverlap, UPrimitiveComponent*, OverlappedComponent, AActor*, OtherActor, UPrimitiveComponent*, OtherComp, int32, OtherBodyIndex, bool, bFromSweep, const FHitResult&, SweepResult)
 

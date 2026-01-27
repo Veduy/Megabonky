@@ -199,6 +199,9 @@ void AMgbPlayerCharacter::EquipWeapon(TSubclassOf<AMgbWeapon> NewWeapon)
 
 void AMgbPlayerCharacter::ActivateWeaponsAbility()
 {
+	if (bDeath)
+		return;
+
 	// 모든 Weapon의 어빌리티 Activate
 	// PlayerAttackSpeed = 100% ~ x%;  Interval 2초,  (2 / PlayerAttackSpeed / 100)
 	float PlayerAttackSpeed = GetAbilitySystemComponent()->GetNumericAttribute(UPlayerAttributeSet::GetAttackSpeedAttribute());
@@ -290,6 +293,18 @@ void AMgbPlayerCharacter::UpdateCharacterMeshRotation(float DeltaTime)
 
 		GetMesh()->SetRelativeRotation(CurrentRotation);
 	}
+}
+
+void AMgbPlayerCharacter::HandleDeath()
+{
+	bDeath = true;
+
+	if (ActivateAbilityHandle.IsValid())
+	{
+		GetWorld()->GetTimerManager().ClearTimer(ActivateAbilityHandle);
+	}
+
+	DeathFadeOut();
 }
 
 void AMgbPlayerCharacter::PickupBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
