@@ -7,6 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/AudioComponent.h"
 #include "Net/UnrealNetwork.h"
 
 #include "GameFramework/Character.h"
@@ -112,10 +113,12 @@ void AMgbGameStateBase::MulticastSetPauseGame_Implementation(bool bPause)
 	if (bPause)
 	{
 		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.0001f);
+		Cast<AMgbPlayerController>(PC)->Audio_Levelup->Play();
 	}
 	else
 	{
 		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.0f);
+		Cast<AMgbPlayerController>(PC)->Audio_Levelup->FadeOut(0.3f, 0.f);
 	}
 }
 

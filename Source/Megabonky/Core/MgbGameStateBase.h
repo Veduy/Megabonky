@@ -52,6 +52,7 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintAssignable)
 	FOnTimeChanged OnTimeChanged;
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
 	TArray<TSubclassOf<AMgbEnemyCharacter>> EnemyClasses;

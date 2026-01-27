@@ -7,6 +7,7 @@
 #include "InputMappingContext.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "Components\AudioComponent.h"
 
 #include "MgbGameStateBase.h"
 #include "MgbGameModeBase.h"
@@ -25,6 +26,8 @@ AMgbPlayerController::AMgbPlayerController()
 	{
 		DamageTextActorClass = BP_DamageTextActor.Class;
 	}
+
+	Audio_Levelup = CreateDefaultSubobject<UAudioComponent>("LevelUp");
 }
 
 void AMgbPlayerController::AcknowledgePossession(APawn* P)

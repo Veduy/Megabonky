@@ -76,6 +76,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<USphereComponent> PickupSphere;
 
+
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
 	TSubclassOf<AMgbWeapon> DefaultWeaponClass;

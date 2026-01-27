@@ -52,6 +52,33 @@ void AMgbEnemyCharacter::BeginPlay()
 
 	bSpawnFinished = false;
 
+	// 애니메이션 뚝뚝끊기게 테스트.
+	auto MeshComp = GetMesh();
+	if (MeshComp)
+	{
+		MeshComp->bEnableUpdateRateOptimizations = true;
+
+		// 보간 비활성
+		MeshComp->AnimUpdateRateParams->bInterpolateSkippedFrames = false;
+
+		MeshComp->AnimUpdateRateParams->bSkipUpdate = true;
+		MeshComp->AnimUpdateRateParams->bSkipEvaluation = true;
+		MeshComp->AnimUpdateRateParams->bShouldUseLodMap = true;
+
+		// Reset and add frame skips. 
+		// A skip of 10 means it ticks every 11th frame (~5.4 FPS at 60 FPS).
+		MeshComp->AnimUpdateRateParams->LODToFrameSkipMap.Empty();
+		MeshComp->AnimUpdateRateParams->LODToFrameSkipMap.Add(0, 15);
+		MeshComp->AnimUpdateRateParams->LODToFrameSkipMap.Add(1, 15);
+		MeshComp->AnimUpdateRateParams->LODToFrameSkipMap.Add(2, 15);
+		MeshComp->AnimUpdateRateParams->LODToFrameSkipMap.Add(3, 15);
+
+		MeshComp->AnimUpdateRateParams->BaseNonRenderedUpdateRate = 2; // Very low rate when not visible
+
+		MeshComp->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickPoseWhenRendered;
+		//MeshComp->SetForcedLOD(0);
+	}
+
 	//서버일때만
 	if (!HasAuthority())
 		return;

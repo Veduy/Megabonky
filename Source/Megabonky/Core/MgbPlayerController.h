@@ -49,6 +49,9 @@ public:
 	void GenerateUpgradeInfo();
 
 public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<UAudioComponent> Audio_Levelup;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputMappingContext> InputMappingContext;
 
