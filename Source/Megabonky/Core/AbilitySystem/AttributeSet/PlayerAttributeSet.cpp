@@ -9,6 +9,7 @@
 #include "../../Characters/MgbPlayerCharacter.h"
 #include "../../MgbPlayerController.h"
 #include "../../../UI/InGame/InGame.h"
+#include "../../../Util/NetworkLog.h"
 
 UPlayerAttributeSet::UPlayerAttributeSet()
 {
@@ -67,6 +68,9 @@ void UPlayerAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute
 void UPlayerAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue)
 {
 	Super::PostAttributeChange(Attribute, OldValue, NewValue);
+
+	
+
 }
 
 void UPlayerAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
