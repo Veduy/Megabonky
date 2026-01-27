@@ -63,17 +63,6 @@ void UMgbGameplayAbility_Lightning::ActivateAbility(const FGameplayAbilitySpecHa
 		{
 			UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(target);
 			WeaponASC->ApplyGameplayEffectSpecToTarget(*EffectSpecHandle.Data.Get(), TargetASC);
-
-			/*Debuging*/
-			/*{
-				FVector TargetLocation = target->GetActorLocation();
-				FVector Start = TargetLocation + FVector(0.f, 0.f, 100.f);
-				TArray<AActor*>ActorsToIgnoreTemp;
-				FHitResult OutHitTemp;
-				UKismetSystemLibrary::LineTraceSingle(GetWorld(),
-					Start, TargetLocation, ETraceTypeQuery::TraceTypeQuery1, false, ActorsToIgnoreTemp, EDrawDebugTrace::ForDuration, OutHitTemp, true,
-					FLinearColor::Red, FLinearColor::Green, 0.5f);
-			}*/
 		}
 	}
 

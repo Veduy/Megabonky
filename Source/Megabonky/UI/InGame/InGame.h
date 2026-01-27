@@ -35,12 +35,18 @@ public:
 	UFUNCTION()
 	void CompleteItemSelect();
 
-	UFUNCTION(BlueprintImplementableEvent)
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void SetItemUpgradeSlot(const int32 SlotNum, const FName ItemName, const TArray<FWeaponUpgradeOption>& UpgradeStat);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void UpdateHPBar(float MaxHP, float CurHP);
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (BindWidget))
 	TObjectPtr<UProgressBar> XPBar;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (BindWidget))
+	TObjectPtr<UProgressBar> HPBar;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (BindWidget))
 	TObjectPtr<UMgbWidget> ItemSelectWindow;

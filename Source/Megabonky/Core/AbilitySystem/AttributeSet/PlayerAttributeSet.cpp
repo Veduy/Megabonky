@@ -4,7 +4,11 @@
 #include "PlayerAttributeSet.h"
 
 #include "GameplayEffectExtension.h"
-#include "Net\UnrealNetwork.h"
+#include "Net/UnrealNetwork.h"
+
+#include "../../Characters/MgbPlayerCharacter.h"
+#include "../../MgbPlayerController.h"
+#include "../../../UI/InGame/InGame.h"
 
 UPlayerAttributeSet::UPlayerAttributeSet()
 {
@@ -84,6 +88,13 @@ void UPlayerAttributeSet::OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHe
 void UPlayerAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UPlayerAttributeSet, Health, OldHealth);
+
+	// UI 업데이트
+	if (auto PC = Cast<AMgbPlayerController>(Cast<AMgbPlayerCharacter>(GetOwningActor())->GetController()))
+	{
+		PC->InGameWidget->UpdateHPBar(GetMaxHealth(), GetHealth());
+	}
+
 }
 
 void UPlayerAttributeSet::OnRep_HealthRegen(const FGameplayAttributeData& OldHealthRegen)
