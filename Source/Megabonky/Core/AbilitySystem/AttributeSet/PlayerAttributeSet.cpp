@@ -69,8 +69,18 @@ void UPlayerAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribut
 {
 	Super::PostAttributeChange(Attribute, OldValue, NewValue);
 
-	
-
+	// 서버에서만
+	if (Attribute == GetHealthAttribute())
+	{
+		if (auto PC = Cast<AMgbPlayerController>(Cast<AMgbPlayerCharacter>(GetOwningActor())->GetController()))
+		{
+			if (PC->InGameWidget)
+			{
+				PC->InGameWidget->UpdateHPBar(GetMaxHealth(), GetHealth());
+			}
+			
+		}
+	}
 }
 
 void UPlayerAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
@@ -93,12 +103,11 @@ void UPlayerAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UPlayerAttributeSet, Health, OldHealth);
 
-	// UI 업데이트
+	// UI 업데이트(클라만, 서버일때 안됨)
 	if (auto PC = Cast<AMgbPlayerController>(Cast<AMgbPlayerCharacter>(GetOwningActor())->GetController()))
 	{
 		PC->InGameWidget->UpdateHPBar(GetMaxHealth(), GetHealth());
 	}
-
 }
 
 void UPlayerAttributeSet::OnRep_HealthRegen(const FGameplayAttributeData& OldHealthRegen)
