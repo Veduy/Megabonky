@@ -52,9 +52,8 @@ void AMgbEnemyCharacter::BeginPlay()
 
 	bSpawnFinished = false;
 
-	// 애니메이션 뚝뚝끊기게 테스트.
 	auto MeshComp = GetMesh();
-	if (MeshComp)
+	if (MeshComp->SkeletalMesh)
 	{
 		MeshComp->bEnableUpdateRateOptimizations = true;
 
