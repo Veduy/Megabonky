@@ -153,7 +153,6 @@ void AMgbGameStateBase::InitSpawnEnemyTimer()
 		return;
 	}
 
-	FTimerHandle SpawnTimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(
 		SpawnTimerHandle,
 		[this]()

@@ -23,16 +23,16 @@ void UTitle::NativeOnInitialized()
 
 void UTitle::HandlePlayBtnClicked()
 {
-	UGameplayStatics::OpenLevel(GetWorld(), FName("Game"));
+	//UGameplayStatics::OpenLevel(GetWorld(), FName("Game"));
 }
 
 void UTitle::HandleDuoBtnClicked()
 {
-	UGameInstance* GI = UGameplayStatics::GetGameInstance(GetWorld());
-	if (GI)
-	{
-		UMgbSubsystem* MgbSubSystem = GI->GetSubsystem<UMgbSubsystem>();
+	//UGameInstance* GI = UGameplayStatics::GetGameInstance(GetWorld());
+	//if (GI)
+	//{
+	//	UMgbSubsystem* MgbSubSystem = GI->GetSubsystem<UMgbSubsystem>();
 
-		MgbSubSystem->Login();
-	}
+	//	MgbSubSystem->Login();
+	//}
 }

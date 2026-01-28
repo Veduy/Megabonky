@@ -53,6 +53,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintAssignable)
 	FOnTimeChanged OnTimeChanged;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	FTimerHandle SpawnTimerHandle;
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
 	TArray<TSubclassOf<AMgbEnemyCharacter>> EnemyClasses;
