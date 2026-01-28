@@ -178,8 +178,6 @@ void AMgbPlayerController::ClientSpawnDamageTextActor_Implementation(FVector Loc
 
 void AMgbPlayerController::GenerateUpgradeInfo()
 {
-	// 서버에서 호출되야함(멀티 되게 수정필요)
-
 	AMgbGameStateBase* GS = Cast<AMgbGameStateBase>(GetWorld()->GetGameState());
 	AMgbPlayerCharacter* MgbPlayer = Cast<AMgbPlayerCharacter>(GetPawn());
 	TArray<FName> WeaponNames;
@@ -201,6 +199,7 @@ void AMgbPlayerController::GenerateUpgradeInfo()
 		}
 	}
 
+	// 랜덤 섞기.
 	WeaponNames.Sort([](const auto&, const auto&)
 		{
 			return FMath::RandBool();

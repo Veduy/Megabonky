@@ -47,7 +47,9 @@ public:
 public:
 	void InitSpawnEnemyTimer();
 	void SpawnEnemy();
+
 	void HandleResumeRequest();
+
 	uint32 GetCurrentPlayerCount();
 
 	UPROPERTY(VisibleAnywhere, BlueprintAssignable)
@@ -63,7 +65,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data", Replicated)
 	float GameStartTime = 0.f;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data", Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data", Replicated)
 	int32 GameTimeSec = 600;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")
@@ -74,20 +76,20 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")
 	int32 ResumeRequestCount = 0;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
 	int32 MaxEnemyCount = 1000;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")
 	int32 CurrentEnemyCount = 0;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
 	float SpawnIntervalTime = 5.f;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
 	float SpawnRange = 1000.f;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
-	int32 EnemyPerSpawn = 5;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
+	int32 EnemySpawnMultiplier = 5;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")
 	float RequiredXP = 100.f;

@@ -32,6 +32,12 @@ void AMgbGameStateBase::BeginPlay()
 	{
 		GameStartTime = GetServerWorldTimeSeconds();
 	}
+
+	// 몬스터 랜덤 순서 섞기.
+	EnemyClasses.Sort([](const auto&, const auto&)
+		{
+			return FMath::RandBool();
+		});
 }
 
 void AMgbGameStateBase::Tick(float DeltaTime)
@@ -165,6 +171,7 @@ void AMgbGameStateBase::InitSpawnEnemyTimer()
 	);
 }
 
+
 void AMgbGameStateBase::SpawnEnemy()
 {
 	// Only Server
@@ -173,6 +180,7 @@ void AMgbGameStateBase::SpawnEnemy()
 		return;
 	}
 
+	// 플레이어 수만큼 플레이어를 타겟으로한 몬스터를 소환한다.
 	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	{
 		if (Iterator->Get())
@@ -183,20 +191,28 @@ void AMgbGameStateBase::SpawnEnemy()
 				return;
 			}
 		
-			// 캐릭터의 좌표를 기준으로 원형태의 랜덤 방향을 구함.
+			// 원형태의 랜덤 방향에서 스폰
 			float y = sinf(rand());
 			float x = cosf(rand());
 			FVector2D Dir = FVector2D(x, y);
 
-			// 일정 Min~Max범위의 값을 곱함 -> 캐릭터 근처 에서 스폰될 거리 지정.
+			// 일정 Min~Max범위의 값을 곱함 -> 스폰 범위 지정.
 			FVector2D Location = Dir * FMath::FRandRange(SpawnRange - 300.f, SpawnRange + 300.f);
 			
-			// 스폰할 EnemyClass 선택
-			// 일단 가지고 있는 몬스터 중에서 랜덤으로 스폰중
-			UClass* EnemyClass = EnemyClasses[FMath::RandRange(0, EnemyClasses.Num() - 1)];
+			// 스폰할 EnemyClass 선택	(1분마다 종류증가)
+			uint8 EnemyClassVariety = (PassedTimeSec / 60) % (EnemyClasses.Num() - 1);
+			UClass* EnemyClass = EnemyClasses[FMath::RandRange(0, EnemyClassVariety)];
 
 			// 스폰할 지점에서 또 작은 원을 기준으로 스폰할 마리수에 해당하는, 진짜 스폰 지점을 뽑아내서 그 지점에 스폰.
-			for (int i = 0; i < EnemyPerSpawn; ++i)
+			
+			if (PassedTimeSec == 0)
+				return;
+
+			int EnemyToSpawn = EnemySpawnMultiplier * FMath::Loge(float(1 + (PassedTimeSec * PassedTimeSec) / 600)) + 3;
+			EnemyToSpawn = FMath::Clamp(EnemyToSpawn, 0, 100);
+			UE_LOG(LogTemp, Warning, TEXT("Count: %d"), EnemyToSpawn);
+
+			for (int i = 0; i < EnemyToSpawn; ++i)
 			{
 				if (CurrentEnemyCount >= MaxEnemyCount)
 					return;
@@ -229,10 +245,6 @@ void AMgbGameStateBase::SpawnEnemy()
 					float CapsuleHeight = Cast<ACharacter>(Player)->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 					RealSpawnLocation = FVector(Hit.Location.X, Hit.Location.Y, Hit.Location.Z - CapsuleHeight);
 				}
-				
-				// 적들이 몰려온다(이벤트) 발생
-				// 게임 시간이 1분 지날때 몬스터 종류가 추가됨.
-				// 가끔 엘리트 몬스터가 출현함.
 				
 				// 스폰
 				FActorSpawnParameters Params;

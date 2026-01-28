@@ -31,11 +31,11 @@ void UMgbGameplayAbility_Projectile::SpawnProjectile(AActor* Owner, const FVecto
 	// 무기의 사이즈 배율 + 캐릭터 사이즈 배율
 	UAbilitySystemComponent* WeaponASC = GetAbilitySystemComponentFromActorInfo();
 	auto WeaponSize = WeaponASC->GetNumericAttribute(UWeaponAttributeSet::GetSizeAttribute()) / 100;
-	auto WeaponProjSpeed = WeaponASC->GetNumericAttribute(UWeaponAttributeSet::GetProjectileSpeedAttribute());
+	auto WeaponProjSpeed = WeaponASC->GetNumericAttribute(UWeaponAttributeSet::GetProjectileSpeedAttribute()); // 실제 값
 
 	UAbilitySystemComponent* PlayerASC = GetPlayerASC();
 	auto PlayerSize = PlayerASC->GetNumericAttribute(UPlayerAttributeSet::GetSizeAttribute()) / 100;
-	auto PlayerProjSpeed = PlayerASC->GetNumericAttribute(UPlayerAttributeSet::GetProjectileSpeedAttribute()) / 100;
+	auto PlayerProjSpeed = PlayerASC->GetNumericAttribute(UPlayerAttributeSet::GetProjectileSpeedAttribute()) / 100; //퍼센트
 
 	auto Size = WeaponSize * PlayerSize;
 	auto ProjSpeed = WeaponProjSpeed * PlayerProjSpeed;

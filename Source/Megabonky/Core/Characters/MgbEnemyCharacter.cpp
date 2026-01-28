@@ -160,6 +160,7 @@ void AMgbEnemyCharacter::Destroyed()
 		if (auto GS = Cast<AMgbGameStateBase>(GetWorld()->GetGameState()))
 		{
 			GS->TotalKill++;
+			GS->CurrentEnemyCount--;
 		}
 
 		GetWorld()->SpawnActor<AActor>(XPCrystalClass, GetActorTransform());
