@@ -25,6 +25,7 @@ AMgbEnemyCharacter::AMgbEnemyCharacter()
 	GetCapsuleComponent()->SetCapsuleHalfHeight(80.f);
 	GetCapsuleComponent()->SetCapsuleRadius(40.f);
 	GetCapsuleComponent()->SetSimulatePhysics(false);
+	GetCapsuleComponent()->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_Yes;
 
 	GetMesh()->SetupAttachment(RootComponent);
 	GetMesh()->SetCollisionProfileName("NoCollision");
@@ -87,7 +88,7 @@ void AMgbEnemyCharacter::BeginPlay()
 	GetCapsuleComponent()->SetSimulatePhysics(false);
 	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &AMgbEnemyCharacter::CollisionHit);
 
-	TargetSpawnHeight = GetActorLocation().Z + GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 2.f;
+	TargetSpawnHeight = GetActorLocation().Z + GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 
 	UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
 	if (IsValid(ASC))
@@ -110,8 +111,9 @@ void AMgbEnemyCharacter::Tick(float DeltaTime)
 	{
 		//float Height = FMath::FInterpTo(GetActorLocation().Z, TargetSpawnHeight, DeltaTime, 3.f);
 		float Height = FMath::Lerp(GetActorLocation().Z, TargetSpawnHeight, DeltaTime * 5.f);
-		SetActorLocation(FVector(GetActorLocation().X, GetActorLocation().Y, Height));
+		SetActorLocation(FVector(GetActorLocation().X, GetActorLocation().Y, Height), true);
 		
+		//UE_LOG(LogTemp, Warning, TEXT("SpawnHeight: %f"), TargetSpawnHeight);
 		if (GetActorLocation().Z >= TargetSpawnHeight - 1.f)
 		{
 			bSpawnFinished = true;   

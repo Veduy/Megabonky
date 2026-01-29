@@ -67,6 +67,8 @@ void AMgbPlayerController::OnPossess(APawn* aPawn)
 	if (PlayerCharacter)
 	{
 		PlayerCharacter->EquipWeapon(PlayerCharacter->DefaultWeaponClass);
+
+		// TODO: ActivateWeapons 는 맵이동 이벤트(아직미구현)가 끝났을때 호출되도록 수정필요.
 		PlayerCharacter->ActivateWeaponsAbility();
 	}
 }

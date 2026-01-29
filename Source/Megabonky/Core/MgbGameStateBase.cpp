@@ -200,7 +200,11 @@ void AMgbGameStateBase::SpawnEnemy()
 			FVector2D Location = Dir * FMath::FRandRange(SpawnRange - 300.f, SpawnRange + 300.f);
 			
 			// 스폰할 EnemyClass 선택	(1분마다 종류증가)
-			uint8 EnemyClassVariety = (PassedTimeSec / 60) % (EnemyClasses.Num() - 1);
+			uint8 EnemyClassVariety = 0;
+			if (EnemyClasses.Num() > 1)
+			{
+				EnemyClassVariety = (PassedTimeSec / 60) % (EnemyClasses.Num() - 1);
+			}
 			UClass* EnemyClass = EnemyClasses[FMath::RandRange(0, EnemyClassVariety)];
 
 			// 스폰할 지점에서 또 작은 원을 기준으로 스폰할 마리수에 해당하는, 진짜 스폰 지점을 뽑아내서 그 지점에 스폰.
@@ -238,24 +242,28 @@ void AMgbGameStateBase::SpawnEnemy()
 
 				bool bResult = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), Start, End,
 					ObjectTypes, false, ActorsToIgnore, EDrawDebugTrace::None, Hit, false);
-				
-				// 땅밑에서 스폰
-				if (bResult)
-				{
-					float CapsuleHeight = Cast<ACharacter>(Player)->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
-					RealSpawnLocation = FVector(Hit.Location.X, Hit.Location.Y, Hit.Location.Z - CapsuleHeight);
-				}
-				
+							
+				if (!bResult)
+					return;
+
+				RealSpawnLocation = FVector(Hit.Location.X, Hit.Location.Y, Hit.Location.Z);
+
 				// 스폰
 				FActorSpawnParameters Params;
 				FRotator SpawnRotation = UKismetMathLibrary::FindLookAtRotation(RealSpawnLocation, Player->GetActorLocation());
 				SpawnRotation.Pitch = 0.f;
 				SpawnRotation.Roll = 0.f;
 				Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+				
 				AActor* SpawnedActor = GetWorld()->SpawnActor<AActor>(EnemyClass, RealSpawnLocation, SpawnRotation, Params);
 				AMgbEnemyCharacter* Enemy = Cast<AMgbEnemyCharacter>(SpawnedActor);
 				if (Enemy)
 				{
+					float CapsuleHeight = Enemy->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+					FVector TempLocation = Enemy->GetActorLocation();
+					TempLocation.Z = TempLocation.Z - CapsuleHeight;
+					Enemy->SetActorLocation(TempLocation);
+
 					Enemy->TargetActor = Player;
 					CurrentEnemyCount++;
 				}

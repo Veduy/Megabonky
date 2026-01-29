@@ -29,6 +29,7 @@ AMgbPlayerCharacter::AMgbPlayerCharacter()
 
 	GetCapsuleComponent()->SetCapsuleHalfHeight(80.f);
 	GetCapsuleComponent()->SetCapsuleRadius(40.f);
+	GetCapsuleComponent()->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_Yes;
 
 	GetCharacterMovement()->bUseControllerDesiredRotation = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
