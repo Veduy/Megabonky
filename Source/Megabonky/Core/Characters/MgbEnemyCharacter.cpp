@@ -93,7 +93,14 @@ void AMgbEnemyCharacter::BeginPlay()
 	UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
 	if (IsValid(ASC))
 	{
+		// 초기화
 		ASC->InitAbilityActorInfo(this, this);
+		
+		// HP, Damage Attribute 적용.
+		auto Level = Cast<AMgbGameStateBase>(GetWorld()->GetGameState())->PassedTimeSec;
+		auto ContextHandle = ASC->MakeEffectContext();
+		auto EffectSpec = ASC->MakeOutgoingSpec(InitAttributeEffect, Level, ContextHandle);
+		ASC->ApplyGameplayEffectSpecToSelf(*EffectSpec.Data.Get());
 	}
 
 	GetWorld()->GetTimerManager().SetTimer(CheckWallTimer, this, &AMgbEnemyCharacter::CheckWall, 0.5f, true, 2.f);
