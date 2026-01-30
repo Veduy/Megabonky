@@ -4,6 +4,9 @@
 #include "MgbGameplayAbility_Lightning.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "NiagaraFunctionLibrary.h"
+#include "GameFramework/Character.h"
+#include "Components/CapsuleComponent.h"
 
 #include "../AttributeSet/WeaponAttributeSet.h"
 #include "../AttributeSet/PlayerAttributeSet.h"
@@ -13,6 +16,11 @@ void UMgbGameplayAbility_Lightning::ActivateAbility(const FGameplayAbilitySpecHa
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
+	Lightning();
+}
+
+void UMgbGameplayAbility_Lightning::Lightning()
+{
 	/* Info Caching*/
 	UAbilitySystemComponent* WeaponASC = GetAbilitySystemComponentFromActorInfo();
 
@@ -38,7 +46,7 @@ void UMgbGameplayAbility_Lightning::ActivateAbility(const FGameplayAbilitySpecHa
 	UKismetSystemLibrary::SphereTraceMultiForObjects(GetWorld(),
 		PlayerActor->GetActorLocation(), PlayerActor->GetActorLocation(), 1500.f,
 		ObjectTypes, false, ActorsToIgnore, EDrawDebugTrace::None, OutHits, true);
-	
+
 	TArray<AActor*> TargetActors;
 	for (const auto& hit : OutHits)
 	{
@@ -59,17 +67,65 @@ void UMgbGameplayAbility_Lightning::ActivateAbility(const FGameplayAbilitySpecHa
 
 		FGameplayEffectSpecHandle EffectSpecHandle = WeaponASC->MakeOutgoingSpec(MgbWeapon->DamageEffectClass, 1.f, EffectContextHandle);
 
-		for (const auto& target : TargetActors)
+		float InterverTime = LightingCount > 0 ? 1.f / LightingCount : 1.f;
+		if (TargetActors.Num() > 0 && MgbWeapon)
 		{
-			UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(target);
-			WeaponASC->ApplyGameplayEffectSpecToTarget(*EffectSpecHandle.Data.Get(), TargetASC);
+			TSharedPtr<FTimerHandle> LightingTimerHandle = MakeShared<FTimerHandle>();
+			TSharedPtr<int32>TargetIndex = MakeShared<int32>(0);
+
+			GetWorld()->GetTimerManager().SetTimer(
+				*LightingTimerHandle,
+				[this, WeaponASC, EffectSpecHandle, TargetActors, LightingTimerHandle, TargetIndex]()
+				{
+					if (!WeaponASC || !EffectSpecHandle.IsValid())
+					{
+						if (LightingTimerHandle.IsValid())
+						{
+							GetWorld()->GetTimerManager().ClearTimer(*LightingTimerHandle);
+						}
+						return;
+					}
+
+					if (*TargetIndex >= TargetActors.Num())
+					{
+						if (LightingTimerHandle.IsValid())
+						{
+							GetWorld()->GetTimerManager().ClearTimer(*LightingTimerHandle);
+						}
+						return;
+					}
+
+					AActor* Target = TargetActors[*TargetIndex];
+					if (Target)
+					{
+						auto TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Target);
+						if (TargetASC)
+						{
+							WeaponASC->ApplyGameplayEffectSpecToTarget(*EffectSpecHandle.Data.Get(), TargetASC);
+						}
+
+						if (LightningEffect)
+						{
+							FFXSystemSpawnParameters SpawnParams;
+							SpawnParams.WorldContextObject = Target;
+							SpawnParams.SystemTemplate = LightningEffect;
+							SpawnParams.AttachToComponent = Target->GetRootComponent();
+
+							SpawnParams.LocationType = EAttachLocation::KeepRelativeOffset;
+							float height = Cast<ACharacter>(Target)->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+							SpawnParams.Location.Z -= height;
+
+							UNiagaraFunctionLibrary::SpawnSystemAttachedWithParams(SpawnParams);
+						}
+					}
+
+					(*TargetIndex)++;
+				},
+				InterverTime,
+				true,
+				0.f);
 		}
 	}
 
-	EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
-}
-
-void UMgbGameplayAbility_Lightning::Lightning()
-{
 
 }

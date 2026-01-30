@@ -93,14 +93,6 @@ void AMgbProjectileActor::BeginOverlap(AActor* OtherActor)
 	}
 }
 
-void AMgbProjectileActor::ComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	if (!HasAuthority())
-	{
-		return;
-	}
-}
-
 void AMgbProjectileActor::Bounce()
 {
 	// 범위내 랜덤 타겟 
@@ -128,6 +120,8 @@ void AMgbProjectileActor::Bounce()
 
 	if (PrimaryTarget)
 	{
+		// 라이트닝 같은 능력의 바운스는 타겟만 지정시 발동되는 기술인데, 날라가는 투삭체가 아님.
+
 		FVector Direction = (PrimaryTarget->GetActorLocation() - GetActorLocation()).GetSafeNormal();
 
 		float Speed = ProjectileMovement->Velocity.Size();
