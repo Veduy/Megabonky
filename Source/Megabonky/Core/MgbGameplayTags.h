@@ -32,3 +32,6 @@ UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Attribute_Weapon_ProjectileBounces);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Attribute_Weapon_Size);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Attribute_Weapon_Knockback);
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Attribute_Weapon_Duration);
+
+// GameplayCue
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_GameplayCue_Lightning_Hit);

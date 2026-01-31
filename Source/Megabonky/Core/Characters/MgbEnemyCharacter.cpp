@@ -52,9 +52,10 @@ void AMgbEnemyCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	bSpawnFinished = false;
+	AutoPossessAI = EAutoPossessAI::Disabled;
 
 	auto MeshComp = GetMesh();
-	if (MeshComp->SkeletalMesh)
+	if (MeshComp->GetSkeletalMeshAsset())
 	{
 		MeshComp->bEnableUpdateRateOptimizations = true;
 
@@ -76,19 +77,14 @@ void AMgbEnemyCharacter::BeginPlay()
 		MeshComp->AnimUpdateRateParams->BaseNonRenderedUpdateRate = 2; // Very low rate when not visible
 
 		MeshComp->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickPoseWhenRendered;
-		//MeshComp->SetForcedLOD(0);
+		MeshComp->SetForcedLOD(0);
 	}
 
 	//서버일때만
 	if (!HasAuthority())
 		return;
 
-	AutoPossessAI = EAutoPossessAI::Disabled;
-
-	GetCapsuleComponent()->SetSimulatePhysics(false);
 	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &AMgbEnemyCharacter::CollisionHit);
-
-	TargetSpawnHeight = GetActorLocation().Z + GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 
 	UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
 	if (IsValid(ASC))
@@ -104,27 +100,29 @@ void AMgbEnemyCharacter::BeginPlay()
 	}
 
 	GetWorld()->GetTimerManager().SetTimer(CheckWallTimer, this, &AMgbEnemyCharacter::CheckWall, 0.5f, true, 2.f);
+
+	auto Location = GetActorLocation();
+	Location.Z -= GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	SetActorLocation(Location);
+
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	TargetSpawnHeight = Location.Z + (GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 2);
 }
 
 void AMgbEnemyCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//서버일때만
-	if (!HasAuthority())
-		return;
-
 	if (bSpawnFinished == false)
 	{
-		//float Height = FMath::FInterpTo(GetActorLocation().Z, TargetSpawnHeight, DeltaTime, 3.f);
 		float Height = FMath::Lerp(GetActorLocation().Z, TargetSpawnHeight, DeltaTime * 5.f);
 		SetActorLocation(FVector(GetActorLocation().X, GetActorLocation().Y, Height), true);
 		
-		//UE_LOG(LogTemp, Warning, TEXT("SpawnHeight: %f"), TargetSpawnHeight);
 		if (GetActorLocation().Z >= TargetSpawnHeight - 1.f)
 		{
 			bSpawnFinished = true;   
 			SpawnDefaultController();
+			GetCapsuleComponent()->SetCollisionProfileName(FName("Enemy"));
 		}
 
 		return;
@@ -146,11 +144,6 @@ void AMgbEnemyCharacter::Tick(float DeltaTime)
 	default:
 		break;
 	}
-
-	/*if (!GetCharacterMovement()->IsMovingOnGround())
-	{
-		
-	}*/
 }
 
 void AMgbEnemyCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

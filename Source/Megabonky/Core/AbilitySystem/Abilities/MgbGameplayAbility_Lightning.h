@@ -6,8 +6,6 @@
 #include "MgbGameplayAbility.h"
 #include "MgbGameplayAbility_Lightning.generated.h"
 
-class UNiagaraSystem;
-
 /**
  * 
  */
@@ -26,7 +24,4 @@ public:
 public:
     UPROPERTY()
     uint8 LightingCount = 0;
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
-    TObjectPtr<UNiagaraSystem> LightningEffect;
 };

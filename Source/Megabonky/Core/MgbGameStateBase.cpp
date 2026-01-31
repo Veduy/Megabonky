@@ -180,6 +180,11 @@ void AMgbGameStateBase::SpawnEnemy()
 		return;
 	}
 
+	FCollisionObjectQueryParams ObjectQueryParams;
+	ObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldStatic);
+	//TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypesForTrace;
+	//ObjectTypesForTrace.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldStatic));
+
 	// 플레이어 수만큼 플레이어를 타겟으로한 몬스터를 소환한다.
 	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	{
@@ -207,22 +212,23 @@ void AMgbGameStateBase::SpawnEnemy()
 			}
 			UClass* EnemyClass = EnemyClasses[FMath::RandRange(0, EnemyClassVariety)];
 
-			// 스폰할 지점에서 또 작은 원을 기준으로 스폰할 마리수에 해당하는, 진짜 스폰 지점을 뽑아내서 그 지점에 스폰.
 			
 			if (PassedTimeSec == 0)
 				return;
 
+			// 스폰할 마리수 계산 (로그함수)
 			int EnemyToSpawn = EnemySpawnMultiplier * FMath::Loge(float(1 + (PassedTimeSec * PassedTimeSec) / 600)) + 3;
 			EnemyToSpawn = FMath::Clamp(EnemyToSpawn, 0, 100);
-			UE_LOG(LogTemp, Warning, TEXT("Count: %d"), EnemyToSpawn);
 
+			// 스폰할 지점에서 또 작은 원을 기준으로 스폰할 마리수에 해당하는, 진짜 스폰 지점을 뽑아내서 그 지점에 스폰.
 			for (int i = 0; i < EnemyToSpawn; ++i)
 			{
 				if (CurrentEnemyCount >= MaxEnemyCount)
 					return;
 
 				FVector2D SmallDir = FVector2D(cosf(rand()), sinf(rand()));
-				FVector2D SmallLocation = SmallDir * FMath::FRandRange(300.f, 500.f);
+				FVector2D SmallLocation = SmallDir * FMath::FRandRange(500.f, 1000.f);
+
 				// 플레이어 위치(x,y 좌표만 가져와야함).
 				FVector2D PlayerXY = FVector2D(Player->GetActorLocation().X, Player->GetActorLocation().Y);
 
@@ -234,36 +240,38 @@ void AMgbGameStateBase::SpawnEnemy()
 				FVector Start = RealSpawnLocation + FVector(0.f, 0.f, 3000.f);
 				FVector End = RealSpawnLocation + FVector(0.f, 0.f, -3000.f);
 
-				TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-				ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldStatic));
-
-				TArray<AActor*> ActorsToIgnore;
 				FHitResult Hit;
 
-				bool bResult = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(), Start, End,
-					ObjectTypes, false, ActorsToIgnore, EDrawDebugTrace::None, Hit, false);
-							
-				if (!bResult)
-					return;
+				// Use engine's collision query params to only get the hit result (location)
+				FCollisionQueryParams QueryParams;
+				QueryParams.AddIgnoredActor(Player);
 
-				RealSpawnLocation = FVector(Hit.Location.X, Hit.Location.Y, Hit.Location.Z);
+				bool bResult = GetWorld()->LineTraceSingleByObjectType(
+					Hit,
+					Start,
+					End,
+					ObjectQueryParams,
+					QueryParams
+				);
+
+				if (!bResult)
+				{
+					continue;
+				}
 
 				// 스폰
 				FActorSpawnParameters Params;
-				FRotator SpawnRotation = UKismetMathLibrary::FindLookAtRotation(RealSpawnLocation, Player->GetActorLocation());
+				Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+				FRotator SpawnRotation = UKismetMathLibrary::FindLookAtRotation(Hit.Location, Player->GetActorLocation());
 				SpawnRotation.Pitch = 0.f;
 				SpawnRotation.Roll = 0.f;
-				Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 				
-				AActor* SpawnedActor = GetWorld()->SpawnActor<AActor>(EnemyClass, RealSpawnLocation, SpawnRotation, Params);
+				AActor* SpawnedActor = GetWorld()->SpawnActor<AActor>(EnemyClass, Hit.Location, SpawnRotation, Params);
 				AMgbEnemyCharacter* Enemy = Cast<AMgbEnemyCharacter>(SpawnedActor);
+
 				if (Enemy)
 				{
-					float CapsuleHeight = Enemy->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
-					FVector TempLocation = Enemy->GetActorLocation();
-					TempLocation.Z = TempLocation.Z - CapsuleHeight;
-					Enemy->SetActorLocation(TempLocation);
-
 					Enemy->TargetActor = Player;
 					CurrentEnemyCount++;
 				}

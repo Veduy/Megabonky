@@ -11,6 +11,7 @@
 #include "../AttributeSet/WeaponAttributeSet.h"
 #include "../AttributeSet/PlayerAttributeSet.h"
 #include "../../MgbWeapon.h"
+#include "../../MgbGameplayTags.h"
 
 void UMgbGameplayAbility_Lightning::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
@@ -102,20 +103,15 @@ void UMgbGameplayAbility_Lightning::Lightning()
 						if (TargetASC)
 						{
 							WeaponASC->ApplyGameplayEffectSpecToTarget(*EffectSpecHandle.Data.Get(), TargetASC);
-						}
 
-						if (LightningEffect)
-						{
-							FFXSystemSpawnParameters SpawnParams;
-							SpawnParams.WorldContextObject = Target;
-							SpawnParams.SystemTemplate = LightningEffect;
-							SpawnParams.AttachToComponent = Target->GetRootComponent();
 
-							SpawnParams.LocationType = EAttachLocation::KeepRelativeOffset;
 							float height = Cast<ACharacter>(Target)->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
-							SpawnParams.Location.Z -= height;
+							FVector TargetLoc = Cast<ACharacter>(Target)->GetActorLocation();
+							TargetLoc.Z -= height;
 
-							UNiagaraFunctionLibrary::SpawnSystemAttachedWithParams(SpawnParams);
+							FGameplayCueParameters Params;
+							Params.Location = TargetLoc;
+							TargetASC->ExecuteGameplayCue(TAG_GameplayCue_Lightning_Hit, Params);
 						}
 					}
 

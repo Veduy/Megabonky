@@ -192,7 +192,7 @@ void AMgbPlayerController::GenerateUpgradeInfo()
 	{
 		WeaponNames = GS->DT_Weapon->GetRowNames();
 	}
-	// 무기가 이미 4개라면, 없다면, 플레이어가 가지고 있는 무기들 중에서 선택.
+	// 무기가 이미 4개라면, 플레이어가 가지고 있는 무기들 중에서 선택.
 	else
 	{
 		for (int i = 0; i < 4; i++)

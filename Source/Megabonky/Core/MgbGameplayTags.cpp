@@ -18,3 +18,7 @@ UE_DEFINE_GAMEPLAY_TAG(TAG_Attribute_Weapon_ProjectileBounces, "Attribute.Weapon
 UE_DEFINE_GAMEPLAY_TAG(TAG_Attribute_Weapon_Size, "Attribute.Weapon.Size");
 UE_DEFINE_GAMEPLAY_TAG(TAG_Attribute_Weapon_Knockback, "Attribute.Weapon.Knockback");
 UE_DEFINE_GAMEPLAY_TAG(TAG_Attribute_Weapon_Duration, "Attribute.Weapon.Duration");
+
+
+UE_DEFINE_GAMEPLAY_TAG(TAG_GameplayCue_Lightning_Hit, "GameplayCue.Lightning.Hit");
+
