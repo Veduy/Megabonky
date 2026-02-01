@@ -54,42 +54,68 @@ void AMgbProjectileActor::BeginOverlap(AActor* OtherActor)
 	if (Enemy)
 	{
 		ActorsToIgnore.Add(Enemy);
+		
+		// 단일 대상 데미지 계산
+		AMgbWeapon* Weapon = Cast<AMgbWeapon>(GetOwner());
 
-		if (bRadialDamage == false)
-		{	
-			AMgbWeapon* Weapon = Cast<AMgbWeapon>(GetOwner());
+		if (Weapon)
+		{
+			FGameplayEffectContextHandle EffectContextHandle = Weapon->GetAbilitySystemComponent()->MakeEffectContext();
+			EffectContextHandle.AddSourceObject(Weapon);
+			EffectContextHandle.AddInstigator(Weapon, Weapon);
 
-			if (Weapon)
+			if (Weapon->DamageEffectClass)
 			{
-				FGameplayEffectContextHandle EffectContextHandle = Weapon->GetAbilitySystemComponent()->MakeEffectContext();
-				EffectContextHandle.AddSourceObject(Weapon);
-				EffectContextHandle.AddInstigator(Weapon, Weapon);
+				// Spec을 생성한 컴포넌트가 ExecCalc의 Source로 설정.
+				FGameplayEffectSpecHandle EffectSpecHandle = Weapon->GetAbilitySystemComponent()->MakeOutgoingSpec(Weapon->DamageEffectClass, 1.f, EffectContextHandle);
 
-				if (Weapon->DamageEffectClass)
+				UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor);
+				Weapon->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*EffectSpecHandle.Data.Get(), TargetASC);
+
+				if (bBounce && BounceCount > 0)
 				{
-					// Spec을 생성한 컴포넌트가 ExecCalc의 Source로 설정.
-					FGameplayEffectSpecHandle EffectSpecHandle = Weapon->GetAbilitySystemComponent()->MakeOutgoingSpec(Weapon->DamageEffectClass, 1.f, EffectContextHandle);
-
-					UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor);
-					Weapon->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*EffectSpecHandle.Data.Get(), TargetASC);
-
-					if (bBounce && BounceCount > 0)
-					{
-						Bounce();
-					}
-					else
-					{
-						Destroy();
-					}
+					Bounce();
+					return;
 				}
 			}
-		}
 
-		else if (bRadialDamage == true)
-		{
-			//static ENGINE_API bool ApplyRadialDamageWithFalloff(const UObject * WorldContextObject, float BaseDamage, float MinimumDamage, const FVector & Origin, float DamageInnerRadius, float DamageOuterRadius, float DamageFalloff, TSubclassOf<class UDamageType> DamageTypeClass, const TArray<AActor*>&IgnoreActors, AActor * DamageCauser = NULL, AController * InstigatedByController = NULL, ECollisionChannel DamagePreventionChannel = ECC_Visibility);
-			//UGameplayStatics::ApplyRadialDamageWithFalloff();
+			// 광역 데미지 계산
+			if (bRadialDamage == true)
+			{
+				TArray<AActor*> OutActors;
+				UKismetSystemLibrary::SphereOverlapActors(GetWorld(), GetActorLocation(), 200.f,
+					TArray<TEnumAsByte<EObjectTypeQuery>>(),
+					AMgbEnemyCharacter::StaticClass(),
+					ActorsToIgnore, OutActors);
+
+				// 일단 고정 딜.
+				for (const auto& Actor : OutActors)
+				{
+					if (Weapon->DamageEffectClass)
+					{
+						// Spec을 생성한 컴포넌트가 ExecCalc의 Source로 설정.
+						FGameplayEffectSpecHandle EffectSpecHandle = Weapon->GetAbilitySystemComponent()->MakeOutgoingSpec(Weapon->DamageEffectClass, 1.f, EffectContextHandle);
+
+						UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Actor);
+						Weapon->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*EffectSpecHandle.Data.Get(), TargetASC);			
+					}
+				}
+				Destroy();
+				return;
+			}
+
+			Destroy();
+			return;
 		}
+		else
+		{
+			Destroy();
+			return;
+		}
+	}
+	else
+	{
+		Destroy();
 	}
 }
 

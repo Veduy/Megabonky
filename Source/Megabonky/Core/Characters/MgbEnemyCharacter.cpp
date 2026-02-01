@@ -35,7 +35,7 @@ AMgbEnemyCharacter::AMgbEnemyCharacter()
 	GetMesh()->SetRelativeScale3D(FVector(0.7f, 0.7f, 0.7f));
 
 	GetCharacterMovement()->bUseControllerDesiredRotation = false;
-	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->bOrientRotationToMovement = false;
 	GetCharacterMovement()->MaxWalkSpeed = 200.f;
 	GetCharacterMovement()->GroundFriction = 0.f;
 	GetCharacterMovement()->BrakingFrictionFactor = 0.f;
@@ -210,11 +210,19 @@ void AMgbEnemyCharacter::LookTarget(float DeltaTime)
 {
 	if (TargetActor)
 	{
-		FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetActor->GetActorLocation());
-
-		//TargetRotation.Yaw = FMath::Lerp(GetActorRotation().Yaw, TargetRotation.Yaw, 10.f * DeltaTime);
-		FRotator LookRotation = FRotator(GetActorRotation().Pitch, TargetRotation.Yaw, GetActorRotation().Roll);
-		SetActorRotation(LookRotation);
+		FVector Dir = (TargetActor->GetActorLocation() - GetActorLocation()).GetSafeNormal();
+		float Dot = FVector::DotProduct(Dir, FVector::UpVector);
+		if (Dot > 0.9f || Dot < -0.9f)
+		{
+			return;
+		}
+		else
+		{
+			FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetActor->GetActorLocation());
+			FRotator LookRotation = FRotator(GetActorRotation().Pitch, TargetRotation.Yaw, GetActorRotation().Roll);
+			LookRotation = FMath::RInterpTo(GetActorRotation(), LookRotation, DeltaTime, 5.f);
+			SetActorRotation(LookRotation);
+		}
 	}
 }
 

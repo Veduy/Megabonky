@@ -94,7 +94,16 @@ void UMgbEffectExecutionCalculation::Execute_Implementation(const FGameplayEffec
 	AMgbPlayerController* PC = Cast<AMgbPlayerController>(PlayerCharacter->GetOwner());
 	if (PC)
 	{
-		FVector Location = ExecutionParams.GetTargetAbilitySystemComponent()->GetAvatarActor()->GetActorLocation();
+		if (!ExecutionParams.GetTargetAbilitySystemComponent())
+			return;
+
+		auto AvatarActor = ExecutionParams.GetTargetAbilitySystemComponent()->GetAvatarActor();
+		if (!AvatarActor)
+		{
+			return;
+		}
+
+		FVector Location = AvatarActor->GetActorLocation();
 		PC->ClientSpawnDamageTextActor(Location, TotalDamage);
 	}
 

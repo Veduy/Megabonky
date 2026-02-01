@@ -1,4 +1,4 @@
-// Copyright is owned by Veduy.
+ï»¿// Copyright is owned by Veduy.
 
 
 #include "MgbPlayerCharacter.h"
@@ -88,7 +88,7 @@ void AMgbPlayerCharacter::BeginPlay()
 void AMgbPlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	
 	UpdateCharacterMeshRotation(DeltaTime);
 }
 
@@ -129,7 +129,7 @@ void AMgbPlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 
 bool AMgbPlayerCharacter::FindPrimaryTargetByCondition(AActor*& OutPrimaryTarget)
 {
-	// ÀÏÁ¤ ¹üÀ§³»¿¡ ¾×ÅÍµé Áß¿¡¼­ °Å¸®¸¸ ÆÇº°ÇØ¼­, °¡±î¿î 3¸¶¸®Áß Å¸°Ù ·£´ı
+	// ì¼ì • ë²”ìœ„ë‚´ì— ì•¡í„°ë“¤ ì¤‘ì—ì„œ ê±°ë¦¬ë§Œ íŒë³„í•´ì„œ, ê°€ê¹Œìš´ 3ë§ˆë¦¬ì¤‘ íƒ€ê²Ÿ ëœë¤
 	FVector Origin = GetActorLocation();
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_GameTraceChannel1));
@@ -144,7 +144,7 @@ bool AMgbPlayerCharacter::FindPrimaryTargetByCondition(AActor*& OutPrimaryTarget
 
 	if (!OutActors.IsEmpty())
 	{
-		// °Å¸® ¿À¸§Â÷¼ø(°¡±î¿î¼ø) Á¤·Ä ÈÄ ±Ù°Å¸® 3¸¶¸®¿¡¼­ ·£´ıÀ¸·Î PrimaryTargetSetting;
+		// ê±°ë¦¬ ì˜¤ë¦„ì°¨ìˆœ(ê°€ê¹Œìš´ìˆœ) ì •ë ¬ í›„ ê·¼ê±°ë¦¬ 3ë§ˆë¦¬ì—ì„œ ëœë¤ìœ¼ë¡œ PrimaryTargetSetting;
 		Algo::Sort(
 			OutActors,
 			[&](const AActor* A, const AActor* B)
@@ -161,7 +161,7 @@ bool AMgbPlayerCharacter::FindPrimaryTargetByCondition(AActor*& OutPrimaryTarget
 		OutPrimaryTarget = Targets[FMath::RandRange(0, TargetCount - 1)];
 		return true;
 
-		// ÃÖ´Ü °Å¸® ¾×ÅÍ
+		// ìµœë‹¨ ê±°ë¦¬ ì•¡í„°
 		/*float ClosesetDistance = MAX_FLT;
 		for (const auto& Target : OutActors)
 		{
@@ -203,8 +203,8 @@ void AMgbPlayerCharacter::ActivateWeaponsAbility()
 	if (bDeath)
 		return;
 
-	// ¸ğµç WeaponÀÇ ¾îºô¸®Æ¼ Activate
-	// PlayerAttackSpeed = 100% ~ x%;  Interval 2ÃÊ,  (2 / PlayerAttackSpeed / 100)
+	// ëª¨ë“  Weaponì˜ ì–´ë¹Œë¦¬í‹° Activate
+	// PlayerAttackSpeed = 100% ~ x%;  Interval 2ì´ˆ,  (2 / PlayerAttackSpeed / 100)
 	float PlayerAttackSpeed = GetAbilitySystemComponent()->GetNumericAttribute(UPlayerAttributeSet::GetAttackSpeedAttribute());
 	GetWorld()->GetTimerManager().SetTimer(ActivateAbilityHandle,
 		[this]()
@@ -221,12 +221,13 @@ void AMgbPlayerCharacter::ActivateWeaponsAbility()
 
 void AMgbPlayerCharacter::UpdateCharacterMeshRotation(float DeltaTime)
 {
+	/* ë°”ë‹¥ë©´ ë…¸ë©€ì— ë§ì¶°ì„œ ë©”ì‰¬ íšŒì „ ë³´ì • */
+	
 	const FVector Start = GetActorLocation() - FVector(0.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
 	const FVector End = Start + (GetActorUpVector() * -500.f);
 
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldStatic));
-	//ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_GameTraceChannel1));
 
 	TArray<AActor*> ActorsToIgnore;
 	FHitResult Hit;
@@ -234,64 +235,47 @@ void AMgbPlayerCharacter::UpdateCharacterMeshRotation(float DeltaTime)
 	const bool bResult = UKismetSystemLibrary::LineTraceSingleForObjects(GetWorld(),
 		Start, End,
 		ObjectTypes, false,
-		ActorsToIgnore, EDrawDebugTrace::Type::ForOneFrame, Hit,
-		true);
+		ActorsToIgnore, EDrawDebugTrace::Type::None, Hit, true);
 
 	if (bResult)
 	{	
-		//FVector FloorNormal = Hit.Normal;
-
-		//FRotator RotationXZ = UKismetMathLibrary::MakeRotFromXZ(GetActorForwardVector(), FloorNormal);
-		//FRotator RotationYZ = UKismetMathLibrary::MakeRotFromYZ(GetActorRightVector(), FloorNormal);
-
-		//FRotator CurrentRotation = GetMesh()->GetRelativeRotation();
-
-		//FRotator TargetRotation;
-		//TargetRotation.Pitch = RotationYZ.Pitch;
-		//TargetRotation.Roll = RotationXZ.Roll;
-
-		//// Mesh°¡ ±âº»À¸·Î YawÃàÀ¸·Î -90µµ µ¹¾Æ°¡ÀÖ¾î¼­ 
-		//CurrentRotation.Pitch = FMath::FInterpTo(CurrentRotation.Pitch, TargetRotation.Roll, DeltaTime, 5.f);
-		//CurrentRotation.Roll = FMath::FInterpTo(CurrentRotation.Roll, -TargetRotation.Pitch, DeltaTime, 5.f);
-
-		//GetMesh()->SetRelativeRotation(CurrentRotation);
-
 		const FVector FloorNormal = Hit.ImpactNormal;
-		
-		FVector WorldSlopeForward = FVector::VectorPlaneProject(GetActorForwardVector(), FloorNormal);
-		WorldSlopeForward = WorldSlopeForward.GetSafeNormal();
+		if (FloorNormal.IsNearlyZero())
+			return;
 
-		const FQuat WorldSlopeQuat = FRotationMatrix::MakeFromZY(FloorNormal, WorldSlopeForward).ToQuat();
+		FVector SlopeForward = FVector::VectorPlaneProject(GetActorForwardVector(), FloorNormal);
 
-		const FQuat ActorWorldQuat = GetActorQuat();
-
-		// °æ»ç È¸ÀüÀ» Actor±âÁØÀ¸·Î 
-		FQuat SlopeLocalQuat = ActorWorldQuat.Inverse() * WorldSlopeQuat;
-
-		//Yaw Á¦°Å
-		FQuat SlopeNoYawQuat;
+		// ìˆ˜ì¹˜ ì•ˆì •í™”
+		if (!SlopeForward.Normalize())
 		{
-			FRotator R = SlopeLocalQuat.Rotator();
-			R.Yaw = 0.f;
-			SlopeNoYawQuat = R.Quaternion();
+			SlopeForward = FVector::VectorPlaneProject(GetActorRightVector(), FloorNormal).GetSafeNormal();
 		}
 
-		//±âº» Mesh È¸Àü°ú ÇÕ¼º (Quat °ö)
+		const FQuat WorldSlopeQuat = FRotationMatrix::MakeFromZY(FloorNormal, SlopeForward).ToQuat();
+
+		// ì›”ë“œ -> ì•¡í„° ì¢Œí‘œê³„ ë³€í™˜
+		const FQuat ActorQuat = GetActorQuat();
+		FQuat LocalSlopQuat = ActorQuat.Inverse() * WorldSlopeQuat;
+
+		//Yaw ì œê±°
+		FRotator LocalRot = LocalSlopQuat.Rotator();
+		LocalRot.Yaw = 0.f;
+		const FQuat SlopeNoYawQuat = LocalRot.Quaternion();
+
+		//ê¸°ë³¸ Mesh íšŒì „ê³¼ í•©ì„± (Quat ê³±)
 		const FQuat TargetMeshQuat = MeshBaseQuat * SlopeNoYawQuat;
+		const FQuat CurrentQuat = GetMesh()->GetRelativeRotation().Quaternion();
 
-		const FQuat Current = GetMesh()->GetRelativeRotation().Quaternion();
-
-		//Interp °è¿­Àº °¢µµ°ª º¸°£ÀÌ¶ó º¹ÇÕ È¸Àü¿¡ ¾àÇÏ°í, Slerp´Â È¸Àü ÀÚÃ¼¸¦ º¸°£ÇØ¼­ °æ»ç¸é¡¤¸Ş½¬ Á¤·Ä¿¡ ¾ÈÁ¤ÀûÀÌ´Ù.
-		const FQuat Smooth = FQuat::Slerp(Current, TargetMeshQuat, DeltaTime * 10.f);
-		GetMesh()->SetRelativeRotation(Smooth);
+		const FQuat SmoothQuat = FQuat::Slerp(CurrentQuat, TargetMeshQuat, DeltaTime * 5.f);
+		GetMesh()->SetRelativeRotation(SmoothQuat);
 	}
 	else
 	{
 		FRotator CurrentRotation = GetMesh()->GetRelativeRotation();
 
-		CurrentRotation.Pitch = FMath::FInterpTo(CurrentRotation.Pitch, 0, DeltaTime, 10.f);
-		CurrentRotation.Roll = FMath::FInterpTo(CurrentRotation.Roll, 0, DeltaTime, 10.f);
-
+		CurrentRotation.Pitch = FMath::FInterpTo(CurrentRotation.Pitch, 0, DeltaTime, 5.f);
+		CurrentRotation.Roll = FMath::FInterpTo(CurrentRotation.Roll, 0, DeltaTime, 5.f);
+	
 		GetMesh()->SetRelativeRotation(CurrentRotation);
 	}
 }
