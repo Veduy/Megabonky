@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "GameplayTagContainer.h"
 #include "MgbProjectileActor.generated.h"
 
+class USphereComponent;
 class UProjectileMovementComponent;
 class UPrimitiveComponent;
 class UGameplayEffect;
@@ -35,12 +37,22 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Knockback();
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void HandleHitEffect(AActor* TargetActor);
+	void HandleHitEffect_Implementation(AActor* TargetActor);
+
 public:
+	UPROPERTY(VisibleAnyWhere, BlueprintReadWrite, Category = "Components")
+	TObjectPtr<USphereComponent> CollisionComp;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")
 	TArray<TObjectPtr<AActor>> ActorsToIgnore;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
+	FGameplayTag HitEffectCueTag;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
 	uint8 bRadialDamage : 1 = false;

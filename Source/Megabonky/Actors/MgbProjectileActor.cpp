@@ -4,6 +4,7 @@
 #include "MgbProjectileActor.h"
 
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Components/SphereComponent.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -20,6 +21,9 @@ AMgbProjectileActor::AMgbProjectileActor()
 	PrimaryActorTick.bCanEverTick = false;
 
 	bReplicates = true;
+
+	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
+	SetRootComponent(CollisionComp);
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile"));
 	ProjectileMovement->ProjectileGravityScale = 0.f;
@@ -82,12 +86,11 @@ void AMgbProjectileActor::BeginOverlap(AActor* OtherActor)
 			}
 
 			// 광역 데미지 계산
-			// 선형적으로 거리 데미지 감쇄식 필요.
-
+			// 선형적으로 거리 데미지 감소(y = 1-x);
 			if (bRadialDamage == true)
 			{
 				// Radius 내의 적들에게 데미지 적용.
-				float Radius = 200.f;		
+				float Radius = 200.f;
 			
 				TArray<AActor*> OutActors;
 				UKismetSystemLibrary::SphereOverlapActors(GetWorld(), GetActorLocation(), 200.f,
@@ -175,6 +178,11 @@ void AMgbProjectileActor::Bounce()
 }
 
 void AMgbProjectileActor::Knockback()
+{
+
+}
+
+void AMgbProjectileActor::HandleHitEffect_Implementation(AActor* TargetActor)
 {
 
 }
