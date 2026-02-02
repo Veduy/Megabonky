@@ -90,10 +90,10 @@ void AMgbProjectileActor::BeginOverlap(AActor* OtherActor)
 			if (bRadialDamage == true)
 			{
 				// Radius 내의 적들에게 데미지 적용.
-				float Radius = 200.f;
-			
+				float Radius = CollisionComp->GetScaledSphereRadius() * 5;
+
 				TArray<AActor*> OutActors;
-				UKismetSystemLibrary::SphereOverlapActors(GetWorld(), GetActorLocation(), 200.f,
+				UKismetSystemLibrary::SphereOverlapActors(GetWorld(), GetActorLocation(), Radius,
 					TArray<TEnumAsByte<EObjectTypeQuery>>(),
 					AMgbEnemyCharacter::StaticClass(),
 					ActorsToIgnore, OutActors);
@@ -105,7 +105,7 @@ void AMgbProjectileActor::BeginOverlap(AActor* OtherActor)
 
 					// 무기의 Damage Attribute 값에 곱해줄 비율값 계산.
 					float Length = (Actor->GetActorLocation() - GetActorLocation()).Length();
-					float DistanceRatio = FMath::Clamp(1.f - (Length / Radius), 0.2f, 1.f);
+					float DistanceRatio = FMath::Clamp(1.f - (Length / Radius), 0.3f, 1.f);
 					DistanceRatio = DistanceRatio;
 
 					if (Weapon->DamageEffectClass)

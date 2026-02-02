@@ -40,7 +40,6 @@ void UMgbGameplayAbility_Projectile::SpawnProjectile(AActor* Owner, const FVecto
 	auto Size = WeaponSize * PlayerSize;
 	auto ProjSpeed = WeaponProjSpeed * PlayerProjSpeed;
 
-
 	FTransform SpawnTransform = FTransform(Rotation, InSpawnOrigin, FVector(1, 1, 1));
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = Owner;
