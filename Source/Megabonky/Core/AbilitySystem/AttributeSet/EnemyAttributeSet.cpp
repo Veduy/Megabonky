@@ -7,6 +7,7 @@
 #include "Net\UnrealNetwork.h"
 
 #include "../../Characters/MgbEnemyCharacter.h"
+#include "../../MgbGameplayTags.h"
 #include "../../../Util/NetworkLog.h"
 
 UEnemyAttributeSet::UEnemyAttributeSet()
@@ -41,9 +42,22 @@ void UEnemyAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute
 
 	if (Attribute == GetHealthAttribute())
 	{
-		if (NewValue == 0.f)
+		if(OldValue > NewValue)
 		{
-			GetOwningActor()->Destroy();
+			AMgbEnemyCharacter* Character = Cast<AMgbEnemyCharacter>(GetOwningActor());
+			if (Character)
+			{
+				//ASC -> Effect Cue 실행하기.
+				auto ASC = GetOwningAbilitySystemComponent();
+				if (!ASC)
+					return;
+
+				ASC->ExecuteGameplayCue(TAG_GameplayCue_EC_Damaged);
+			}
+		}
+		if (NewValue <= 0.f)
+		{
+			GetOwningActor()->SetLifeSpan(0.2f);
 		}
 	}
 }
@@ -75,11 +89,7 @@ void UEnemyAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth)
 
 	if (GetHealth() <= OldHealth.GetCurrentValue())
 	{
-		// 클라이언트에서만, 데미지 이펙트 처리.
-		if (AMgbEnemyCharacter* Character = Cast<AMgbEnemyCharacter>(GetOwningActor()))
-		{
-			Character->OnDamaged.ExecuteIfBound();
-		}
+
 	}
 }
 

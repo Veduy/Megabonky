@@ -155,7 +155,6 @@ void AMgbEnemyCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 
 void AMgbEnemyCharacter::Destroyed()
 {
-	//서버일때만 XPCrystal Drop
 	if (HasAuthority())
 	{
 		if (auto GS = Cast<AMgbGameStateBase>(GetWorld()->GetGameState()))
@@ -327,7 +326,7 @@ void AMgbEnemyCharacter::CollisionHit(UPrimitiveComponent* HitComponent, AActor*
 	}
 }
 
-void AMgbEnemyCharacter::HandleDamageEvents()
+void AMgbEnemyCharacter::HandleDamageEffect_Implementation()
 {
 
 }

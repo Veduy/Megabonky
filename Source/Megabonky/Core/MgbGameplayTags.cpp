@@ -19,8 +19,8 @@ UE_DEFINE_GAMEPLAY_TAG(TAG_Attribute_Weapon_Size, "Attribute.Weapon.Size");
 UE_DEFINE_GAMEPLAY_TAG(TAG_Attribute_Weapon_Knockback, "Attribute.Weapon.Knockback");
 UE_DEFINE_GAMEPLAY_TAG(TAG_Attribute_Weapon_Duration, "Attribute.Weapon.Duration");
 
-
 UE_DEFINE_GAMEPLAY_TAG(TAG_GameplayCue_Lightning_Hit, "GameplayCue.Lightning.Hit");
+UE_DEFINE_GAMEPLAY_TAG(TAG_GameplayCue_FireBall_Hit, "GameplayCue.FireBall.Hit");
+UE_DEFINE_GAMEPLAY_TAG(TAG_GameplayCue_EC_Damaged, "GameplayCue.EC.Damaged");
 
 UE_DEFINE_GAMEPLAY_TAG(TAG_Data_AreaDamageMultiplier, "Data.AreaDamageMultiplier");
-

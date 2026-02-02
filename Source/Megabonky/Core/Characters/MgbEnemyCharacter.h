@@ -7,9 +7,6 @@
 #include "AbilitySystemInterface.h"
 #include "MgbEnemyCharacter.generated.h"
 
-//DECLARE_MULTICAST_DELEGATE()
-DECLARE_DELEGATE(FOnDamaged);
-
 class UEnemyAttributeSet;
 class UCapsuleComponent;
 class UFloatingPawnMovement;
@@ -54,8 +51,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void CollisionHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
-	UFUNCTION(BlueprintCallable)
-	void HandleDamageEvents();
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void HandleDamageEffect();
+	void HandleDamageEffect_Implementation();
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
@@ -80,5 +78,4 @@ public:
 	float TargetSpawnHeight;
 
 	FTimerHandle CheckWallTimer;
-	FOnDamaged OnDamaged;
 };
