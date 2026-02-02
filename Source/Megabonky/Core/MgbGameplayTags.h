@@ -35,3 +35,6 @@ UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Attribute_Weapon_Duration);
 
 // GameplayCue
 UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_GameplayCue_Lightning_Hit);
+
+// SetByCaller еб╠в
+UE_DECLARE_GAMEPLAY_TAG_EXTERN(TAG_Data_AreaDamageMultiplier);

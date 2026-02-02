@@ -208,7 +208,7 @@ void AMgbGameStateBase::SpawnEnemy()
 			uint8 EnemyClassVariety = 0;
 			if (EnemyClasses.Num() > 1)
 			{
-				EnemyClassVariety = (PassedTimeSec / 60) % (EnemyClasses.Num() - 1);
+				EnemyClassVariety = (PassedTimeSec / 60) % EnemyClasses.Num();
 			}
 			UClass* EnemyClass = EnemyClasses[FMath::RandRange(0, EnemyClassVariety)];
 

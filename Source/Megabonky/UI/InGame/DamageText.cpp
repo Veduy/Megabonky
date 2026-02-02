@@ -6,8 +6,7 @@
 
 void UDamageText::SetDamageText(float InValue)
 {
-	//FText NewText = FText::FromString(FString::Printf(TEXT("%f"), InValue));
-	FText NewText = FText::AsNumber(InValue);
+	FText NewText = FText::AsNumber(FMath::TruncToInt(InValue));
 
 	Value->SetText(NewText);
 }

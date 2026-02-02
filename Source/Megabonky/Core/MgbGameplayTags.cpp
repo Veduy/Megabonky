@@ -22,3 +22,5 @@ UE_DEFINE_GAMEPLAY_TAG(TAG_Attribute_Weapon_Duration, "Attribute.Weapon.Duration
 
 UE_DEFINE_GAMEPLAY_TAG(TAG_GameplayCue_Lightning_Hit, "GameplayCue.Lightning.Hit");
 
+UE_DEFINE_GAMEPLAY_TAG(TAG_Data_AreaDamageMultiplier, "Data.AreaDamageMultiplier");
+

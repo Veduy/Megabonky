@@ -67,6 +67,7 @@ void UMgbGameplayAbility_Lightning::Lightning()
 		EffectContextHandle.AddInstigator(WeaponActor, WeaponActor);
 
 		FGameplayEffectSpecHandle EffectSpecHandle = WeaponASC->MakeOutgoingSpec(MgbWeapon->DamageEffectClass, 1.f, EffectContextHandle);
+		EffectSpecHandle.Data.Get()->SetSetByCallerMagnitude(TAG_Data_AreaDamageMultiplier, 1.f);
 
 		float InterverTime = LightingCount > 0 ? 1.f / LightingCount : 1.f;
 		if (TargetActors.Num() > 0 && MgbWeapon)
@@ -103,7 +104,6 @@ void UMgbGameplayAbility_Lightning::Lightning()
 						if (TargetASC)
 						{
 							WeaponASC->ApplyGameplayEffectSpecToTarget(*EffectSpecHandle.Data.Get(), TargetASC);
-
 
 							float height = Cast<ACharacter>(Target)->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 							FVector TargetLoc = Cast<ACharacter>(Target)->GetActorLocation();

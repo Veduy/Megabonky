@@ -8,6 +8,7 @@
 #include "AbilitySystemBlueprintLibrary.h"
 
 #include "../../Core/MgbWeapon.h"
+#include "../../Core/MgbGameplayTags.h"
 #include "../../Core/Characters/MgbEnemyCharacter.h"
 
 AProjectile_Bananarang::AProjectile_Bananarang()
@@ -83,6 +84,7 @@ void AProjectile_Bananarang::BeginOverlap(AActor* OtherActor)
 				{
 					FGameplayEffectSpecHandle EffectSpecHandle = Weapon->GetAbilitySystemComponent()->MakeOutgoingSpec(Weapon->DamageEffectClass, 1.f, EffectContextHandle);
 
+					EffectSpecHandle.Data.Get()->SetSetByCallerMagnitude(TAG_Data_AreaDamageMultiplier, 1.f);
 					UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor);
 					Weapon->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*EffectSpecHandle.Data.Get(), TargetASC);
 				}

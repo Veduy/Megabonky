@@ -11,6 +11,7 @@
 
 #include "../Core/Characters/MgbEnemyCharacter.h"
 #include "../Core/MgbWeapon.h"
+#include "../Core/MgbGameplayTags.h"
 #include "../Util/NetworkLog.h"
 
 // Sets default values
@@ -69,6 +70,7 @@ void AMgbProjectileActor::BeginOverlap(AActor* OtherActor)
 				// Spec을 생성한 컴포넌트가 ExecCalc의 Source로 설정.
 				FGameplayEffectSpecHandle EffectSpecHandle = Weapon->GetAbilitySystemComponent()->MakeOutgoingSpec(Weapon->DamageEffectClass, 1.f, EffectContextHandle);
 
+				EffectSpecHandle.Data.Get()->SetSetByCallerMagnitude(TAG_Data_AreaDamageMultiplier, 1.f);
 				UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor);
 				Weapon->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*EffectSpecHandle.Data.Get(), TargetASC);
 
@@ -80,21 +82,35 @@ void AMgbProjectileActor::BeginOverlap(AActor* OtherActor)
 			}
 
 			// 광역 데미지 계산
+			// 선형적으로 거리 데미지 감쇄식 필요.
+
 			if (bRadialDamage == true)
 			{
+				// Radius 내의 적들에게 데미지 적용.
+				float Radius = 200.f;		
+			
 				TArray<AActor*> OutActors;
 				UKismetSystemLibrary::SphereOverlapActors(GetWorld(), GetActorLocation(), 200.f,
 					TArray<TEnumAsByte<EObjectTypeQuery>>(),
 					AMgbEnemyCharacter::StaticClass(),
 					ActorsToIgnore, OutActors);
 
-				// 일단 고정 딜.
 				for (const auto& Actor : OutActors)
 				{
+					if (!Actor)
+						continue;
+
+					// 무기의 Damage Attribute 값에 곱해줄 비율값 계산.
+					float Length = (Actor->GetActorLocation() - GetActorLocation()).Length();
+					float DistanceRatio = FMath::Clamp(1.f - (Length / Radius), 0.2f, 1.f);
+					DistanceRatio = DistanceRatio;
+
 					if (Weapon->DamageEffectClass)
 					{
 						// Spec을 생성한 컴포넌트가 ExecCalc의 Source로 설정.
 						FGameplayEffectSpecHandle EffectSpecHandle = Weapon->GetAbilitySystemComponent()->MakeOutgoingSpec(Weapon->DamageEffectClass, 1.f, EffectContextHandle);
+
+						EffectSpecHandle.Data.Get()->SetSetByCallerMagnitude(TAG_Data_AreaDamageMultiplier, DistanceRatio);
 
 						UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Actor);
 						Weapon->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*EffectSpecHandle.Data.Get(), TargetASC);			
