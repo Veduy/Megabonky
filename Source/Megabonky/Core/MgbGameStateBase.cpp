@@ -237,8 +237,8 @@ void AMgbGameStateBase::SpawnEnemy()
 				FVector RealSpawnLocation = FVector(RealSpawn2D.X, RealSpawn2D.Y, 0);
 
 				// 스폰할 높이는 LineTrace로 설정.
-				FVector Start = RealSpawnLocation + FVector(0.f, 0.f, 3000.f);
-				FVector End = RealSpawnLocation + FVector(0.f, 0.f, -3000.f);
+				FVector Start = RealSpawnLocation + FVector(0.f, 0.f, 50000.f);
+				FVector End = RealSpawnLocation + FVector(0.f, 0.f, -50000.f);
 
 				FHitResult Hit;
 
