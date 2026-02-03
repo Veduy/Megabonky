@@ -22,7 +22,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 public:
-	virtual void BeginOverlap(AActor* OtherActor);
+	virtual void HandleOverlap(AActor* OtherActor) override;
 
 public:
 	UFUNCTION()

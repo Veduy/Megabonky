@@ -53,7 +53,7 @@ void AProjectile_Bananarang::Tick(float DeltaTime)
 	}
 }
 
-void AProjectile_Bananarang::BeginOverlap(AActor* OtherActor)
+void AProjectile_Bananarang::HandleOverlap(AActor* OtherActor)
 {
 	// 서버에서만 충돌 검사.
 	if (!HasAuthority())
@@ -91,7 +91,6 @@ void AProjectile_Bananarang::BeginOverlap(AActor* OtherActor)
 			}
 		}
 	}
-	
 }
 
 void AProjectile_Bananarang::ThrowBananarang()

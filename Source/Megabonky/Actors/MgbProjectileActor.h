@@ -28,7 +28,10 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable)
-	virtual void BeginOverlap(AActor* OtherActor);
+	void OnCollisionOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION(BlueprintCallable)
+	virtual void HandleOverlap(AActor* OtherActor);
 
 public:
 	UFUNCTION(BlueprintCallable)

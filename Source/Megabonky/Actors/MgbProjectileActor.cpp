@@ -46,7 +46,12 @@ void AMgbProjectileActor::Tick(float DeltaTime)
 
 }
 
-void AMgbProjectileActor::BeginOverlap(AActor* OtherActor)
+void AMgbProjectileActor::OnCollisionOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	HandleOverlap(OtherActor);
+}
+
+void AMgbProjectileActor::HandleOverlap(AActor* OtherActor)
 {
 	// 서버에서만 충돌 검사.
 	if (!HasAuthority())
@@ -59,7 +64,7 @@ void AMgbProjectileActor::BeginOverlap(AActor* OtherActor)
 	if (Enemy)
 	{
 		ActorsToIgnore.Add(Enemy);
-		
+
 		// 단일 대상 데미지 계산
 		AMgbWeapon* Weapon = Cast<AMgbWeapon>(GetOwner());
 
@@ -116,7 +121,7 @@ void AMgbProjectileActor::BeginOverlap(AActor* OtherActor)
 						EffectSpecHandle.Data.Get()->SetSetByCallerMagnitude(TAG_Data_AreaDamageMultiplier, DistanceRatio);
 
 						UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Actor);
-						Weapon->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*EffectSpecHandle.Data.Get(), TargetASC);			
+						Weapon->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*EffectSpecHandle.Data.Get(), TargetASC);
 					}
 				}
 				Destroy();
