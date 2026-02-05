@@ -14,25 +14,11 @@ void UTitle::NativeOnInitialized()
 	{
 		PlayBtn->OnClicked.AddDynamic(this, &UTitle::HandlePlayBtnClicked);
 	}
-
-	if (DuoBtn)
-	{
-		DuoBtn->OnClicked.AddDynamic(this, &UTitle::HandleDuoBtnClicked);
-	}
 }
 
 void UTitle::HandlePlayBtnClicked()
 {
-	//UGameplayStatics::OpenLevel(GetWorld(), FName("Game"));
-}
+	//컨트롤러에서 서버RPC로 실행
+	//GetWorld()->ServerTravel(TEXT("/Game/Maps/GameMap?listen"));
 
-void UTitle::HandleDuoBtnClicked()
-{
-	//UGameInstance* GI = UGameplayStatics::GetGameInstance(GetWorld());
-	//if (GI)
-	//{
-	//	UMgbSubsystem* MgbSubSystem = GI->GetSubsystem<UMgbSubsystem>();
-
-	//	MgbSubSystem->Login();
-	//}
 }

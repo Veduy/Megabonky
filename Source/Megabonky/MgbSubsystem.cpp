@@ -19,11 +19,9 @@ void UMgbSubsystem::RequestCompleted(FHttpRequestPtr Request, FHttpResponsePtr R
 {
 	if (!bProcessedSuccessfully || !Response.IsValid())
 	{
-		//È£Ãâ ½ÇÆÐ
 		return;
 	}
 
-	//È£Ãâ µÆÀ¸³ª ¼­¹ö¿¡¼­ ¿Â °á°ú Ã³¸®
 	int32 StatusCode = Response->GetResponseCode();
 	FString ResponseContent = Response->GetContentAsString();
 
@@ -34,10 +32,18 @@ void UMgbSubsystem::RequestCompleted(FHttpRequestPtr Request, FHttpResponsePtr R
 	TSharedPtr<FJsonObject> JsonObject;
 	FJsonSerializer::Deserialize(JsonReader, JsonObject);
 
-	auto Name = JsonObject->GetField(TEXT("name"), EJson::String);
 	auto Result = JsonObject->GetField(TEXT("result"), EJson::Boolean);
+	bool bResult = Result.IsValid() && Result->AsBool();
 
-	UE_LOG(LogTemp, Warning, TEXT("name  : %s, result : %d"), *Name->AsString(), Result->AsBool());
+	if (bResult)
+	{
+		auto Name = JsonObject->GetField(TEXT("name"), EJson::String);
+		UE_LOG(LogTemp, Warning, TEXT("Login Success - name: %s"), *Name->AsString());
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Login Failed"));
+	}
 }
 
 void UMgbSubsystem::Login()
@@ -47,10 +53,14 @@ void UMgbSubsystem::Login()
 
 	FString ID = "admin";
 	FString Passwd = "1234";
-	FString URL = FString::Printf(TEXT("http://127.0.0.1:8080/api/login?user_id=%s&passwd=%s"), *ID, *Passwd);
-	
-	Request->SetURL(URL);
-	Request->SetVerb(TEXT("GET"));
+
+	// JSON bodyë¡œ ID, Passwd ì „ì†¡
+	FString JsonBody = FString::Printf(TEXT("{\"user_id\": \"%s\", \"passwd\": \"%s\"}"), *ID, *Passwd);
+
+	Request->SetURL(TEXT("http://127.0.0.1:8080/api/login"));
+	Request->SetVerb(TEXT("POST"));
+	Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
+	Request->SetContentAsString(JsonBody);
 
 	Request->ProcessRequest();
 }

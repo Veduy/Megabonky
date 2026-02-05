@@ -22,13 +22,7 @@ public:
 	UFUNCTION()
 	void HandlePlayBtnClicked();
 
-	UFUNCTION()
-	void HandleDuoBtnClicked();
-
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (BindWidget))
 	TObjectPtr<UButton> PlayBtn;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Component, meta = (BindWidget))
-	TObjectPtr<UButton> DuoBtn;
 };

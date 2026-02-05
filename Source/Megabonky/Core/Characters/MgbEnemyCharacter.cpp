@@ -113,36 +113,39 @@ void AMgbEnemyCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (bSpawnFinished == false)
+	if (HasAuthority())
 	{
-		float Height = FMath::Lerp(GetActorLocation().Z, TargetSpawnHeight, DeltaTime * 5.f);
-		SetActorLocation(FVector(GetActorLocation().X, GetActorLocation().Y, Height), true);
-		
-		if (GetActorLocation().Z >= TargetSpawnHeight - 1.f)
+		if (bSpawnFinished == false)
 		{
-			bSpawnFinished = true;   
-			SpawnDefaultController();
-			GetCapsuleComponent()->SetCollisionProfileName(FName("Enemy"));
+			float Height = FMath::Lerp(GetActorLocation().Z, TargetSpawnHeight, DeltaTime * 5.f);
+			SetActorLocation(FVector(GetActorLocation().X, GetActorLocation().Y, Height), true);
+
+			if (GetActorLocation().Z >= TargetSpawnHeight - 1.f)
+			{
+				bSpawnFinished = true;
+				SpawnDefaultController();
+				GetCapsuleComponent()->SetCollisionProfileName(FName("Enemy"));
+			}
+
+			return;
 		}
 
-		return;
-	}
-
-	switch (CurrentMoveState)
-	{
-	case EMoveState::Idle:
-		LookTarget(DeltaTime);
-		break;
-	case EMoveState::Walk:
-		LookTarget(DeltaTime);
-		MoveToTarget(DeltaTime);
-		break;
-	case EMoveState::Climb:
-		LookTarget(DeltaTime);
-		ClimbWall(DeltaTime);
-		break;
-	default:
-		break;
+		switch (CurrentMoveState)
+		{
+		case EMoveState::Idle:
+			LookTarget(DeltaTime);
+			break;
+		case EMoveState::Walk:
+			LookTarget(DeltaTime);
+			MoveToTarget(DeltaTime);
+			break;
+		case EMoveState::Climb:
+			LookTarget(DeltaTime);
+			ClimbWall(DeltaTime);
+			break;
+		default:
+			break;
+		}
 	}
 }
 
@@ -151,6 +154,7 @@ void AMgbEnemyCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AMgbEnemyCharacter, TargetActor);
+	DOREPLIFETIME(AMgbEnemyCharacter, bSpawnFinished);
 }
 
 void AMgbEnemyCharacter::Destroyed()

@@ -68,7 +68,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")
 	EMoveState CurrentMoveState = EMoveState::Idle;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite, Category = "Data")
 	uint8 bSpawnFinished : 1 = false;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
