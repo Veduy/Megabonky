@@ -128,6 +128,7 @@ TSharedPtr<FJsonObject> FEpicUnrealMCPBlueprintCommands::HandleCreateBlueprint(c
     // Handle parent class
     FString ParentClass;
     Params->TryGetStringField(TEXT("parent_class"), ParentClass);
+    UE_LOG(LogTemp, Log, TEXT("Creating blueprint '%s' with parent class '%s'"), *BlueprintName, *ParentClass);
     
     // Default to Actor if no parent class specified
     UClass* SelectedParentClass = AActor::StaticClass();
@@ -135,33 +136,38 @@ TSharedPtr<FJsonObject> FEpicUnrealMCPBlueprintCommands::HandleCreateBlueprint(c
     // Try to find the specified parent class
     if (!ParentClass.IsEmpty())
     {
+        // First try searching across all loaded modules (prefix 없는 원본 이름으로 검색)
+        UClass* FoundClass = FindFirstObjectSafe<UClass>(*ParentClass);
+
+        // Fallback: prefix 붙여서 경로 기반 검색
         FString ClassName = ParentClass;
         if (!ClassName.StartsWith(TEXT("A")))
         {
             ClassName = TEXT("A") + ClassName;
         }
-        
-        // First try direct StaticClass lookup for common classes
-        UClass* FoundClass = nullptr;
-        if (ClassName == TEXT("APawn"))
+
+        if (!FoundClass)
         {
-            FoundClass = APawn::StaticClass();
-        }
-        else if (ClassName == TEXT("AActor"))
-        {
-            FoundClass = AActor::StaticClass();
-        }
-        else
-        {
-            // Try loading the class using LoadClass which is more reliable than FindObject
-            const FString ClassPath = FString::Printf(TEXT("/Script/Engine.%s"), *ClassName);
-            FoundClass = LoadClass<AActor>(nullptr, *ClassPath);
-            
-            if (!FoundClass)
+            if (ClassName == TEXT("APawn"))
             {
-                // Try alternate paths if not found
-                const FString GameClassPath = FString::Printf(TEXT("/Script/Game.%s"), *ClassName);
-                FoundClass = LoadClass<AActor>(nullptr, *GameClassPath);
+                FoundClass = APawn::StaticClass();
+            }
+            else if (ClassName == TEXT("AActor"))
+            {
+                FoundClass = AActor::StaticClass();
+            }
+            else
+            {
+                // Try loading the class using LoadClass which is more reliable than FindObject
+                const FString ClassPath = FString::Printf(TEXT("/Script/Engine.%s"), *ClassName);
+                FoundClass = LoadClass<AActor>(nullptr, *ClassPath);
+
+                if (!FoundClass)
+                {
+                    // Try alternate paths if not found
+                    const FString GameClassPath = FString::Printf(TEXT("/Script/Game.%s"), *ClassName);
+                    FoundClass = LoadClass<AActor>(nullptr, *GameClassPath);
+                }
             }
         }
 
