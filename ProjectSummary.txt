@@ -1,0 +1,1450 @@
+================================================================================
+Megabonky 소스 코드 설계 문서
+생성일: 2026-02-06
+프로젝트 경로: C:\Work\Megabonky
+================================================================================
+
+## 1. 프로젝트 개요
+
+Megabonky는 Unreal Engine 5 기반의 멀티플레이어 액션 게임으로, Gameplay Ability System(GAS)을
+활용한 능력 기반 전투 시스템을 갖춘 프로젝트입니다. 플레이어는 다양한 무기를 장착하고 적과 전투하며,
+레벨업을 통해 캐릭터와 무기를 강화할 수 있습니다.
+
+주요 특징:
+- Gameplay Ability System(GAS) 기반 전투 시스템
+- 네트워크 멀티플레이어 지원
+- 무기 기반 능력(Ability) 시스템
+- 속성(Attribute) 기반 캐릭터 성장
+- 데이터 테이블 기반 무기 및 업그레이드 관리
+
+
+================================================================================
+## 2. 클래스 계층 구조 (Class Hierarchy)
+================================================================================
+
+### 2.1 Core 게임 프레임워크
+
+AGameModeBase
+└── AMgbGameModeBase                    - 게임 모드 (적 생성 여부 관리)
+
+AGameStateBase
+└── AMgbGameStateBase                   - 게임 상태 (시간, XP, 레벨, 적 생성 관리)
+
+APlayerState
+└── AMgbPlayerState                     - 플레이어 상태 (기본 구조만 존재)
+
+APlayerController
+└── AMgbPlayerController                - 플레이어 컨트롤러 (입력, UI, 무기 업그레이드)
+
+
+### 2.2 캐릭터 계층 구조
+
+ACharacter + IAbilitySystemInterface
+└── AMgbCharacter                       - 기본 캐릭터 (ASC 소유, 데미지 처리)
+    ├── AMgbPlayerCharacter             - 플레이어 캐릭터 (이동, 카메라, 무기 장착)
+    └── AMgbEnemyCharacter              - 적 캐릭터 (AI 이동, 타겟 추적, 벽 등반)
+
+
+### 2.3 무기 시스템
+
+AActor + IAbilitySystemInterface
+└── AMgbWeapon                          - 무기 베이스 (ASC 소유, 능력 보유)
+
+
+### 2.4 Gameplay Ability 계층 구조
+
+UGameplayAbility
+└── UMgbGameplayAbility                 - 기본 어빌리티 (플레이어 ASC 접근)
+    ├── UMgbGameplayAbility_Lightning   - 번개 공격
+    └── UMgbGameplayAbility_Projectile  - 발사체 기반 공격
+        ├── UMgbGameplayAbility_Dagger      - 단검 투척
+        └── UMgbGameplayAbility_Bananarang  - 부메랑 투척
+
+
+### 2.5 Actor 시스템
+
+AActor
+├── AMgbEffectActor                     - GameplayEffect 적용 액터
+├── AMgbItemActor                       - 아이템 액터 (픽업 가능)
+├── ADamageTextActor                    - 데미지 텍스트 표시 액터
+└── AMgbProjectileActor                 - 발사체 액터 (충돌, 바운스 처리)
+    └── AProjectile_Bananarang          - 부메랑 발사체 (플레이어 복귀)
+
+
+### 2.6 UI 계층 구조
+
+UUserWidget
+└── UMgbWidget                          - 기본 위젯 (Show/Hide)
+    ├── UInGame                         - 인게임 UI (HP, XP, 아이템 선택)
+    ├── UItemSelectWindow               - 아이템 선택 창
+    ├── UItemSelectButton               - 아이템 선택 버튼
+    └── UDamageText                     - 데미지 텍스트
+    └── UTitle                          - 타이틀 화면
+
+
+### 2.7 Ability System Component
+
+UAbilitySystemComponent
+└── UMgbAbilitySystemComponent          - 커스텀 ASC (ActorInfo 초기화)
+
+
+### 2.8 Attribute Set 계층 구조
+
+UAttributeSet
+├── UPlayerAttributeSet                 - 플레이어 속성 (체력, 공격력, 크리티컬 등)
+├── UEnemyAttributeSet                  - 적 속성 (체력, 이동속도, 데미지)
+└── UWeaponAttributeSet                 - 무기 속성 (데미지, 발사체 수, 크리티컬 등)
+
+
+### 2.9 기타 시스템
+
+UGameplayEffectExecutionCalculation
+└── UMgbEffectExecutionCalculation      - 데미지 계산 (크리티컬, 속성 적용)
+
+UGameInstanceSubsystem
+└── UMgbSubsystem                       - 게임 인스턴스 서브시스템 (HTTP 통신)
+
+
+================================================================================
+## 3. 핵심 클래스 상세 설명
+================================================================================
+
+### 3.1 Core 시스템 클래스
+
+────────────────────────────────────────────────────────────────────────────
+[AMgbGameModeBase]
+────────────────────────────────────────────────────────────────────────────
+역할: 게임의 기본 규칙 및 설정 관리
+상속: AGameModeBase
+
+주요 프로퍼티:
+  - bSpawnEnemy: uint8 (BitField) - 적 생성 활성화 여부
+
+파일 경로:
+  C:\Work\Megabonky\Source\Megabonky\Core\MgbGameModeBase.h
+
+
+────────────────────────────────────────────────────────────────────────────
+[AMgbGameStateBase]
+────────────────────────────────────────────────────────────────────────────
+역할: 게임 전체 상태 관리 (시간, 레벨, 적 생성, XP 시스템)
+상속: AGameStateBase
+Replication: 지원 (GameStartTime, GameTimeSec, CurrentLevel, Gold, TotalKill 등)
+
+주요 프로퍼티:
+  - GameStartTime: float (Replicated) - 게임 시작 시간
+  - GameTimeSec: int32 (Replicated) - 게임 제한 시간 (기본 600초)
+  - PassedTimeSec: int32 - 경과 시간
+  - CurrentLevel: int32 (Replicated) - 현재 레벨
+  - CurrentXP: float - 현재 경험치
+  - RequiredXP: float - 레벨업 필요 경험치
+  - Gold: int32 (Replicated) - 골드
+  - TotalKill: int64 (Replicated) - 총 처치 수
+  - CurrentEnemyCount: int32 - 현재 적 수
+  - MaxEnemyCount: int32 - 최대 적 수 (기본 1000)
+  - SpawnIntervalTime: float - 적 생성 간격 (기본 5초)
+  - EnemyClasses: TArray<TSubclassOf<AMgbEnemyCharacter>> - 생성할 적 클래스 목록
+  - DT_Weapon: UDataTable* - 무기 데이터 테이블
+  - DT_WeaponUpgradeBonus: UDataTable* - 무기 업그레이드 보너스 데이터 테이블
+
+주요 함수:
+  - ServerAddXP(float): Server RPC - 경험치 추가 및 레벨업 처리
+  - MulticastUpdateUI_XP(float): Multicast RPC - XP UI 업데이트
+  - MulticastSetPauseGame(bool): Multicast RPC - 게임 일시정지 설정
+  - MulticastShowItemSelectWindow(): Multicast RPC - 아이템 선택 창 표시
+  - InitSpawnEnemyTimer(): 적 생성 타이머 초기화
+  - SpawnEnemy(): 적 생성 로직
+  - HandleResumeRequest(): 게임 재개 요청 처리
+
+델리게이트:
+  - OnTimeChanged: FOnTimeChanged - 시간 변경 이벤트
+
+연관 클래스: AMgbEnemyCharacter, AMgbPlayerController
+
+파일 경로:
+  C:\Work\Megabonky\Source\Megabonky\Core\MgbGameStateBase.h
+
+
+────────────────────────────────────────────────────────────────────────────
+[AMgbPlayerController]
+────────────────────────────────────────────────────────────────────────────
+역할: 플레이어 입력 및 UI 관리, 무기 업그레이드 처리
+상속: APlayerController
+
+주요 프로퍼티:
+  - InputMappingContext: UInputMappingContext* - Enhanced Input 매핑 컨텍스트
+  - InGameWidget: UInGame* - 인게임 UI 위젯
+  - DamageTextActorClass: TSubclassOf<AActor> - 데미지 텍스트 액터 클래스
+  - GE_WeaponUpgradeDefaultClass: TSubclassOf<UGameplayEffect> - 무기 업그레이드 GE
+  - DT_Weapons: UDataTable* - 무기 데이터 테이블
+  - Audio_Levelup: UAudioComponent* - 레벨업 오디오
+
+주요 함수:
+  - ServerResumeRequestCountIncrementAndCheck(): Server RPC - 재개 요청 카운트 증가
+  - ServerApplyWeaponUpgradeEffect(): Server RPC - 무기 업그레이드 적용
+  - ClientSpawnDamageTextActor(): Client RPC - 데미지 텍스트 생성
+  - GenerateUpgradeInfo(): 업그레이드 정보 생성
+
+연관 클래스: UInGame, AMgbWeapon, UGameplayEffect
+
+파일 경로:
+  C:\Work\Megabonky\Source\Megabonky\Core\MgbPlayerController.h
+
+
+────────────────────────────────────────────────────────────────────────────
+[AMgbPlayerState]
+────────────────────────────────────────────────────────────────────────────
+역할: 플레이어별 상태 저장 (현재는 기본 구조만 존재)
+상속: APlayerState
+
+파일 경로:
+  C:\Work\Megabonky\Source\Megabonky\Core\MgbPlayerState.h
+
+
+================================================================================
+### 3.2 캐릭터 시스템
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────
+[AMgbCharacter]
+────────────────────────────────────────────────────────────────────────────
+역할: 캐릭터 기본 클래스, Ability System 통합
+상속: ACharacter, IAbilitySystemInterface
+
+주요 컴포넌트:
+  - AbilitySystemComponent: UAbilitySystemComponent* - GAS 컴포넌트
+
+주요 프로퍼티:
+  - InitAttributeEffect: TSubclassOf<UGameplayEffect> - 초기 속성 설정 GE
+
+주요 함수:
+  - GetAbilitySystemComponent(): IAbilitySystemInterface 구현
+  - TakeDamage(): 데미지 처리 오버라이드
+
+특징:
+  - 모든 캐릭터의 기본 클래스로 GAS 통합 제공
+  - 플레이어와 적 모두 이 클래스를 상속
+
+파일 경로:
+  C:\Work\Megabonky\Source\Megabonky\Core\MgbCharacter.h
+
+
+────────────────────────────────────────────────────────────────────────────
+[AMgbPlayerCharacter]
+────────────────────────────────────────────────────────────────────────────
+역할: 플레이어 캐릭터, 이동/카메라/무기 관리
+상속: AMgbCharacter
+Replication: 지원 (Weapons, Tomes 배열)
+
+주요 컴포넌트:
+  - SpringArm: USpringArmComponent* - 카메라 암
+  - MainCamera: UCameraComponent* - 메인 카메라
+  - PickupSphere: USphereComponent* - 아이템 픽업 범위 (반경 300)
+  - PlayerAttributeSet: UPlayerAttributeSet* - 플레이어 속성 세트
+
+주요 프로퍼티:
+  - bDeath: uint8 (BitField) - 사망 여부
+  - DefaultWeaponClass: TSubclassOf<AMgbWeapon> - 기본 무기 클래스
+  - Weapons: TArray<AMgbWeapon*> (Replicated) - 장착한 무기 목록
+  - Tomes: TArray<FTomes> (Replicated) - 비전서 목록 (능력 강화 아이템)
+  - MoveAction: UInputAction* - 이동 입력
+  - LookAction: UInputAction* - 시점 변경 입력
+  - JumpAction: UInputAction* - 점프 입력
+
+주요 함수:
+  - FindPrimaryTargetByCondition(): 조건에 맞는 주요 타겟 검색
+  - EquipWeapon(TSubclassOf<AMgbWeapon>): 무기 장착
+  - ActivateWeaponsAbility(): 모든 무기의 능력 활성화
+  - UpdateCharacterMeshRotation(float): 캐릭터 메시 회전 업데이트
+  - DeathFadeOut(): Blueprint Event - 사망 연출
+  - HandleDeath(): 사망 처리
+  - PickupBeginOverlap(): 아이템 픽업 처리
+  - Move(FInputActionValue): 이동 입력 처리
+  - Look(FInputActionValue): 시점 변경 입력 처리
+
+구조체:
+  - FTomes: 비전서 정보 (Name: FGameplayTag, Level: int32)
+
+특징:
+  - Enhanced Input System 사용
+  - 탑다운 시점 (SpringArm Length: 1500)
+  - 이동 방향으로 캐릭터 회전 (bOrientRotationToMovement)
+  - 네트워크 리플리케이션 지원
+
+연관 클래스: AMgbWeapon, UPlayerAttributeSet, AMgbItemActor
+
+파일 경로:
+  C:\Work\Megabonky\Source\Megabonky\Core\Characters\MgbPlayerCharacter.h
+
+
+────────────────────────────────────────────────────────────────────────────
+[AMgbEnemyCharacter]
+────────────────────────────────────────────────────────────────────────────
+역할: 적 캐릭터, AI 이동 및 타겟 추적
+상속: AMgbCharacter
+Replication: 지원 (TargetActor, bSpawnFinished)
+
+주요 프로퍼티:
+  - EnemyAttributeSet: UEnemyAttributeSet* - 적 속성 세트
+  - TargetActor: AActor* (Replicated) - 추적 대상
+  - CurrentMoveState: EMoveState - 현재 이동 상태 (Idle, Walk, Climb)
+  - bSpawnFinished: uint8 (Replicated, BitField) - 스폰 완료 여부
+  - HitDamageEffectClass: TSubclassOf<UGameplayEffect> - 충돌 데미지 GE
+  - XPCrystalClass: TSubclassOf<AActor> - 경험치 크리스탈 클래스
+
+주요 함수:
+  - MoveToTarget(float): 타겟으로 이동
+  - LookTarget(float): 타겟 바라보기
+  - CheckWall(): 벽 감지
+  - ClimbWall(float): 벽 등반
+  - CollisionHit(): 충돌 처리
+  - HandleDamageEffect(): Blueprint Event - 데미지 이펙트 처리
+
+열거형:
+  - EMoveState: Idle(0), Walk(5), Climb(10)
+
+특징:
+  - 타겟 추적 및 자동 이동
+  - 벽 등반 기능
+  - 사망 시 경험치 크리스탈 드랍
+
+연관 클래스: UEnemyAttributeSet, AMgbPlayerCharacter
+
+파일 경로:
+  C:\Work\Megabonky\Source\Megabonky\Core\Characters\MgbEnemyCharacter.h
+
+
+================================================================================
+### 3.3 무기 시스템
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────
+[AMgbWeapon]
+────────────────────────────────────────────────────────────────────────────
+역할: 무기 기본 클래스, 자체 Ability System 보유
+상속: AActor, IAbilitySystemInterface
+
+주요 컴포넌트:
+  - AbilitySystemComponent: UAbilitySystemComponent* - 무기 전용 ASC
+
+주요 프로퍼티:
+  - WeaponName: FName - 무기 이름
+  - AbilityClass: TSubclassOf<UGameplayAbility> - 무기가 부여하는 능력 클래스
+  - WeaponAttributeSet: UWeaponAttributeSet* - 무기 속성 세트
+  - DamageEffectClass: TSubclassOf<UGameplayEffect> - 데미지 GE
+  - InitAttributeEffectClass: TSubclassOf<UGameplayEffect> - 초기 속성 GE
+
+특징:
+  - 무기가 독립적인 ASC를 보유 (플레이어와 별도)
+  - 무기별로 고유한 Ability와 Attribute 관리
+  - 플레이어가 다중 무기 장착 가능
+
+연관 클래스: UWeaponAttributeSet, UMgbGameplayAbility
+
+파일 경로:
+  C:\Work\Megabonky\Source\Megabonky\Core\MgbWeapon.h
+
+
+================================================================================
+### 3.4 Gameplay Ability System
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────
+[UMgbAbilitySystemComponent]
+────────────────────────────────────────────────────────────────────────────
+역할: 커스텀 Ability System Component
+상속: UAbilitySystemComponent
+
+주요 함수:
+  - InitAbilityActorInfo(): ActorInfo 초기화 오버라이드
+  - OnPlayerControllerSet(): PlayerController 설정 시 호출
+
+파일 경로:
+  C:\Work\Megabonky\Source\Megabonky\Core\AbilitySystem\MgbAbilitySystemComponent.h
+
+
+────────────────────────────────────────────────────────────────────────────
+[UMgbGameplayAbility]
+────────────────────────────────────────────────────────────────────────────
+역할: 게임플레이 어빌리티 기본 클래스
+상속: UGameplayAbility
+
+주요 함수:
+  - ActivateAbility(): 능력 활성화
+  - OnGiveAbility(): 능력 부여 시 호출
+  - GetPlayerASC(): 플레이어 ASC 접근 헬퍼 함수
+
+특징:
+  - 모든 커스텀 능력의 기본 클래스
+  - Blueprintable (블루프린트로 확장 가능)
+
+파일 경로:
+  C:\Work\Megabonky\Source\Megabonky\Core\AbilitySystem\Abilities\MgbGameplayAbility.h
+
+
+────────────────────────────────────────────────────────────────────────────
+[UMgbGameplayAbility_Projectile]
+────────────────────────────────────────────────────────────────────────────
+역할: 발사체 기반 공격 능력
+상속: UMgbGameplayAbility
+
+주요 프로퍼티:
+  - ProjectileClass: TSubclassOf<AMgbProjectileActor> - 발사체 클래스
+  - SpawnProjectileCount: uint8 - 발사체 생성 수 (기본 1)
+  - ProjectileBounceCount: uint8 - 발사체 바운스 횟수 (기본 0)
+
+주요 함수:
+  - RapidFire(): 연속 발사
+  - SpawnProjectile(AActor*, FVector, FRotator): 발사체 생성
+
+특징:
+  - 타이머 기반 연속 발사 지원
+  - 다중 발사체 생성 가능
+
+연관 클래스: AMgbProjectileActor
+
+파일 경로:
+  C:\Work\Megabonky\Source\Megabonky\Core\AbilitySystem\Abilities\MgbGameplayAbility_Projectile.h
+
+
+────────────────────────────────────────────────────────────────────────────
+[UMgbGameplayAbility_Dagger]
+────────────────────────────────────────────────────────────────────────────
+역할: 단검 투척 능력
+상속: UMgbGameplayAbility_Projectile
+
+특징:
+  - Projectile 클래스를 상속하여 단검 고유 로직 구현
+
+파일 경로:
+  C:\Work\Megabonky\Source\Megabonky\Core\AbilitySystem\Abilities\MgbGameplayAbility_Dagger.h
+
+
+────────────────────────────────────────────────────────────────────────────
+[UMgbGameplayAbility_Bananarang]
+────────────────────────────────────────────────────────────────────────────
+역할: 부메랑 투척 능력 (돌아오는 발사체)
+상속: UMgbGameplayAbility_Projectile
+
+특징:
+  - 발사 후 플레이어에게 복귀하는 특수 발사체
+
+파일 경로:
+  C:\Work\Megabonky\Source\Megabonky\Core\AbilitySystem\Abilities\MgbGameplayAbility_Bananarang.h
+
+
+────────────────────────────────────────────────────────────────────────────
+[UMgbGameplayAbility_Lightning]
+────────────────────────────────────────────────────────────────────────────
+역할: 번개 공격 능력
+상속: UMgbGameplayAbility
+
+주요 프로퍼티:
+  - LightingCount: uint8 - 번개 타격 횟수
+
+주요 함수:
+  - Lightning(): 번개 공격 실행
+
+특징:
+  - 발사체를 사용하지 않는 즉시 공격형 능력
+
+파일 경로:
+  C:\Work\Megabonky\Source\Megabonky\Core\AbilitySystem\Abilities\MgbGameplayAbility_Lightning.h
+
+
+────────────────────────────────────────────────────────────────────────────
+[UMgbEffectExecutionCalculation]
+────────────────────────────────────────────────────────────────────────────
+역할: 데미지 계산 로직 (크리티컬, 속성 적용)
+상속: UGameplayEffectExecutionCalculation
+
+캡처 속성:
+  - Source(Weapon): Damage, CritChance, CritDamage
+  - Owner(PlayerCharacter): Damage, CritChance, CritDamage, DamageToElite
+  - Target(Enemy): Health
+
+주요 함수:
+  - Execute_Implementation(): 데미지 계산 실행
+
+특징:
+  - 무기와 플레이어 속성을 합산하여 최종 데미지 계산
+  - 크리티컬 히트 계산
+
+파일 경로:
+  C:\Work\Megabonky\Source\Megabonky\Core\AbilitySystem\MgbEffectExecutionCalculation.h
+
+
+================================================================================
+### 3.5 Attribute Sets
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────
+[UPlayerAttributeSet]
+────────────────────────────────────────────────────────────────────────────
+역할: 플레이어 캐릭터 속성 관리
+상속: UAttributeSet
+Replication: 모든 속성 리플리케이션 지원 (ReplicatedUsing)
+
+속성 카테고리 (총 35개):
+
+[방어 속성]
+  - MaxHealth: float - 최대 체력
+  - Health: float - 현재 체력
+  - HealthRegen: float - 체력 재생
+  - OverHeal: float - 과다 힐
+  - MaxShield: float - 최대 실드
+  - Shield: float - 현재 실드
+  - Armor: float - 방어력 (Value)
+  - Evasion: float - 회피율 (Percent)
+  - LifeSteal: float - 생명력 흡수 (Percent)
+  - Thorns: float - 가시 데미지 (Value)
+
+[공격 속성]
+  - Damage: float - 공격력 (Percent)
+  - CritChance: float - 크리티컬 확률 (Percent)
+  - CritDamage: float - 크리티컬 데미지 (Percent)
+  - AttackSpeed: float - 공격 속도 (Percent)
+  - DamageToElites: float - 엘리트 추가 데미지 (Percent)
+
+[발사체 속성]
+  - ProjectileCount: float - 발사체 수 (Value)
+  - ProjectileBounces: float - 발사체 바운스 횟수 (Value)
+  - Size: float - 크기 (Percent)
+  - ProjectileSpeed: float - 발사체 속도 (Percent)
+  - Duration: float - 지속시간 (Percent)
+  - Knockback: float - 넉백 (Percent)
+
+[이동 속성]
+  - MovementSpeed: float - 이동 속도 (Percent)
+  - ExtraJumps: float - 추가 점프 횟수 (Value)
+  - JumpHeight: float - 점프 높이 (Percent)
+
+[기타 속성]
+  - Luck: float - 행운 (Percent)
+  - Difficulty: float - 난이도 (Percent)
+  - Pickup: float - 픽업 범위 (Percent)
+  - XPGain: float - 경험치 획득 (Percent)
+  - GoldGain: float - 골드 획득 (Percent)
+  - SilverGain: float - 실버 획득 (Percent)
+  - EliteSpawnIncrease: float - 엘리트 생성 증가 (Percent)
+  - PowerupMultiplier: float - 파워업 배수 (Percent)
+  - PowerupDropChance: float - 파워업 드랍 확률 (Percent)
+
+주요 함수:
+  - PreAttributeChange(): 속성 변경 전 검증
+  - PostAttributeChange(): 속성 변경 후 처리
+  - PostGameplayEffectExecute(): GE 실행 후 처리
+  - OnRep_XXX(): 각 속성별 리플리케이션 콜백 (35개)
+
+특징:
+  - 모든 속성에 대해 ATTRIBUTE_ACCESSORS 매크로 적용
+  - Value/Percent 타입 명시로 가독성 향상
+  - 네트워크 동기화 완벽 지원
+
+파일 경로:
+  C:\Work\Megabonky\Source\Megabonky\Core\AbilitySystem\AttributeSet\PlayerAttributeSet.h
+
+
+────────────────────────────────────────────────────────────────────────────
+[UEnemyAttributeSet]
+────────────────────────────────────────────────────────────────────────────
+역할: 적 캐릭터 속성 관리
+상속: UAttributeSet
+Replication: 지원
+
+속성 (4개):
+  - MaxHealth: float (Replicated) - 최대 체력
+  - Health: float (Replicated) - 현재 체력
+  - MovementSpeed: float (Replicated) - 이동 속도
+  - DamageTaken: float - 받은 데미지 (리플리케이션 없음)
+
+주요 함수:
+  - PreAttributeChange(): 속성 변경 전 검증
+  - PostAttributeChange(): 속성 변경 후 처리
+  - PostGameplayEffectExecute(): GE 실행 후 처리 (데미지 적용)
+
+특징:
+  - 플레이어보다 단순한 속성 구조
+  - DamageTaken을 통한 데미지 처리
+
+파일 경로:
+  C:\Work\Megabonky\Source\Megabonky\Core\AbilitySystem\AttributeSet\EnemyAttributeSet.h
+
+
+────────────────────────────────────────────────────────────────────────────
+[UWeaponAttributeSet]
+────────────────────────────────────────────────────────────────────────────
+역할: 무기 속성 관리
+상속: UAttributeSet
+Replication: 지원
+
+속성 (9개):
+  - Damage: float - 공격력 (Value)
+  - CritChance: float - 크리티컬 확률 (Percent)
+  - CritDamage: float - 크리티컬 데미지 (Percent)
+  - ProjectileCount: float - 발사체 수 (Value)
+  - ProjectileSpeed: float - 발사체 속도 (Value)
+  - ProjectileBounces: float - 발사체 바운스 횟수 (Value)
+  - Size: float - 크기 (Percent)
+  - Knockback: float - 넉백 (Value)
+  - Duration: float - 지속시간 (Value)
+
+주요 함수:
+  - PostGameplayEffectExecute(): GE 실행 후 처리
+
+특징:
+  - 무기별로 독립적인 속성 관리
+  - 플레이어 속성과 분리되어 관리
+
+파일 경로:
+  C:\Work\Megabonky\Source\Megabonky\Core\AbilitySystem\AttributeSet\WeaponAttributeSet.h
+
+
+================================================================================
+### 3.6 Actor 시스템
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────
+[AMgbProjectileActor]
+────────────────────────────────────────────────────────────────────────────
+역할: 발사체 기본 클래스
+상속: AActor
+
+주요 컴포넌트:
+  - CollisionComp: USphereComponent* - 충돌 감지
+  - ProjectileMovement: UProjectileMovementComponent* - 발사체 이동
+
+주요 프로퍼티:
+  - ActorsToIgnore: TArray<AActor*> - 충돌 무시할 액터 목록
+  - HitEffectCueTag: FGameplayTag - 충돌 이펙트 큐 태그
+  - bRadialDamage: uint8 (BitField) - 범위 데미지 여부
+  - bBounce: uint8 (BitField) - 바운스 여부
+  - BounceCount: uint8 - 바운스 횟수
+  - BounceRange: float - 바운스 범위 (기본 500)
+
+주요 함수:
+  - OnCollisionOverlap(): 충돌 감지
+  - HandleOverlap(AActor*): 충돌 처리 (Virtual)
+  - Bounce(): 바운스 로직
+  - Knockback(): 넉백 처리
+  - HandleHitEffect(AActor*): Blueprint Event - 충돌 이펙트
+
+특징:
+  - 바운스 기능 지원 (적을 향해 다시 튕김)
+  - 충돌한 액터 추적하여 중복 충돌 방지
+  - Blueprint에서 이펙트 커스터마이징 가능
+
+연관 클래스: UGameplayEffect
+
+파일 경로:
+  C:\Work\Megabonky\Source\Megabonky\Actors\MgbProjectileActor.h
+
+
+────────────────────────────────────────────────────────────────────────────
+[AProjectile_Bananarang]
+────────────────────────────────────────────────────────────────────────────
+역할: 부메랑 발사체 (플레이어에게 복귀)
+상속: AMgbProjectileActor
+
+주요 프로퍼티:
+  - OutBoundFlightTime: float - 전진 비행 시간 (기본 0.7초)
+  - bReturning: uint8 (BitField) - 복귀 중 여부
+
+주요 함수:
+  - ThrowBananarang(): 부메랑 던지기
+  - ReturnToPlayer(): 플레이어에게 복귀
+  - HandleOverlap(AActor*): 충돌 처리 오버라이드
+
+특징:
+  - 일정 시간 후 플레이어에게 자동 복귀
+  - 복귀 중에도 적 충돌 가능
+
+파일 경로:
+  C:\Work\Megabonky\Source\Megabonky\Actors\Projectile\Projectile_Bananarang.h
+
+
+────────────────────────────────────────────────────────────────────────────
+[AMgbEffectActor]
+────────────────────────────────────────────────────────────────────────────
+역할: GameplayEffect 적용 액터
+상속: AActor
+
+주요 함수:
+  - ApplyEffectToTarget(AActor*, TSubclassOf<UGameplayEffect>): 대상에게 GE 적용
+
+특징:
+  - GE를 다른 액터에게 적용하는 헬퍼 액터
+  - 버프/디버프 존, 트랩 등에 활용 가능
+
+파일 경로:
+  C:\Work\Megabonky\Source\Megabonky\Actors\MgbEffectActor.h
+
+
+────────────────────────────────────────────────────────────────────────────
+[AMgbItemActor]
+────────────────────────────────────────────────────────────────────────────
+역할: 픽업 가능한 아이템 액터
+상속: AActor
+
+델리게이트:
+  - OnAction: FOnItemAction(AActor*) - 아이템 액션 이벤트
+
+특징:
+  - 픽업 시 델리게이트 호출
+  - 경험치 크리스탈, 골드 등에 활용
+
+파일 경로:
+  C:\Work\Megabonky\Source\Megabonky\Actors\MgbItemActor.h
+
+
+────────────────────────────────────────────────────────────────────────────
+[ADamageTextActor]
+────────────────────────────────────────────────────────────────────────────
+역할: 데미지 텍스트 표시 액터
+상속: AActor
+
+주요 컴포넌트:
+  - WidgetComponent: UWidgetComponent* - 위젯 컴포넌트
+
+주요 함수:
+  - SetText(float): 데미지 값 설정
+
+특징:
+  - 3D 공간에 데미지 텍스트 표시
+  - Client RPC로 각 클라이언트에서 생성
+
+파일 경로:
+  C:\Work\Megabonky\Source\Megabonky\Actors\DamageTextActor.h
+
+
+================================================================================
+### 3.7 UI 시스템
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────
+[UMgbWidget]
+────────────────────────────────────────────────────────────────────────────
+역할: 위젯 기본 클래스
+상속: UUserWidget
+
+주요 함수:
+  - HideWidget(): 위젯 숨김
+  - ShowWidget(): 위젯 표시
+
+특징:
+  - 모든 커스텀 위젯의 기본 클래스
+  - 간단한 Show/Hide 로직 제공
+
+파일 경로:
+  C:\Work\Megabonky\Source\Megabonky\UI\MgbWidget.h
+
+
+────────────────────────────────────────────────────────────────────────────
+[UInGame]
+────────────────────────────────────────────────────────────────────────────
+역할: 인게임 HUD UI
+상속: UMgbWidget
+
+주요 위젯 (BindWidget):
+  - XPBar: UProgressBar* - 경험치 바
+  - HPBar: UProgressBar* - 체력 바
+  - ItemSelectWindow: UMgbWidget* - 아이템 선택 창
+  - PassedTime: UTextBlock* - 경과 시간
+  - Silver: UTextBlock* - 실버
+  - Gold: UTextBlock* - 골드
+  - TotalKill: UTextBlock* - 총 처치 수
+  - RemainingTime: UTextBlock* - 남은 시간
+  - NextBoxGold: UTextBlock* - 다음 박스 골드
+  - Level: UTextBlock* - 레벨
+
+주요 함수:
+  - SetXPBarPercent(float): XP 바 퍼센트 설정
+  - ShowItemSelectWindow(): 아이템 선택 창 표시
+  - HideItemSelectWindow(): 아이템 선택 창 숨김
+  - CompleteItemSelect(): 아이템 선택 완료
+  - SetItemUpgradeSlot(): Blueprint Event - 아이템 업그레이드 슬롯 설정
+  - UpdateHPBar(float, float): Blueprint Event - HP 바 업데이트
+
+특징:
+  - 게임 상태 정보 실시간 표시
+  - 레벨업 시 아이템 선택 UI 관리
+
+파일 경로:
+  C:\Work\Megabonky\Source\Megabonky\UI\InGame\InGame.h
+
+
+────────────────────────────────────────────────────────────────────────────
+[UItemSelectWindow]
+────────────────────────────────────────────────────────────────────────────
+역할: 아이템 선택 창
+상속: UMgbWidget
+
+주요 위젯 (BindWidget):
+  - ItemA: UMgbWidget* - 아이템 A 슬롯
+  - ItemB: UMgbWidget* - 아이템 B 슬롯
+  - ItemC: UMgbWidget* - 아이템 C 슬롯
+
+특징:
+  - 레벨업 시 3개의 아이템 선택지 제공
+
+파일 경로:
+  C:\Work\Megabonky\Source\Megabonky\UI\InGame\ItemSelectWindow.h
+
+
+================================================================================
+### 3.8 데이터 구조 및 기타
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────
+[데이터 구조체]
+────────────────────────────────────────────────────────────────────────────
+
+FMgbWeaponInfo (DataTable Row):
+  - Name: FName - 무기 이름
+  - WeaponClass: TSubclassOf<AMgbWeapon> - 무기 클래스
+  - Description: FString - 설명
+  - Icon: UTexture2D* - 아이콘
+
+EWeaponUpgradeStat (Enum):
+  - Damage, CritChance, CritDamage
+  - ProjectileCount, ProjectileSpeed, ProjectileBounce
+  - Size, Knockback, Duration
+
+FWeaponUpgradeOption (Struct):
+  - StatType: EWeaponUpgradeStat - 업그레이드 속성
+  - IncreaseValue: float - 증가 값
+
+FMgbWeaponUpgradeBonus (DataTable Row):
+  - UpgradeOptions: TArray<FWeaponUpgradeOption> - 업그레이드 옵션 목록
+
+파일 경로:
+  C:\Work\Megabonky\Source\Megabonky\Core\Data\WeaponInfo.h
+
+
+────────────────────────────────────────────────────────────────────────────
+[UMgbSubsystem]
+────────────────────────────────────────────────────────────────────────────
+역할: 게임 인스턴스 서브시스템 (HTTP 통신)
+상속: UGameInstanceSubsystem
+
+주요 프로퍼티:
+  - HttpModule: FHttpModule* - HTTP 모듈
+
+주요 함수:
+  - Initialize(): 서브시스템 초기화
+  - Deinitialize(): 서브시스템 종료
+  - RequestCompleted(): HTTP 요청 완료 콜백
+  - Login(): 로그인 요청
+
+특징:
+  - 타이틀 화면에서 서버 통신 처리
+  - 게임 인스턴스 수명 동안 유지
+
+파일 경로:
+  C:\Work\Megabonky\Source\Megabonky\MgbSubsystem.h
+
+
+────────────────────────────────────────────────────────────────────────────
+[Gameplay Tags]
+────────────────────────────────────────────────────────────────────────────
+
+캐릭터 상태:
+  - TAG_Character_State_Jump
+  - TAG_Character_State_Invincible
+
+무기 이벤트:
+  - TAG_Event_Weapon_FireStaff
+
+무기 속성 (SetByCaller):
+  - TAG_Attribute_Weapon_Damage
+  - TAG_Attribute_Weapon_CritChance
+  - TAG_Attribute_Weapon_CritDamage
+  - TAG_Attribute_Weapon_ProjectileCount
+  - TAG_Attribute_Weapon_ProjectileSpeed
+  - TAG_Attribute_Weapon_ProjectileBounces
+  - TAG_Attribute_Weapon_Size
+  - TAG_Attribute_Weapon_Knockback
+  - TAG_Attribute_Weapon_Duration
+
+GameplayCue:
+  - TAG_GameplayCue_Lightning_Hit
+  - TAG_GameplayCue_FireBall_Hit
+  - TAG_GameplayCue_EC_Damaged
+
+기타:
+  - TAG_Data_AreaDamageMultiplier
+
+파일 경로:
+  C:\Work\Megabonky\Source\Megabonky\Core\MgbGameplayTags.h
+
+
+================================================================================
+## 4. 설계 패턴 및 아키텍처
+================================================================================
+
+### 4.1 Gameplay Ability System (GAS) 패턴
+
+사용 위치:
+  - AMgbCharacter, AMgbWeapon
+
+구현 방식:
+  - 캐릭터와 무기가 각각 독립적인 AbilitySystemComponent 보유
+  - IAbilitySystemInterface 구현으로 GAS 통합
+  - AttributeSet을 통한 속성 관리 (PlayerAttributeSet, EnemyAttributeSet, WeaponAttributeSet)
+  - GameplayEffect를 통한 속성 변경 및 데미지 적용
+  - ExecutionCalculation을 통한 복잡한 데미지 계산
+
+목적:
+  - 능력 기반 게임플레이 시스템 구축
+  - 네트워크 리플리케이션 자동 처리
+  - 모듈화된 능력 및 효과 관리
+
+
+### 4.2 다중 ASC 패턴 (Multiple Ability System Components)
+
+사용 위치:
+  - AMgbPlayerCharacter (캐릭터 ASC)
+  - AMgbWeapon (무기별 ASC)
+
+구현 방식:
+  - 플레이어 캐릭터가 자체 ASC를 보유하여 기본 속성 관리
+  - 각 무기가 독립적인 ASC를 보유하여 무기별 능력 및 속성 관리
+  - 데미지 계산 시 무기와 플레이어 속성을 모두 참조 (ExecutionCalculation)
+
+목적:
+  - 무기별 독립적인 능력 관리
+  - 다중 무기 시스템 지원
+  - 무기 교체 시 능력 동적 변경
+
+
+### 4.3 네트워크 리플리케이션 패턴
+
+사용 위치:
+  - 모든 Core 클래스 (GameState, PlayerController, Character)
+  - AttributeSet (ReplicatedUsing 패턴)
+
+구현 방식:
+  - Server RPC: 클라이언트 → 서버 (ServerAddXP, ServerApplyWeaponUpgradeEffect)
+  - Client RPC: 서버 → 특정 클라이언트 (ClientSpawnDamageTextActor)
+  - Multicast RPC: 서버 → 모든 클라이언트 (MulticastUpdateUI_XP, MulticastSetPauseGame)
+  - Property Replication: Replicated 속성 (GameStartTime, CurrentLevel, Gold 등)
+  - ReplicatedUsing: 속성 변경 시 콜백 함수 호출 (OnRep_XXX)
+
+목적:
+  - 멀티플레이어 동기화
+  - 서버 권한 보장 (Authority 체크)
+  - 클라이언트별 시각 효과 처리
+
+
+### 4.4 Timer 기반 주기 실행 패턴
+
+사용 위치:
+  - AMgbGameStateBase (적 생성 타이머)
+  - AMgbPlayerCharacter (무기 능력 활성화 타이머)
+  - UMgbGameplayAbility_Projectile (연속 발사 타이머)
+  - AProjectile_Bananarang (복귀 타이머)
+
+구현 방식:
+  - FTimerHandle 사용
+  - GetWorld()->GetTimerManager() 활용
+  - 주기적 함수 호출 또는 일회성 딜레이
+
+목적:
+  - 게임 로직 스케줄링
+  - 주기적 이벤트 처리 (적 생성, 공격 쿨다운)
+
+
+### 4.5 델리게이트 (Delegate) 패턴
+
+사용 위치:
+  - AMgbGameStateBase::OnTimeChanged
+  - AMgbItemActor::OnAction
+
+구현 방식:
+  - DECLARE_DYNAMIC_MULTICAST_DELEGATE 매크로 사용
+  - BlueprintAssignable로 Blueprint 바인딩 지원
+  - Broadcast()로 이벤트 발생
+
+목적:
+  - 느슨한 결합 (Loose Coupling)
+  - UI와 로직 분리
+  - Blueprint 통합
+
+
+### 4.6 데이터 테이블 패턴
+
+사용 위치:
+  - AMgbGameStateBase (DT_Weapon, DT_WeaponUpgradeBonus)
+  - AMgbPlayerController (DT_Weapons)
+
+구현 방식:
+  - FTableRowBase 상속 구조체 정의 (FMgbWeaponInfo, FMgbWeaponUpgradeBonus)
+  - UDataTable 참조
+  - 런타임에 데이터 테이블 조회
+
+목적:
+  - 데이터와 코드 분리
+  - 디자이너가 수정 가능한 게임 밸런스
+  - 무기 및 업그레이드 정보 중앙 관리
+
+
+### 4.7 Component 기반 구성 패턴
+
+사용 위치:
+  - 모든 Character 및 Actor 클래스
+
+구현 방식:
+  - AMgbPlayerCharacter: SpringArmComponent, CameraComponent, SphereComponent
+  - AMgbProjectileActor: SphereComponent, ProjectileMovementComponent
+  - ADamageTextActor: WidgetComponent
+
+목적:
+  - 기능 모듈화
+  - 재사용성 향상
+  - Unreal의 Component 시스템 활용
+
+
+### 4.8 Enhanced Input System 패턴
+
+사용 위치:
+  - AMgbPlayerCharacter
+  - AMgbPlayerController
+
+구현 방식:
+  - UInputMappingContext 사용
+  - UInputAction 정의 (MoveAction, LookAction, JumpAction)
+  - UEnhancedInputComponent로 바인딩
+
+목적:
+  - 유연한 입력 시스템
+  - 키 리매핑 지원
+  - Blueprint와의 통합
+
+
+### 4.9 Object Pooling 개념 (일부 적용)
+
+사용 위치:
+  - AMgbGameStateBase (적 생성 관리)
+  - AMgbProjectileActor (발사체)
+
+구현 방식:
+  - 현재 적 수 추적 (CurrentEnemyCount)
+  - 최대 적 수 제한 (MaxEnemyCount: 1000)
+  - 적 파괴 시 카운트 감소
+
+목적:
+  - 메모리 관리
+  - 성능 최적화 (대량의 적 처리)
+
+
+### 4.10 Factory 패턴
+
+사용 위치:
+  - UMgbGameplayAbility_Projectile (발사체 생성)
+  - AMgbGameStateBase (적 생성)
+  - AMgbPlayerCharacter (무기 장착)
+
+구현 방식:
+  - TSubclassOf<T> 프로퍼티로 클래스 참조
+  - SpawnActor로 동적 생성
+
+목적:
+  - 런타임 객체 생성
+  - 다양한 타입의 객체 생성 지원
+
+
+================================================================================
+## 5. 데이터 흐름 및 상호작용
+================================================================================
+
+### 5.1 게임 시작 흐름
+
+1. AMgbGameModeBase::StartPlay()
+   ↓
+2. AMgbGameStateBase::BeginPlay()
+   → GameStartTime 설정
+   → EnemyClasses 랜덤 섞기
+   ↓
+3. AMgbPlayerCharacter::BeginPlay()
+   → 기본 무기 장착 (DefaultWeaponClass)
+   → PlayerAttributeSet 초기화
+   ↓
+4. AMgbGameStateBase::InitSpawnEnemyTimer()
+   → 적 생성 타이머 시작 (SpawnIntervalTime 간격)
+
+
+### 5.2 전투 흐름 (데미지 처리)
+
+1. AMgbPlayerCharacter::ActivateWeaponsAbility()
+   → 모든 무기의 Ability 활성화
+   ↓
+2. UMgbGameplayAbility_Projectile::ActivateAbility()
+   → RapidFire() 호출
+   ↓
+3. SpawnProjectile()
+   → AMgbProjectileActor 생성
+   → 타겟 방향으로 발사
+   ↓
+4. AMgbProjectileActor::OnCollisionOverlap()
+   → HandleOverlap(OtherActor)
+   → 적인지 확인
+   ↓
+5. UMgbEffectExecutionCalculation::Execute_Implementation()
+   → Source(Weapon) 속성 캡처 (Damage, CritChance, CritDamage)
+   → Owner(Player) 속성 캡처 (추가 Damage, CritChance, CritDamage)
+   → 최종 데미지 계산 (크리티컬 판정 포함)
+   ↓
+6. UEnemyAttributeSet::PostGameplayEffectExecute()
+   → DamageTaken 속성에 데미지 적용
+   → Health 감소
+   ↓
+7. AMgbEnemyCharacter::Tick() 또는 Health 변경 감지
+   → Health <= 0 체크
+   → 사망 처리
+   ↓
+8. AMgbEnemyCharacter::Destroyed()
+   → XPCrystal 생성
+   → CurrentEnemyCount 감소
+   ↓
+9. AMgbPlayerCharacter::PickupBeginOverlap()
+   → XPCrystal 충돌 감지
+   ↓
+10. AMgbGameStateBase::ServerAddXP()
+    → CurrentXP 증가
+    → RequiredXP 도달 시 레벨업
+    ↓
+11. MulticastShowItemSelectWindow()
+    → 모든 클라이언트에서 아이템 선택 UI 표시
+
+
+### 5.3 레벨업 및 아이템 업그레이드 흐름
+
+1. AMgbGameStateBase::ServerAddXP()
+   → CurrentXP >= RequiredXP 체크
+   → CurrentLevel++
+   ↓
+2. MulticastShowItemSelectWindow()
+   → 모든 클라이언트 UI 표시
+   → SetGlobalTimeDilation(0.0001) - 게임 일시정지
+   ↓
+3. AMgbPlayerController::GenerateUpgradeInfo()
+   → DT_Weapon, DT_WeaponUpgradeBonus 조회
+   → 3개의 업그레이드 옵션 생성
+   ↓
+4. UInGame::SetItemUpgradeSlot() (Blueprint)
+   → 각 슬롯에 업그레이드 정보 표시
+   ↓
+5. 플레이어 선택
+   ↓
+6. AMgbPlayerController::ServerApplyWeaponUpgradeEffect()
+   → 선택한 업그레이드의 GameplayEffect 적용
+   → WeaponAttributeSet 또는 PlayerAttributeSet 수정
+   ↓
+7. AMgbPlayerController::ServerResumeRequestCountIncrementAndCheck()
+   → 모든 플레이어가 선택 완료했는지 확인
+   ↓
+8. AMgbGameStateBase::HandleResumeRequest()
+   → SetGlobalTimeDilation(1.0) - 게임 재개
+
+
+### 5.4 네트워크 동기화 흐름
+
+[Server Authority]
+  - 적 생성 (SpawnEnemy)
+  - XP 추가 (ServerAddXP)
+  - 무기 업그레이드 적용 (ServerApplyWeaponUpgradeEffect)
+  - 데미지 계산 및 적용
+
+[Multicast]
+  - UI 업데이트 (MulticastUpdateUI_XP)
+  - 게임 일시정지/재개 (MulticastSetPauseGame)
+  - 아이템 선택 창 표시 (MulticastShowItemSelectWindow)
+
+[Client]
+  - 데미지 텍스트 생성 (ClientSpawnDamageTextActor)
+  - 입력 처리 (Move, Look, Jump)
+  - 로컬 UI 업데이트
+
+[Property Replication]
+  - GameState: GameStartTime, CurrentLevel, Gold, TotalKill
+  - PlayerCharacter: Weapons, Tomes
+  - EnemyCharacter: TargetActor, bSpawnFinished
+  - AttributeSets: 모든 속성 (ReplicatedUsing)
+
+
+### 5.5 무기 시스템 데이터 흐름
+
+1. 게임 시작 시
+   ↓
+2. AMgbPlayerCharacter::EquipWeapon(TSubclassOf<AMgbWeapon>)
+   → 무기 인스턴스 생성
+   → Weapons 배열에 추가
+   ↓
+3. AMgbWeapon::BeginPlay()
+   → WeaponAttributeSet 초기화
+   → InitAttributeEffectClass 적용
+   → AbilityClass 부여
+   ↓
+4. 주기적으로 AMgbPlayerCharacter::ActivateWeaponsAbility()
+   → 모든 Weapons의 Ability 활성화
+   ↓
+5. UMgbGameplayAbility::ActivateAbility()
+   → GetPlayerASC()로 플레이어 ASC 접근
+   → 무기의 ASC와 플레이어 ASC 모두 활용
+   ↓
+6. 데미지 계산 (ExecutionCalculation)
+   → Source: Weapon의 속성
+   → Owner: Player의 속성
+   → 두 속성을 합산하여 최종 데미지 계산
+
+
+================================================================================
+## 6. 주요 파일 경로 맵
+================================================================================
+
+### Core 시스템
+  AMgbGameModeBase:       Core\MgbGameModeBase.h
+  AMgbGameStateBase:      Core\MgbGameStateBase.h
+  AMgbPlayerState:        Core\MgbPlayerState.h
+  AMgbPlayerController:   Core\MgbPlayerController.h
+
+### 캐릭터
+  AMgbCharacter:          Core\MgbCharacter.h
+  AMgbPlayerCharacter:    Core\Characters\MgbPlayerCharacter.h
+  AMgbEnemyCharacter:     Core\Characters\MgbEnemyCharacter.h
+
+### 무기
+  AMgbWeapon:             Core\MgbWeapon.h
+
+### Ability System
+  UMgbAbilitySystemComponent:         Core\AbilitySystem\MgbAbilitySystemComponent.h
+  UMgbGameplayAbility:                Core\AbilitySystem\Abilities\MgbGameplayAbility.h
+  UMgbGameplayAbility_Projectile:    Core\AbilitySystem\Abilities\MgbGameplayAbility_Projectile.h
+  UMgbGameplayAbility_Dagger:        Core\AbilitySystem\Abilities\MgbGameplayAbility_Dagger.h
+  UMgbGameplayAbility_Lightning:     Core\AbilitySystem\Abilities\MgbGameplayAbility_Lightning.h
+  UMgbGameplayAbility_Bananarang:    Core\AbilitySystem\Abilities\MgbGameplayAbility_Bananarang.h
+  UMgbEffectExecutionCalculation:    Core\AbilitySystem\MgbEffectExecutionCalculation.h
+
+### Attribute Sets
+  UPlayerAttributeSet:    Core\AbilitySystem\AttributeSet\PlayerAttributeSet.h
+  UEnemyAttributeSet:     Core\AbilitySystem\AttributeSet\EnemyAttributeSet.h
+  UWeaponAttributeSet:    Core\AbilitySystem\AttributeSet\WeaponAttributeSet.h
+
+### Actors
+  AMgbProjectileActor:    Actors\MgbProjectileActor.h
+  AProjectile_Bananarang: Actors\Projectile\Projectile_Bananarang.h
+  AMgbEffectActor:        Actors\MgbEffectActor.h
+  AMgbItemActor:          Actors\MgbItemActor.h
+  ADamageTextActor:       Actors\DamageTextActor.h
+
+### UI
+  UMgbWidget:             UI\MgbWidget.h
+  UInGame:                UI\InGame\InGame.h
+  UItemSelectWindow:      UI\InGame\ItemSelectWindow.h
+  UItemSelectButton:      UI\InGame\ItemSelectButton.h
+  UDamageText:            UI\InGame\DamageText.h
+  UTitle:                 UI\Title\Title.h
+
+### 데이터 및 기타
+  WeaponInfo:             Core\Data\WeaponInfo.h
+  MgbGameplayTags:        Core\MgbGameplayTags.h
+  UMgbSubsystem:          MgbSubsystem.h
+  NetworkLog:             Util\NetworkLog.h
+
+
+================================================================================
+## 7. 주요 설계 결정 및 특징
+================================================================================
+
+### 7.1 이중 ASC 아키텍처
+  - 플레이어와 무기가 각각 ASC를 보유
+  - 장점: 무기별 독립적인 능력 관리, 다중 무기 시스템 유연성
+  - 단점: ASC 관리 복잡도 증가, 메모리 사용량 증가
+
+### 7.2 광범위한 Attribute 시스템
+  - PlayerAttributeSet: 35개의 속성
+  - 거의 모든 게임 요소가 Attribute로 관리됨
+  - 장점: 통합된 시스템, GameplayEffect로 모든 것 조작 가능
+  - 단점: 초기 설정 복잡, 성능 고려 필요
+
+### 7.3 네트워크 중심 설계
+  - 모든 중요 로직이 Server Authority
+  - RPC 적극 활용 (Server, Client, Multicast)
+  - Replicated 속성 광범위 사용
+  - 목적: 멀티플레이어 치팅 방지, 동기화 보장
+
+### 7.4 데이터 테이블 기반 밸런싱
+  - 무기 정보, 업그레이드 정보 모두 DataTable
+  - 코드 수정 없이 밸런스 조정 가능
+  - 디자이너 친화적
+
+### 7.5 Enhanced Input System 채택
+  - UE5의 최신 입력 시스템
+  - 키 리매핑, 입력 컨텍스트 전환 지원
+
+### 7.6 Blueprint 통합
+  - Blueprint Implementable Event 다수 활용
+  - C++로 기본 로직, Blueprint로 시각/사운드 효과
+  - 예: HandleHitEffect, DeathFadeOut, SetItemUpgradeSlot
+
+### 7.7 Timer 기반 게임 루프
+  - Tick 최소화
+  - Timer를 통한 주기적 이벤트 처리
+  - 성능 최적화 고려
+
+
+================================================================================
+## 8. 확장 포인트 및 TODO
+================================================================================
+
+코드 내 발견된 TODO 및 개선 가능 영역:
+
+1. MgbGameStateBase.cpp:94
+   - "TODO: 레벨업시 발동 이벤트"
+   - 현재는 아이템 선택만 있으나, 추가 이벤트 가능
+
+2. Projectile 크기 Attribute
+   - 주석에 "TODO: Projectile Size Attribute" 언급
+   - Size Attribute가 실제 발사체 크기에 반영되도록 구현 필요
+
+3. Boss Monster
+   - Git commit 메시지에 "Make Boss Monster" TODO 언급
+   - 보스 전용 클래스 또는 특수 적 시스템 필요
+
+4. MgbPlayerState 확장
+   - 현재 거의 빈 클래스
+   - 플레이어별 통계, 업적 등 추가 가능
+
+5. 추가 무기 타입
+   - 현재: Projectile, Lightning, Dagger, Bananarang
+   - 확장 가능: 근접 무기, 광역 스킬, 버프 스킬 등
+
+6. AI 시스템 확장
+   - 현재 적 AI는 단순 추적만 구현
+   - Behavior Tree, 다양한 공격 패턴 추가 가능
+
+7. 세이브/로드 시스템
+   - 현재 구현되지 않음
+   - SaveGame 클래스를 통한 진행도 저장 필요
+
+8. 서버 브라우저 / 매치메이킹
+   - UMgbSubsystem에 HTTP 통신 기반 구현
+   - 온라인 세션, 매치메이킹 시스템 확장 가능
+
+
+================================================================================
+## 9. 성능 고려사항
+================================================================================
+
+### 9.1 적 생성 관리
+  - MaxEnemyCount: 1000으로 제한
+  - SpawnIntervalTime으로 생성 속도 조절
+  - 적 파괴 시 카운트 감소
+
+### 9.2 Attribute Replication
+  - 35개의 PlayerAttribute가 모두 Replicated
+  - 네트워크 트래픽 고려 필요
+  - 변경 빈도가 낮은 속성은 OnRep 최적화 고려
+
+### 9.3 Timer 사용
+  - Tick 대신 Timer 사용으로 CPU 절약
+  - 필요한 시점에만 로직 실행
+
+### 9.4 충돌 최적화
+  - PickupSphere: "PickupDetector" 프로필 사용
+  - Projectile: ActorsToIgnore로 중복 충돌 방지
+  - Mesh: "NoCollision" 프로필 (플레이어 메시)
+
+### 9.5 Global Time Dilation 주의
+  - 레벨업 시 0.0001로 설정
+  - 모든 플레이어에게 영향
+  - 타이머 동작 변경될 수 있음
+
+
+================================================================================
+## 10. 네트워크 아키텍처 요약
+================================================================================
+
+### Authority (서버에서만 실행)
+  - 적 생성 및 관리
+  - 데미지 계산 및 적용
+  - XP 및 레벨 관리
+  - 무기 업그레이드 적용
+  - 게임 상태 변경 (일시정지/재개)
+
+### Replicated Properties
+  - GameState: 시간, 레벨, 골드, 킬 수
+  - PlayerCharacter: 무기 목록, 비전서 목록
+  - EnemyCharacter: 타겟, 스폰 완료 여부
+  - All AttributeSets: 모든 속성값
+
+### RPC Usage
+  - Server RPC: 클라이언트가 서버에 요청 (XP 추가, 업그레이드 적용)
+  - Client RPC: 서버가 특정 클라이언트에 명령 (데미지 텍스트)
+  - Multicast RPC: 서버가 모든 클라이언트에 명령 (UI 업데이트, 일시정지)
+
+
+================================================================================
+## 11. 개발 팁 및 주의사항
+================================================================================
+
+1. ASC 초기화 순서
+   - InitAbilityActorInfo는 Possession 후에 호출되어야 함
+   - PossessedBy와 OnRep_PlayerState에서 처리
+
+2. AttributeSet 수정 시
+   - PreAttributeChange: 값 변경 전 클램핑
+   - PostGameplayEffectExecute: GE 실행 후 추가 로직
+
+3. Gameplay Tags
+   - Native Gameplay Tags 사용
+   - MgbGameplayTags.h에서 UE_DECLARE_GAMEPLAY_TAG_EXTERN
+   - cpp 파일에서 UE_DEFINE_GAMEPLAY_TAG 정의 필요
+
+4. DataTable 구조 변경 시
+   - 에디터에서 DataTable 자동 업데이트되지 않음
+   - 재생성 또는 수동 수정 필요
+
+5. Multicast RPC 주의
+   - 모든 클라이언트에서 실행됨
+   - HasAuthority() 체크로 서버 중복 실행 방지
+
+6. Timer 정리
+   - EndPlay에서 ClearAllTimersForObject 호출
+   - 메모리 누수 방지
+
+7. Network Log 활용
+   - NetworkLog.h의 매크로 사용
+   - 네트워크 디버깅 시 유용
+
+
+================================================================================
+## 12. 결론
+================================================================================
+
+Megabonky 프로젝트는 Unreal Engine의 Gameplay Ability System을 중심으로 설계된
+멀티플레이어 액션 게임입니다. 주요 특징은 다음과 같습니다:
+
+1. **이중 ASC 아키텍처**: 플레이어와 무기가 각각 ASC를 보유하여 유연한 능력 시스템 구현
+
+2. **광범위한 Attribute 시스템**: 35개 이상의 속성으로 세밀한 게임 밸런스 조정 가능
+
+3. **네트워크 중심 설계**: Server Authority 기반으로 치팅 방지 및 동기화 보장
+
+4. **데이터 주도 설계**: DataTable을 통한 무기 및 업그레이드 관리
+
+5. **모듈화된 구조**: Component 기반, Ability 시스템, AttributeSet 분리 등
+
+6. **확장 가능한 아키텍처**: 새로운 무기, 능력, 적 타입 추가 용이
+
+프로젝트의 핵심은 GAS를 활용한 능력 기반 전투 시스템과 무기별 독립적인 ASC를
+통한 유연한 무기 시스템입니다. 네트워크 멀티플레이어를 고려한 설계로
+확장성과 안정성을 동시에 확보하고 있습니다.
+
+향후 확장 방향으로는 보스 몬스터, 추가 무기 타입, 고급 AI 시스템,
+세이브/로드 기능 등이 있으며, 현재 구조에서 큰 변경 없이 확장 가능합니다.
+
+
+================================================================================
+문서 끝
+================================================================================
