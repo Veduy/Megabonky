@@ -4,7 +4,10 @@
 
 #include "SMgbDebuggerWidget.h"
 #include "LevelEditor.h"
+#include "HAL/IConsoleManager.h"
 #include "Widgets/Docking/SDockTab.h"
+#include "EpicUnrealMCPBridge.h"
+#include "Async/Async.h"
 
 #define LOCTEXT_NAMESPACE "FMgbDebugToolModule"
 
@@ -20,6 +23,57 @@ void FMgbDebugToolModule::StartupModule()
 	LevelEditorModule.GetMenuExtensibilityManager()->AddExtender(MenuExtender);
 
 
+	// 콘솔 명령 등록 (에디터 상시 사용 가능) 
+	// 사용법: Mgb.Cmd <CommandType> [Key=Value ...]
+	// 예: Mgb.Cmd get_actors_in_level
+	// 예: Mgb.Cmd find_actors_by_name pattern=Cube
+	// 예: Mgb.Cmd spawn_actor type=StaticMeshActor name=MyActor
+	ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(
+		TEXT("Mgb.Cmd"),
+		TEXT("Execute MCP command locally. Usage: Mgb.Cmd <CommandType> [Key=Value ...]"),
+		FConsoleCommandWithArgsDelegate::CreateLambda([](const TArray<FString>& Args)
+		{
+			if (Args.Num() == 0)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Usage: Mgb.Cmd <CommandType> [Key=Value ...]"));
+				return;
+			}
+
+			const FString CommandType = Args[0];
+
+			TSharedPtr<FJsonObject> Params = MakeShared<FJsonObject>();
+			for (int32 i = 1; i < Args.Num(); ++i)
+			{
+				FString Key, Value;
+				if (Args[i].Split(TEXT("="), &Key, &Value))
+				{
+					Params->SetStringField(Key, Value);
+				}
+			}
+
+			UEpicUnrealMCPBridge* Bridge = GEditor->GetEditorSubsystem<UEpicUnrealMCPBridge>();
+			if (!Bridge)
+			{
+				UE_LOG(LogTemp, Error, TEXT("Mgb.Cmd: UEpicUnrealMCPBridge not found"));
+				return;
+			}
+
+			// ExecuteCommand 내부에서 AsyncTask(GameThread)를 사용하므로
+			// 콘솔 명령(GameThread)에서 직접 호출하면 데드락 발생.
+			// 백그라운드 스레드에서 호출하여 우회.
+			Async(EAsyncExecution::Thread, [Bridge, CommandType, Params]()
+			{
+				FString Result = Bridge->ExecuteCommand(CommandType, Params);
+
+				AsyncTask(ENamedThreads::GameThread, [CommandType, Result]()
+				{
+					UE_LOG(LogTemp, Log, TEXT("Mgb.Cmd [%s] Result:\n%s"), *CommandType, *Result);
+				});
+			});
+		}),
+		ECVF_Default
+	));
+
 	// 탭 등록
 	FGlobalTabmanager::Get()->RegisterNomadTabSpawner(
 		"MgbDebugger",
@@ -30,8 +84,12 @@ void FMgbDebugToolModule::StartupModule()
 
 void FMgbDebugToolModule::ShutdownModule()
 {
-	// This function may be called during shutdown to clean up your module.  For modules that support dynamic reloading,
-	// we call this function before unloading the module.
+	for (IConsoleObject* Cmd : ConsoleCommands)
+	{
+		IConsoleManager::Get().UnregisterConsoleObject(Cmd);
+	}
+	ConsoleCommands.Empty();
+
 	FGlobalTabmanager::Get()->UnregisterNomadTabSpawner("MgbDebugger");
 }
 

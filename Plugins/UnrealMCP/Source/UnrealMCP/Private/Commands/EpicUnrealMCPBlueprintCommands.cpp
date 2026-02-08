@@ -136,7 +136,7 @@ TSharedPtr<FJsonObject> FEpicUnrealMCPBlueprintCommands::HandleCreateBlueprint(c
     // Try to find the specified parent class
     if (!ParentClass.IsEmpty())
     {
-        // First try searching across all loaded modules (prefix 없는 원본 이름으로 검색)
+        // (추가)Prefix 없는 원본 이름으로 검색
         UClass* FoundClass = FindFirstObjectSafe<UClass>(*ParentClass);
 
         // Fallback: prefix 붙여서 경로 기반 검색
@@ -247,6 +247,10 @@ TSharedPtr<FJsonObject> FEpicUnrealMCPBlueprintCommands::HandleAddComponentToBlu
         ComponentClass = FindObject<UClass>(nullptr, *ComponentTypeWithSuffix);
     }
     
+    //여기서 컴포넌트를 몾찾는다. 
+
+
+
     // If still not found, try with "U" prefix
     if (!ComponentClass && !ComponentType.StartsWith(TEXT("U")))
     {

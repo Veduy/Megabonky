@@ -22,9 +22,9 @@ void AMgbGameModeBase::StartPlay()
 {
 	Super::StartPlay();
 
-	// ╟тюсюл ╫цюш┴Гю╩╤╖ гЮгьа╝╬ъго╢б╟м╣И;
+	// О©╫О©╫О©╫О©╫О©╫О©╫ О©╫О©╫О©╫ш┴О©╫О©╫О©╫О©╫О©╫ О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫о╢б╟м╣О©╫;
 	//1.EnemySpawn
-	//2.╫╨евюлаЖ Timer ╣©юш
+	//2.О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫ Timer О©╫О©╫О©╫О©╫
 	AMgbGameStateBase* GS = GetGameState<AMgbGameStateBase>();
 	if (GS)
 	{

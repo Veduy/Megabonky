@@ -20,4 +20,7 @@ public:
 	void AddMenuEntry(FMenuBuilder& MenuBuilder);
 
 	void OpenTab();
+
+private:
+	TArray<IConsoleObject*> ConsoleCommands;
 };

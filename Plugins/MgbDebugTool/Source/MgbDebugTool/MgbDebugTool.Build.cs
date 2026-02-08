@@ -36,6 +36,9 @@ public class MgbDebugTool : ModuleRules
                 "UnrealEd",
                 "PropertyEditor",
                 "Megabonky",
+                "UnrealMCP",
+                "Json",
+                "JsonUtilities",
             }
 			);
 			

@@ -12,7 +12,7 @@
 class FHttpModule;
 
 /**
- * е╦юлф╡╟З юн╟тюс ╟ё ╣╔юлем ю╞аЖ
+ * е╦О©╫О©╫ф╡О©╫О©╫ О©╫н╟О©╫О©╫О©╫ О©╫О©╫ О©╫О©╫О©╫О©╫О©╫О©╫ О©╫О©╫О©╫О©╫
  */
 UCLASS()
 class MEGABONKY_API UMgbSubsystem : public UGameInstanceSubsystem

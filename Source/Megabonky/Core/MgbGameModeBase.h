@@ -23,9 +23,6 @@ public:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:
-
-
-public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
 	uint8 bSpawnEnemy : 1 = false;
 };
