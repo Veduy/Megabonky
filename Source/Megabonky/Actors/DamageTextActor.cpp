@@ -20,7 +20,7 @@ void ADamageTextActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SetLifeSpan(1.5f);
+	SetLifeSpan(1.f);
 }
 
 void ADamageTextActor::SetText(float InDamage)

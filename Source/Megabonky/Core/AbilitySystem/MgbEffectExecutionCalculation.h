@@ -18,13 +18,13 @@
 }
 
 // Source(Weapon)
-// ->Damage		//Á¤¼ö
+// ->Damage		//ï¿½ï¿½ï¿½ï¿½
 // ->CritChance
 // ->CritDamage
 
 // PlayerCharacter (Weapon->Owner)
-// ->Damage		//¹èÀ²
-// ->CritChance	//ÆÛ¼¾Æ®
+// ->Damage		//ï¿½ï¿½ï¿½ï¿½
+// ->CritChance	//ï¿½Û¼ï¿½Æ®
 // ->CritDamage	//
 // ->DamageToElite
 

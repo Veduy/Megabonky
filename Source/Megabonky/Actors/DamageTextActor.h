@@ -25,6 +25,9 @@ protected:
 public:
 	void SetText(float InDamage);
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void SetCritText();
+
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
 	TObjectPtr<UWidgetComponent> WidgetComponent;

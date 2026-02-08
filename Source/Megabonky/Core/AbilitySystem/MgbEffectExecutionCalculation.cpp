@@ -1,4 +1,4 @@
-// Copyright is owned by Veduy.
+ï»¿// Copyright is owned by Veduy.
 
 
 #include "MgbEffectExecutionCalculation.h"
@@ -33,7 +33,7 @@ UMgbEffectExecutionCalculation::UMgbEffectExecutionCalculation(const FObjectInit
 
 void UMgbEffectExecutionCalculation::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
 {	
-	// SourceObj(Weapon)->Owner(Player)ÀÇ Attribute°ª ÇÊ¿ä.
+	// SourceObj(Weapon)->Owner(Player)ï¿½ï¿½ Attributeï¿½ï¿½ ï¿½Ê¿ï¿½.
 	UObject* SourceObj = ExecutionParams.GetOwningSpec().GetEffectContext().GetSourceObject();
 	AMgbWeapon* Weapon = Cast<AMgbWeapon>(SourceObj);
 	AMgbPlayerCharacter* PlayerCharacter = Cast<AMgbPlayerCharacter>(Weapon->GetOwner());
@@ -45,33 +45,33 @@ void UMgbEffectExecutionCalculation::Execute_Implementation(const FGameplayEffec
 	float WeaponDamage = 0.f; 
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageDef, EvaluatedParams, WeaponDamage);
 
-	float WeaponCritChance = 0.f; // %ÆÛ¼¾Æ®
+	float WeaponCritChance = 0.f; // %ï¿½Û¼ï¿½Æ®
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(CritChanceDef, EvaluatedParams, WeaponCritChance);
 
-	float WeaponCritDamage = 0.f; // %ÆÛ¼¾Æ®
+	float WeaponCritDamage = 0.f; // %ï¿½Û¼ï¿½Æ®
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(CritDamageDef, EvaluatedParams, WeaponCritDamage);
 
-	float PlayerDamage = 0.f; // x¹èÀ² ÃÖÁ¾ÀûÀ¸·Î °è»êµÈ µ¥¹ÌÁö¿¡ °öÇØÁÙ °ª 1.00 ~ 1.xx 
+	float PlayerDamage = 0.f; // xï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ 1.00 ~ 1.xx 
 	UAbilitySystemComponent* ASC = PlayerCharacter->GetAbilitySystemComponent();
 	PlayerDamage = PlayerCharacter->GetAbilitySystemComponent()->GetNumericAttribute(UPlayerAttributeSet::GetDamageAttribute()) / 100;
 
-	float PlayerCritChance = 0.f; // %ÆÛ¼¾Æ®
+	float PlayerCritChance = 0.f; // %ï¿½Û¼ï¿½Æ®
 	PlayerCritChance = PlayerCharacter->GetAbilitySystemComponent()->GetNumericAttribute(UPlayerAttributeSet::GetCritChanceAttribute()) / 100;
 	
-	float PlayerCritDamage = 0.f; // x¹èÀ²
+	float PlayerCritDamage = 0.f; // xï¿½ï¿½ï¿½ï¿½
 	PlayerCritDamage = PlayerCharacter->GetAbilitySystemComponent()->GetNumericAttribute(UPlayerAttributeSet::GetCritDamageAttribute()) / 100;
 
-	float PlayerDamageToElite = 0.f;// x¹èÀ²
+	float PlayerDamageToElite = 0.f;// xï¿½ï¿½ï¿½ï¿½
 	PlayerDamageToElite = PlayerCharacter->GetAbilitySystemComponent()->GetNumericAttribute(UPlayerAttributeSet::GetDamageToElitesAttribute()) / 100;
 
-	// 1.Crit Chance °Ë»ç
+	// 1.Crit Chance ï¿½Ë»ï¿½
 	// WeaponCritChance + PlayerCritChance
 
-	// 2.Damage °è»ê (Crit)
-	// ¹«±â¿¡ ÇÃ·¹ÀÌ¾î ½ºÅÝÀ» Àû¿ë½ÃÅ²´Ù.
+	// 2.Damage ï¿½ï¿½ï¿½ (Crit)
+	// ï¿½ï¿½ï¿½â¿¡ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Å²ï¿½ï¿½.
 	// Damage = WeaponDamage *  (1 + (WeaponCritDamage/100)) 
-	// Damage = Damage * PlayerCritDamage(¹èÀ² 2.xx)
-	// Damage = Damage * PlayerDamage (ÃÖÁ¾)
+	// Damage = Damage * PlayerCritDamage(ï¿½ï¿½ï¿½ï¿½ 2.xx)
+	// Damage = Damage * PlayerDamage (ï¿½ï¿½ï¿½ï¿½)
 
 	bool bCrit = false;
 
@@ -90,7 +90,7 @@ void UMgbEffectExecutionCalculation::Execute_Implementation(const FGameplayEffec
 		TotalDamage = WeaponDamage * PlayerDamage;
 	}
 
-	// µ¥¹ÌÁö¸¦ ÁØ PlayerController¿¡°Ô¸¸ µ¥¹ÌÁö°¡ º¸ÀÌ°Ô UI Ã³¸®
+
 	AMgbPlayerController* PC = Cast<AMgbPlayerController>(PlayerCharacter->GetOwner());
 	if (PC)
 	{
@@ -104,7 +104,7 @@ void UMgbEffectExecutionCalculation::Execute_Implementation(const FGameplayEffec
 		}
 
 		FVector Location = AvatarActor->GetActorLocation();
-		PC->ClientSpawnDamageTextActor(Location, TotalDamage);
+		PC->ClientSpawnDamageTextActor(Location, TotalDamage, bCrit);
 	}
 
 	return OutExecutionOutput.AddOutputModifier(

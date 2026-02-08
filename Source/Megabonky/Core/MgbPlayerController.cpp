@@ -52,7 +52,7 @@ void AMgbPlayerController::BeginPlay()
 
 void AMgbPlayerController::OnPossess(APawn* aPawn)
 {
-	// ¿ÀÁ÷ ¼­¹ö¿¡¼­¸¸ È£ÃâµÊ.
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ È£ï¿½ï¿½ï¿½.
 	Super::OnPossess(aPawn);
 	
 	if (ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(GetLocalPlayer()))
@@ -68,7 +68,7 @@ void AMgbPlayerController::OnPossess(APawn* aPawn)
 	{
 		PlayerCharacter->EquipWeapon(PlayerCharacter->DefaultWeaponClass);
 
-		// TODO: ActivateWeapons ´Â ¸ÊÀÌµ¿ ÀÌº¥Æ®(¾ÆÁ÷¹Ì±¸Çö)°¡ ³¡³µÀ»¶§ È£ÃâµÇµµ·Ï ¼öÁ¤ÇÊ¿ä.
+		// TODO: ActivateWeapons ï¿½ï¿½ ï¿½ï¿½ï¿½Ìµï¿½ ï¿½Ìºï¿½Æ®(ï¿½ï¿½ï¿½ï¿½ï¿½Ì±ï¿½ï¿½ï¿½)ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ È£ï¿½ï¿½Çµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ê¿ï¿½.
 		PlayerCharacter->ActivateWeaponsAbility();
 	}
 }
@@ -95,7 +95,7 @@ void AMgbPlayerController::ServerApplyWeaponUpgradeEffect_Implementation(FName I
 	auto EquipedWeapons = MgbPlayer->Weapons;
 	for (const auto& w : EquipedWeapons)
 	{
-		// ÀåÂøÁßÀÎ ¹«±âÀÏ°æ¿ì.
+		// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï°ï¿½ï¿½.
 		if (w->WeaponName == InWeaponName)
 		{
 			UAbilitySystemComponent* WeaponASC = w->GetAbilitySystemComponent();
@@ -154,7 +154,7 @@ void AMgbPlayerController::ServerApplyWeaponUpgradeEffect_Implementation(FName I
 		}
 	}
 
-	// ½Å±Ô ¹«±âÀÏ°æ¿ì ¹«±âÃß°¡, µ¥ÀÌÅÍ Å×ÀÌºí¿¡¼­ Å¬·¡½º °¡Á®¿Í¼­ 
+	// ï¿½Å±ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï°ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ß°ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ìºï¿½ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ 
 	if (DT_Weapons)
 	{
 		auto WeaponInfo = DT_Weapons->FindRow<FMgbWeaponInfo>(InWeaponName, FString("Find Weapon"));
@@ -167,14 +167,22 @@ void AMgbPlayerController::ServerApplyWeaponUpgradeEffect_Implementation(FName I
 	}
 }
 
-void AMgbPlayerController::ClientSpawnDamageTextActor_Implementation(FVector Location, float DamageValue)
+void AMgbPlayerController::ClientSpawnDamageTextActor_Implementation(FVector Location, float DamageValue, bool bCrit)
 {
 	FTransform SpawnTransform = FTransform(FRotator(), Location, FVector::OneVector);
 	AActor* Actor = GetWorld()->SpawnActor<AActor>(DamageTextActorClass, SpawnTransform);
 
 	if (Actor)
 	{
-		Cast<ADamageTextActor>(Actor)->SetText(DamageValue);
+		auto DmgText = Cast<ADamageTextActor>(Actor);
+		if (DmgText)
+		{
+			DmgText->SetText(DamageValue);
+			if (bCrit)
+			{
+				DmgText->SetCritText();
+			}
+		}
 	}
 }
 
@@ -186,13 +194,13 @@ void AMgbPlayerController::GenerateUpgradeInfo()
 
 	bool bWeapon = true;
 
-	// ¹«±â Ä­ÀÌ ³²¾ÆÀÖ´Ù¸é µ¥ÀÌÅÍÅ×ÀÌºí¿¡ ÀÖ´Â ¹«±âµéÁß¿¡¼­ ·£´ýÀ¸·Î ¼±ÅÃ.
+	// ï¿½ï¿½ï¿½ï¿½ Ä­ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ö´Ù¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ìºï¿½ï¿½ ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½.
 	int WeaponCount = MgbPlayer->Weapons.Num();
 	if (WeaponCount < 4)
 	{
 		WeaponNames = GS->DT_Weapon->GetRowNames();
 	}
-	// ¹«±â°¡ ÀÌ¹Ì 4°³¶ó¸é, ÇÃ·¹ÀÌ¾î°¡ °¡Áö°í ÀÖ´Â ¹«±âµé Áß¿¡¼­ ¼±ÅÃ.
+	// ï¿½ï¿½ï¿½â°¡ ï¿½Ì¹ï¿½ 4ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½Ã·ï¿½ï¿½Ì¾î°¡ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ß¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½.
 	else
 	{
 		for (int i = 0; i < 4; i++)
@@ -201,22 +209,22 @@ void AMgbPlayerController::GenerateUpgradeInfo()
 		}
 	}
 
-	// ·£´ý ¼¯±â.
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½.
 	WeaponNames.Sort([](const auto&, const auto&)
 		{
 			return FMath::RandBool();
 		});
 
 
-	// ½½·ÔÀÇ °³¼ö¸¸Å­ ½ÇÇà.
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å­ ï¿½ï¿½ï¿½ï¿½.
 	for (int SlotNum = 0; SlotNum < 3; SlotNum++)
 	{
 		if (bWeapon)
 		{
-			// 2ºÐÀÇ 1È®·ü·Î ¹«±â/ºñÀü¼­.
-			// ÀÏ´Ü ¹«Á¶°Ç ¹«±â.
+			// 2ï¿½ï¿½ï¿½ï¿½ 1È®ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.
+			// ï¿½Ï´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½.
 
-			// ¾÷±×·¹ÀÌµåÇÒ ¹«±â¸¦ Á¤ÇÔ.
+			// ï¿½ï¿½ï¿½×·ï¿½ï¿½Ìµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½â¸¦ ï¿½ï¿½ï¿½ï¿½.
 			FName RandomWeaponName = WeaponNames[SlotNum];
 			FMgbWeaponInfo* WeaponInfo = GS->DT_Weapon->FindRow<FMgbWeaponInfo>(RandomWeaponName, FString("Find Weapon"));
 			if (!WeaponInfo)
@@ -224,14 +232,14 @@ void AMgbPlayerController::GenerateUpgradeInfo()
 				return;
 			}
 
-			// ¹«±â ¿É¼Ç °¡Á®¿À±â.
+			// ï¿½ï¿½ï¿½ï¿½ ï¿½É¼ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.
 			auto WeaponBonus = GS->DT_WeaponUpgradeBonus->FindRow<FMgbWeaponUpgradeBonus>(RandomWeaponName, FString("Find Bouns"));
 			if (!WeaponBonus)
 			{
 				return;
 			}
 
-			// ¾÷±×·¹ÀÌµå ¿É¼Ç ¼¯±â
+			// ï¿½ï¿½ï¿½×·ï¿½ï¿½Ìµï¿½ ï¿½É¼ï¿½ ï¿½ï¿½ï¿½ï¿½
 			auto Temp = WeaponBonus->UpgradeOptions;
 			TArray<FWeaponUpgradeOption> SelectedOptions;
 			Temp.Sort([](const auto&, const auto&)
@@ -246,7 +254,7 @@ void AMgbPlayerController::GenerateUpgradeInfo()
 				SelectedOptions.Add(Temp[i]);
 			}
 
-			// (ÀÌ°Å¸¦ Å¬¶óÀÌ¾ðÆ® ÇÔ¼ö·Î ¼öÁ¤ÇÊ¿ä)
+			// (ï¿½Ì°Å¸ï¿½ Å¬ï¿½ï¿½ï¿½Ì¾ï¿½Æ® ï¿½Ô¼ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ê¿ï¿½)
 			InGameWidget->SetItemUpgradeSlot(SlotNum, RandomWeaponName, SelectedOptions);
 		}
 		else

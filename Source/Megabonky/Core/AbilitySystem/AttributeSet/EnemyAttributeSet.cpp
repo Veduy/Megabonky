@@ -47,7 +47,6 @@ void UEnemyAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute
 			AMgbEnemyCharacter* Character = Cast<AMgbEnemyCharacter>(GetOwningActor());
 			if (Character)
 			{
-				//ASC -> Effect Cue 실행하기.
 				auto ASC = GetOwningAbilitySystemComponent();
 				if (!ASC)
 					return;

@@ -42,8 +42,8 @@ public:
 
 public:
 	UFUNCTION(Client, Unreliable)
-	void ClientSpawnDamageTextActor(FVector Location, float DamageValue);
-	void ClientSpawnDamageTextActor_Implementation(FVector Location, float DamageValue);
+	void ClientSpawnDamageTextActor(FVector Location, float DamageValue, bool bCrit = false);
+	void ClientSpawnDamageTextActor_Implementation(FVector Location, float DamageValue, bool bCrit = false);
 
 	UFUNCTION(BlueprintCallable)
 	void GenerateUpgradeInfo();
