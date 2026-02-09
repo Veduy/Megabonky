@@ -5,6 +5,7 @@
 #include "K2Node_SpawnActorFromClass.h"
 #include "EdGraphSchema_K2.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "UObject/UObjectIterator.h"
 #include "Json.h"
 
 UK2Node* FUtilityNodeCreator::CreatePrintNode(UEdGraph* Graph, const TSharedPtr<FJsonObject>& Params)
@@ -61,7 +62,6 @@ UK2Node* FUtilityNodeCreator::CreateCallFunctionNode(UEdGraph* Graph, const TSha
 		return nullptr;
 	}
 
-	// Get target function name
 	FString TargetFunction;
 	if (!Params->TryGetStringField(TEXT("target_function"), TargetFunction))
 	{
@@ -74,29 +74,50 @@ UK2Node* FUtilityNodeCreator::CreateCallFunctionNode(UEdGraph* Graph, const TSha
 		return nullptr;
 	}
 
-	// Find the function to call
 	UFunction* TargetFunc = nullptr;
+
+	// 1) target_class가 지정된 경우, 해당 클래스에서 검색
 	FString ClassName;
 	if (Params->TryGetStringField(TEXT("target_class"), ClassName))
 	{
-		UClass* TargetClass = Cast<UClass>(StaticFindObject(UClass::StaticClass(), nullptr, *ClassName));
-		if (TargetClass)
+		// UClass::GetName()은 U/A 접두사 없이 저장되므로, 접두사 제거
+		FString SearchName = ClassName;
+		if (SearchName.Len() > 1
+			&& (SearchName.StartsWith(TEXT("U")) || SearchName.StartsWith(TEXT("A")))
+			&& FChar::IsUpper(SearchName[1]))
 		{
-			TargetFunc = TargetClass->FindFunctionByName(FName(*TargetFunction));
+			SearchName = SearchName.RightChop(1);
+		}
+
+		for (TObjectIterator<UClass> It; It; ++It)
+		{
+			if (It->GetName().Equals(SearchName, ESearchCase::IgnoreCase))
+			{
+				TargetFunc = It->FindFunctionByName(FName(*TargetFunction));
+				break;
+			}
 		}
 	}
-	else
+
+	// 2) 못 찾았으면, 모든 UClass를 순회하여 함수 검색
+	if (!TargetFunc)
 	{
-		// Try common Unreal classes
-		TargetFunc = UKismetSystemLibrary::StaticClass()->FindFunctionByName(FName(*TargetFunction));
+		for (TObjectIterator<UClass> It; It; ++It)
+		{
+			TargetFunc = It->FindFunctionByName(FName(*TargetFunction), EIncludeSuperFlag::ExcludeSuper);
+			if (TargetFunc)
+			{
+				break;
+			}
+		}
 	}
 
 	if (!TargetFunc)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("CreateCallFunctionNode: Function '%s' not found"), *TargetFunction);
 		return nullptr;
 	}
 
-	// Set function reference BEFORE initialization
 	CallNode->SetFromFunction(TargetFunc);
 
 	double PosX, PosY;
