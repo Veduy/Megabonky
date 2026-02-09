@@ -78,6 +78,14 @@ void AMgbPlayerController::OnUnPossess()
 	Super::OnUnPossess();
 }
 
+void AMgbPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	// 맵 이동(ServerTravel) 시 PlayerController의 타이머 안전하게 정리
+	GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
+
+	Super::EndPlay(EndPlayReason);
+}
+
 void AMgbPlayerController::ServerResumeRequestCountIncrementAndCheck_Implementation()
 {
 	AMgbGameStateBase* GS = Cast<AMgbGameStateBase>(GetWorld()->GetGameState());

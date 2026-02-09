@@ -115,7 +115,7 @@ TSharedPtr<FJsonObject> FEpicUnrealMCPBlueprintCommands::HandleCreateBlueprint(c
     }
 
     // Check if blueprint already exists
-    FString PackagePath = TEXT("/Game/Blueprints/");
+    FString PackagePath = TEXT("/Game/Blueprints/MCP/");
     FString AssetName = BlueprintName;
     if (UEditorAssetLibrary::DoesAssetExist(PackagePath + AssetName))
     {
@@ -238,8 +238,17 @@ TSharedPtr<FJsonObject> FEpicUnrealMCPBlueprintCommands::HandleAddComponentToBlu
     UClass* ComponentClass = nullptr;
 
     // Try to find the class with exact name first
-    ComponentClass = FindObject<UClass>(nullptr, *ComponentType);
-    
+
+    ComponentClass = FindFirstObjectSafe<UClass>(*ComponentType);
+    if (ComponentClass)
+    {
+		UE_LOG(LogTemp, Warning, TEXT("HandleAddComponentToBlueprint: Found component class %s using FindFirstObjectSafe"), *ComponentType);
+    }
+    else if (!ComponentClass)
+    {
+        ComponentClass = FindObject<UClass>(nullptr, *ComponentType);
+    }
+
     // If not found, try with "Component" suffix
     if (!ComponentClass && !ComponentType.EndsWith(TEXT("Component")))
     {
@@ -247,9 +256,13 @@ TSharedPtr<FJsonObject> FEpicUnrealMCPBlueprintCommands::HandleAddComponentToBlu
         ComponentClass = FindObject<UClass>(nullptr, *ComponentTypeWithSuffix);
     }
     
-    //여기서 컴포넌트를 몾찾는다. 
-
-
+	// Add "/Script/Engine." prefix and try again
+    if (!ComponentClass && !ComponentType.StartsWith(TEXT("/Script/Engine.")))
+    {
+	    UE_LOG(LogTemp, Warning, TEXT("HandleAddComponentToBlueprint: Searching for component class /Script/Engine/.%s"), *ComponentType);
+        FString ComponentScript = TEXT("/Script/Engine.") + ComponentType;
+        ComponentClass = FindObject<UClass>(nullptr, *ComponentScript);
+    }
 
     // If still not found, try with "U" prefix
     if (!ComponentClass && !ComponentType.StartsWith(TEXT("U")))

@@ -67,6 +67,7 @@ void AMgbGameStateBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	DOREPLIFETIME(AMgbGameStateBase, bGameOver);
 	DOREPLIFETIME(AMgbGameStateBase, GameStartTime);
 	DOREPLIFETIME(AMgbGameStateBase, GameTimeSec);
 	DOREPLIFETIME(AMgbGameStateBase, CurrentLevel);
@@ -91,8 +92,7 @@ void AMgbGameStateBase::ServerAddXP_Implementation(float InValue)
 
 		ServerAddXP(temp);
 
-		// TODO:레벨업시 발동 이벤트
-		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.0001f); //서버도 똑같이
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.0001f); 
 		MulticastShowItemSelectWindow();
 		MulticastSetPauseGame(true);
 	}
@@ -116,7 +116,6 @@ void AMgbGameStateBase::MulticastUpdateUI_XP_Implementation(float InPercent)
 
 void AMgbGameStateBase::MulticastSetPauseGame_Implementation(bool bPause)
 {
-	//UGameplayStatics::SetGamePaused(GetWorld(), bPause);
 	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 	if (PC && PC->IsLocalPlayerController())
 	{
@@ -145,11 +144,21 @@ void AMgbGameStateBase::MulticastShowItemSelectWindow_Implementation()
 		{
 			if (MgbPC)
 			{
-				MgbPC->GenerateUpgradeInfo(); //임시로 여기 위치.
+				MgbPC->GenerateUpgradeInfo(); 
 				MgbPC->InGameWidget->ShowItemSelectWindow();
 			}
 		}
 	}
+}
+
+void AMgbGameStateBase::MulticastHandleGameOver_Implementation()
+{
+	HandleGameOver();
+}
+
+void AMgbGameStateBase::ServerHandleGameOver_Implementation()
+{
+	HandleGameOver();
 }
 
 void AMgbGameStateBase::InitSpawnEnemyTimer()
@@ -280,13 +289,22 @@ void AMgbGameStateBase::SpawnEnemy()
 	}
 }
 
+void AMgbGameStateBase::HandleGameOver()
+{
+	bGameOver = true;
+	OnGameOver.Broadcast();
+	if (SpawnTimerHandle.IsValid())
+	{
+		GetWorld()->GetTimerManager().ClearTimer(SpawnTimerHandle);
+	}
+}
+
 void AMgbGameStateBase::HandleResumeRequest()
 {
 	ResumeRequestCount++;
 	
 	if (ResumeRequestCount == GetCurrentPlayerCount())
 	{	
-		NET_LOG("");
 		ResumeRequestCount = 0;
 
 		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.0f); //서버도 똑같이

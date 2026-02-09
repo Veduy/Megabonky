@@ -15,12 +15,14 @@ UK2Node* FDataNodeCreator::CreateVariableGetNode(UEdGraph* Graph, const TSharedP
 	FString VariableName;
 	if (!Params->TryGetStringField(TEXT("variable_name"), VariableName))
 	{
+		UE_LOG(LogTemp, Warning, TEXT("CreateVariableGetNode: 'variable_name' field is missing in Params JSON."));
 		return nullptr;
 	}
 
 	UK2Node_VariableGet* VarGetNode = NewObject<UK2Node_VariableGet>(Graph);
 	if (!VarGetNode)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("CreateVariableGetNode: Failed to create UK2Node_VariableGet object."));
 		return nullptr;
 	}
 

@@ -166,7 +166,7 @@ UBlueprint* FEpicUnrealMCPCommonUtils::FindBlueprintByName(const FString& Bluepr
     else
     {
         // It's just a name, add the default /Game/Blueprints/ prefix
-        ObjectPath = FString::Printf(TEXT("/Game/Blueprints/%s.%s"), *BlueprintName, *BlueprintName);
+        ObjectPath = FString::Printf(TEXT("/Game/Blueprints/MCP/%s.%s"), *BlueprintName, *BlueprintName);
     }
 
     // First, try to load the object directly, as it's the fastest method.
@@ -192,7 +192,7 @@ UBlueprint* FEpicUnrealMCPCommonUtils::FindBlueprintByName(const FString& Bluepr
 
     // Fallback for cases where the asset is in memory but not yet fully saved,
     // where it might be found via its package path.
-    FString PackagePath = TEXT("/Game/Blueprints/") + BlueprintName;
+    FString PackagePath = TEXT("/Game/Blueprints/MCP") + BlueprintName;
     Blueprint = FindObject<UBlueprint>(nullptr, *PackagePath);
 
     if (!Blueprint)

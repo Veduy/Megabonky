@@ -7,6 +7,7 @@
 #include "MgbGameStateBase.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnTimeChanged, int32, PassedTime);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnGameOver);
 
 class AMgbEnemyCharacter;
 
@@ -43,11 +44,26 @@ public:
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void MulticastShowItemSelectWindow();
 	void MulticastShowItemSelectWindow_Implementation();
+
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void MulticastHandleGameOver();
+	void MulticastHandleGameOver_Implementation();
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void ServerHandleGameOver();
+	void ServerHandleGameOver_Implementation();
 	
 public:
+	UFUNCTION()
 	void InitSpawnEnemyTimer();
+
+	UFUNCTION()
 	void SpawnEnemy();
 
+	UFUNCTION()
+	void HandleGameOver();
+
+	UFUNCTION()
 	void HandleResumeRequest();
 
 	uint32 GetCurrentPlayerCount();
@@ -55,12 +71,18 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintAssignable)
 	FOnTimeChanged OnTimeChanged;
 
+	UPROPERTY(VisibleAnywhere, BlueprintAssignable)
+	FOnGameOver OnGameOver;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	FTimerHandle SpawnTimerHandle;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
 	TArray<TSubclassOf<AMgbEnemyCharacter>> EnemyClasses;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data", Replicated)
+	uint8 bGameOver : 1 = false;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data", Replicated)
 	float GameStartTime = 0.f;

@@ -23,11 +23,17 @@ void FMgbDebugToolModule::StartupModule()
 	LevelEditorModule.GetMenuExtensibilityManager()->AddExtender(MenuExtender);
 
 
-	// 콘솔 명령 등록 (에디터 상시 사용 가능) 
-	// 사용법: Mgb.Cmd <CommandType> [Key=Value ...]
-	// 예: Mgb.Cmd get_actors_in_level
-	// 예: Mgb.Cmd find_actors_by_name pattern=Cube
-	// 예: Mgb.Cmd spawn_actor type=StaticMeshActor name=MyActor
+	// Mgb.Cmd <CommandType> [Key=Value ...]
+	// gb.Cmd get_actors_in_level
+	// Mgb.Cmd find_actors_by_name pattern=Cube
+	// Mgb.Cmd spawn_actor type=StaticMeshActor name=MyActor
+	// 
+	// ex)
+	// create_blueprint name=BP_MgbClassEnemy01 parent_class=MgbEnemyCharacter
+	// add_component_to_blueprint blueprint_name=BP_Cube component_type=BoxComponent component_name=BoxCollision
+	// add_component_to_blueprint blueprint_name=BP_Cube component_type=StaticMeshComponent component_name=StaticMesh
+	// add_blueprint_node blueprint_name=BP_MgbClassEnemy01 node_type=VariableGet node_params=variable_name=CapsuleComponent 
+
 	ConsoleCommands.Add(IConsoleManager::Get().RegisterConsoleCommand(
 		TEXT("Mgb.Cmd"),
 		TEXT("Execute MCP command locally. Usage: Mgb.Cmd <CommandType> [Key=Value ...]"),
@@ -47,7 +53,19 @@ void FMgbDebugToolModule::StartupModule()
 				FString Key, Value;
 				if (Args[i].Split(TEXT("="), &Key, &Value))
 				{
-					Params->SetStringField(Key, Value);
+					// If the value contains '=', treat it as a sub-object
+					// e.g. node_params=variable_name=CapsuleComponent -> node_params: { "variable_name": "CapsuleComponent" }
+					FString SubKey, SubValue;
+					if (Value.Split(TEXT("="), &SubKey, &SubValue))
+					{
+						TSharedPtr<FJsonObject> SubObj = MakeShared<FJsonObject>();
+						SubObj->SetStringField(SubKey, SubValue);
+						Params->SetObjectField(Key, SubObj);
+					}
+					else
+					{
+						Params->SetStringField(Key, Value);
+					}
 				}
 			}
 

@@ -7,6 +7,7 @@
 #include "Net/UnrealNetwork.h"
 
 #include "../../Characters/MgbPlayerCharacter.h"
+#include "../../MgbGameStateBase.h"
 #include "../../MgbPlayerController.h"
 #include "../../../UI/InGame/InGame.h"
 #include "../../../Util/NetworkLog.h"
@@ -68,30 +69,35 @@ void UPlayerAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribut
 {
 	Super::PostAttributeChange(Attribute, OldValue, NewValue);
 
-	// 서버에서만
 	if (Attribute == GetHealthAttribute())
 	{
-		auto Character = Cast<AMgbPlayerCharacter>(GetOwningActor());
-		if (!Character)
-			return;
+		HandleHealthChanged();
+	}
+}
 
-		if (auto PC = Cast<AMgbPlayerController>(Character->GetController()))
+void UPlayerAttributeSet::HandleHealthChanged()
+{
+	auto Character = Cast<AMgbPlayerCharacter>(GetOwningActor());
+	if (!Character)
+		return;
+
+	auto PC = Cast<AMgbPlayerController>(Character->GetController());
+	if (PC || PC->IsLocalPlayerController())
+	{
+		if (PC->InGameWidget)
 		{
-			if (!PC->IsLocalPlayerController())
-				return;
-
-			if (PC->InGameWidget)
-			{
-				PC->InGameWidget->UpdateHPBar(GetMaxHealth(), GetHealth());
-			}
-
-			if (GetHealth() <= 0.f && !Character->bDeath)
-			{
-				Character->HandleDeath();
-			}
+			PC->InGameWidget->UpdateHPBar(GetMaxHealth(), GetHealth());
 		}
+	}
 
-	
+	if (GetHealth() <= 0.f && !Character->bDeath)
+	{
+		auto GS = Cast<AMgbGameStateBase>(GetWorld()->GetGameState());
+		if (GS)
+		{
+			GS->ServerHandleGameOver();
+		}
+		Character->HandleDeath();
 	}
 }
 
@@ -100,9 +106,7 @@ void UPlayerAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCall
 	Super::PostGameplayEffectExecute(Data);
 	
 	//Data.Target.
-	
 	//Data.EvaluatedData.Attribute.
-	
 	//FGameplayEffectContextHandle EffectContextHandle = Data.EffectSpec.GetContext();
 }
 
@@ -115,26 +119,7 @@ void UPlayerAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UPlayerAttributeSet, Health, OldHealth);
 
-	// UI 업데이트(클라만, 서버일때 안됨)
-	auto Character = Cast<AMgbPlayerCharacter>(GetOwningActor());
-	if (!Character)
-		return;
-
-	if (auto PC = Cast<AMgbPlayerController>(Character->GetController()))
-	{
-		if (!PC->IsLocalPlayerController())
-			return;
-
-		if (PC->InGameWidget)
-		{
-			PC->InGameWidget->UpdateHPBar(GetMaxHealth(), GetHealth());
-		}
-
-		if (GetHealth() <= 0.f && !Character->bDeath)
-		{
-			Character->HandleDeath();
-		}
-	}
+	HandleHealthChanged();
 }
 
 void UPlayerAttributeSet::OnRep_HealthRegen(const FGameplayAttributeData& OldHealthRegen)

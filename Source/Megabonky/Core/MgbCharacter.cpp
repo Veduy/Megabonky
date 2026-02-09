@@ -10,6 +10,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
 
+#include "MgbGameStateBase.h"
 #include "MgbWeapon.h"
 #include "../Util/NetworkLog.h"
 
@@ -32,7 +33,14 @@ void AMgbCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	
+	if (HasAuthority())
+	{
+		auto GS = Cast<AMgbGameStateBase>(GetWorld()->GetGameState());
+		if (GS)
+		{
+			GS->OnGameOver.AddDynamic(this, &AMgbCharacter::OnGameOver);
+		}
+	}
 }
 
 // Called every frame
@@ -53,22 +61,8 @@ UAbilitySystemComponent* AMgbCharacter::GetAbilitySystemComponent() const
 	return AbilitySystemComponent;
 }
 
-float AMgbCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+void AMgbCharacter::OnGameOver()
 {
-	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-		
-	//NET_LOG(FString::Printf(TEXT("DamageCauser : %s"), *DamageCauser->GetName()));			
-	//NET_LOG(FString::Printf(TEXT("Weapon : %s"), *DamageCauser->GetName()));	
-	//NET_LOG(FString::Printf(TEXT("EventInstigator : %s"), *EventInstigator->GetName()));	
-
-	if (DamageEvent.IsOfType(FDamageEvent::ClassID))
-	{
-		
-	}
-	else if (DamageEvent.IsOfType(FRadialDamageEvent::ClassID))
-	{	
-
-	}
-
-	return 0.0f;
+	SetActorTickEnabled(false);
+	GetCharacterMovement()->DisableMovement();
 }

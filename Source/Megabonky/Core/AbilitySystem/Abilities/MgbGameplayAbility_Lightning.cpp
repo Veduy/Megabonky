@@ -72,18 +72,17 @@ void UMgbGameplayAbility_Lightning::Lightning()
 		float InterverTime = LightingCount > 0 ? 1.f / LightingCount : 1.f;
 		if (TargetActors.Num() > 0 && MgbWeapon)
 		{
-			TSharedPtr<FTimerHandle> LightingTimerHandle = MakeShared<FTimerHandle>();
-			TSharedPtr<int32>TargetIndex = MakeShared<int32>(0);
+				TSharedPtr<int32>TargetIndex = MakeShared<int32>(0);
 
 			GetWorld()->GetTimerManager().SetTimer(
-				*LightingTimerHandle,
-				[this, WeaponASC, EffectSpecHandle, TargetActors, LightingTimerHandle, TargetIndex]()
+				LightingTimerHandle,
+				[this, WeaponASC, EffectSpecHandle, TargetActors, TargetIndex]()
 				{
 					if (!WeaponASC || !EffectSpecHandle.IsValid())
 					{
 						if (LightingTimerHandle.IsValid())
 						{
-							GetWorld()->GetTimerManager().ClearTimer(*LightingTimerHandle);
+							GetWorld()->GetTimerManager().ClearTimer(LightingTimerHandle);
 						}
 						return;
 					}
@@ -92,7 +91,7 @@ void UMgbGameplayAbility_Lightning::Lightning()
 					{
 						if (LightingTimerHandle.IsValid())
 						{
-							GetWorld()->GetTimerManager().ClearTimer(*LightingTimerHandle);
+							GetWorld()->GetTimerManager().ClearTimer(LightingTimerHandle);
 						}
 						return;
 					}
@@ -125,4 +124,17 @@ void UMgbGameplayAbility_Lightning::Lightning()
 	}
 
 
+}
+
+void UMgbGameplayAbility_Lightning::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
+{
+	// Lightning은 lambda 내에서 shared_ptr로 타이머를 관리하고 있음
+	// 비정상 종료 시 추가 정리 (안전성)
+	if (UWorld* World = GetWorld())
+	{
+		World->GetTimerManager().ClearTimer(LightingTimerHandle);
+	}
+
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }

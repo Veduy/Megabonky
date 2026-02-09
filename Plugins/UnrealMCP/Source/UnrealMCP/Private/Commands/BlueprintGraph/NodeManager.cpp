@@ -35,12 +35,17 @@ TSharedPtr<FJsonObject> FBlueprintNodeManager::AddNode(const TSharedPtr<FJsonObj
 	{
 		return CreateErrorResponse(TEXT("Missing 'blueprint_name' parameter"));
 	}
+	if (!BlueprintName.IsEmpty())
+	{
+		UE_LOG(LogTemp, Display, TEXT("FBlueprintNodeManager::AddNode: Adding node to blueprint '%s'"), *BlueprintName);
+	}
 
 	FString NodeType;
 	if (!Params->TryGetStringField(TEXT("node_type"), NodeType))
 	{
 		return CreateErrorResponse(TEXT("Missing 'node_type' parameter"));
 	}
+	
 
 	// Get optional node parameters
 	const TSharedPtr<FJsonObject>* NodeParamsPtr;
@@ -414,7 +419,7 @@ UBlueprint* FBlueprintNodeManager::LoadBlueprint(const FString& BlueprintName)
 	// If no path prefix, assume /Game/Blueprints/
 	if (!BlueprintPath.StartsWith(TEXT("/")))
 	{
-		BlueprintPath = TEXT("/Game/Blueprints/") + BlueprintPath;
+		BlueprintPath = TEXT("/Game/Blueprints/MCP/") + BlueprintPath;
 	}
 
 	// Add .Blueprint suffix if not present

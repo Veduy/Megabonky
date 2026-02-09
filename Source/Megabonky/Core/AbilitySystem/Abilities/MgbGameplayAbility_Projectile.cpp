@@ -28,14 +28,14 @@ void UMgbGameplayAbility_Projectile::SpawnProjectile(AActor* Owner, const FVecto
 	FRotator Rotation = InSpawnDir;
 	Rotation.Roll = 0.f;
 
-	// ¹«±âÀÇ »çÀÌÁî ¹èÀ² + Ä³¸¯ÅÍ »çÀÌÁî ¹èÀ²
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ + Ä³ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	UAbilitySystemComponent* WeaponASC = GetAbilitySystemComponentFromActorInfo();
 	auto WeaponSize = WeaponASC->GetNumericAttribute(UWeaponAttributeSet::GetSizeAttribute()) / 100;
-	auto WeaponProjSpeed = WeaponASC->GetNumericAttribute(UWeaponAttributeSet::GetProjectileSpeedAttribute()); // ½ÇÁ¦ °ª
+	auto WeaponProjSpeed = WeaponASC->GetNumericAttribute(UWeaponAttributeSet::GetProjectileSpeedAttribute()); // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
 
 	UAbilitySystemComponent* PlayerASC = GetPlayerASC();
 	auto PlayerSize = PlayerASC->GetNumericAttribute(UPlayerAttributeSet::GetSizeAttribute()) / 100;
-	auto PlayerProjSpeed = PlayerASC->GetNumericAttribute(UPlayerAttributeSet::GetProjectileSpeedAttribute()) / 100; //ÆÛ¼¾Æ®
+	auto PlayerProjSpeed = PlayerASC->GetNumericAttribute(UPlayerAttributeSet::GetProjectileSpeedAttribute()) / 100; //ï¿½Û¼ï¿½Æ®
 
 	auto Size = WeaponSize * PlayerSize;
 	auto ProjSpeed = WeaponProjSpeed * PlayerProjSpeed;
@@ -84,7 +84,7 @@ void UMgbGameplayAbility_Projectile::RapidFire()
 		[this, PlayerActor, WeaponActor]()
 		{
 			AActor* TargetActor = nullptr;
-			// ½ºÆù ¹æÇâÀ» PrimaryTarget À¸·Î ¼öÁ¤.
+			// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ PrimaryTarget ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½.
 			AMgbPlayerCharacter* PlayerCharacter = Cast<AMgbPlayerCharacter>(PlayerActor);
 
 			bool bFoundTarget = false;
@@ -115,4 +115,16 @@ void UMgbGameplayAbility_Projectile::RapidFire()
 		SpawnInterval,
 		true,
 		0.f);
+}
+
+void UMgbGameplayAbility_Projectile::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
+{
+	// Ability ì¢…ë£Œ ì‹œ íƒ€ì´ë¨¸ ì•ˆì „í•˜ê²Œ ì •ë¦¬ (ë¹„ì •ìƒ ì¢…ë£Œ ì‹œì—ë„ ì •ë¦¬ë¨)
+	if (UWorld* World = GetWorld())
+	{
+		World->GetTimerManager().ClearTimer(SpawnTimerHandle);
+	}
+
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }

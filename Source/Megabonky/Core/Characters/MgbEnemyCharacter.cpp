@@ -159,6 +159,9 @@ void AMgbEnemyCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 
 void AMgbEnemyCharacter::Destroyed()
 {
+	// 타이머 정리 (EndPlay보다 먼저 호출될 수 있으므로 명시적으로 정리)
+	GetWorld()->GetTimerManager().ClearTimer(CheckWallTimer);
+
 	if (HasAuthority())
 	{
 		if (auto GS = Cast<AMgbGameStateBase>(GetWorld()->GetGameState()))
@@ -169,6 +172,8 @@ void AMgbEnemyCharacter::Destroyed()
 
 		GetWorld()->SpawnActor<AActor>(XPCrystalClass, GetActorTransform());
 	}
+
+	Super::Destroyed();
 }
 
 void AMgbEnemyCharacter::MoveToTarget(float DeltaTime)

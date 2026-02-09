@@ -284,6 +284,11 @@ void AMgbPlayerCharacter::HandleDeath()
 {
 	bDeath = true;
 
+	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+	{
+		DisableInput(PC);
+	}
+
 	if (ActivateAbilityHandle.IsValid())
 	{
 		GetWorld()->GetTimerManager().ClearTimer(ActivateAbilityHandle);
