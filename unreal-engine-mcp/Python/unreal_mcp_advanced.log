@@ -1,0 +1,478 @@
+2026-01-19 10:03:38,518 - mcp.server.lowlevel.server - DEBUG - [server.py:162] - Initializing server 'UnrealMCP_Advanced'
+2026-01-19 10:03:38,518 - mcp.server.lowlevel.server - DEBUG - [server.py:432] - Registering handler for ListToolsRequest
+2026-01-19 10:03:38,518 - mcp.server.lowlevel.server - DEBUG - [server.py:512] - Registering handler for CallToolRequest
+2026-01-19 10:03:38,519 - mcp.server.lowlevel.server - DEBUG - [server.py:301] - Registering handler for ListResourcesRequest
+2026-01-19 10:03:38,519 - mcp.server.lowlevel.server - DEBUG - [server.py:336] - Registering handler for ReadResourceRequest
+2026-01-19 10:03:38,519 - mcp.server.lowlevel.server - DEBUG - [server.py:263] - Registering handler for PromptListRequest
+2026-01-19 10:03:38,519 - mcp.server.lowlevel.server - DEBUG - [server.py:285] - Registering handler for GetPromptRequest
+2026-01-19 10:03:38,519 - mcp.server.lowlevel.server - DEBUG - [server.py:321] - Registering handler for ListResourceTemplatesRequest
+2026-01-19 10:03:38,616 - UnrealMCP_Advanced - INFO - [unreal_mcp_server_advanced.py:2795] - Starting Advanced MCP server with stdio transport
+2026-01-19 10:03:38,621 - asyncio - DEBUG - [proactor_events.py:633] - Using proactor: IocpProactor
+2026-01-19 10:03:38,625 - UnrealMCP_Advanced - INFO - [unreal_mcp_server_advanced.py:434] - UnrealMCP Advanced server starting up
+2026-01-19 10:03:38,625 - UnrealMCP_Advanced - INFO - [unreal_mcp_server_advanced.py:435] - Connection will be established lazily on first tool call
+2026-01-19 10:03:57,845 - mcp.server.lowlevel.server - DEBUG - [server.py:668] - Received message: 1 validation error for JSONRPCMessage
+  Invalid JSON: EOF while parsing a value at line 2 column 0 [type=json_invalid, input_value='\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:03:57,845 - mcp.server.lowlevel.server - ERROR - [server.py:693] - Received exception from stream: 1 validation error for JSONRPCMessage
+  Invalid JSON: EOF while parsing a value at line 2 column 0 [type=json_invalid, input_value='\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:04:01,685 - mcp.server.lowlevel.server - DEBUG - [server.py:668] - Received message: 1 validation error for JSONRPCMessage
+  Invalid JSON: EOF while parsing a value at line 2 column 0 [type=json_invalid, input_value='\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:04:01,685 - mcp.server.lowlevel.server - ERROR - [server.py:693] - Received exception from stream: 1 validation error for JSONRPCMessage
+  Invalid JSON: EOF while parsing a value at line 2 column 0 [type=json_invalid, input_value='\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:04:34,765 - mcp.server.lowlevel.server - DEBUG - [server.py:162] - Initializing server 'UnrealMCP_Advanced'
+2026-01-19 10:04:34,765 - mcp.server.lowlevel.server - DEBUG - [server.py:432] - Registering handler for ListToolsRequest
+2026-01-19 10:04:34,765 - mcp.server.lowlevel.server - DEBUG - [server.py:512] - Registering handler for CallToolRequest
+2026-01-19 10:04:34,765 - mcp.server.lowlevel.server - DEBUG - [server.py:301] - Registering handler for ListResourcesRequest
+2026-01-19 10:04:34,765 - mcp.server.lowlevel.server - DEBUG - [server.py:336] - Registering handler for ReadResourceRequest
+2026-01-19 10:04:34,765 - mcp.server.lowlevel.server - DEBUG - [server.py:263] - Registering handler for PromptListRequest
+2026-01-19 10:04:34,766 - mcp.server.lowlevel.server - DEBUG - [server.py:285] - Registering handler for GetPromptRequest
+2026-01-19 10:04:34,766 - mcp.server.lowlevel.server - DEBUG - [server.py:321] - Registering handler for ListResourceTemplatesRequest
+2026-01-19 10:04:34,848 - UnrealMCP_Advanced - INFO - [unreal_mcp_server_advanced.py:2795] - Starting Advanced MCP server with stdio transport
+2026-01-19 10:04:34,860 - asyncio - DEBUG - [proactor_events.py:633] - Using proactor: IocpProactor
+2026-01-19 10:04:34,864 - UnrealMCP_Advanced - INFO - [unreal_mcp_server_advanced.py:434] - UnrealMCP Advanced server starting up
+2026-01-19 10:04:34,864 - UnrealMCP_Advanced - INFO - [unreal_mcp_server_advanced.py:435] - Connection will be established lazily on first tool call
+2026-01-19 10:04:43,969 - mcp.server.lowlevel.server - DEBUG - [server.py:162] - Initializing server 'UnrealMCP_Advanced'
+2026-01-19 10:04:43,969 - mcp.server.lowlevel.server - DEBUG - [server.py:432] - Registering handler for ListToolsRequest
+2026-01-19 10:04:43,969 - mcp.server.lowlevel.server - DEBUG - [server.py:512] - Registering handler for CallToolRequest
+2026-01-19 10:04:43,969 - mcp.server.lowlevel.server - DEBUG - [server.py:301] - Registering handler for ListResourcesRequest
+2026-01-19 10:04:43,969 - mcp.server.lowlevel.server - DEBUG - [server.py:336] - Registering handler for ReadResourceRequest
+2026-01-19 10:04:43,969 - mcp.server.lowlevel.server - DEBUG - [server.py:263] - Registering handler for PromptListRequest
+2026-01-19 10:04:43,969 - mcp.server.lowlevel.server - DEBUG - [server.py:285] - Registering handler for GetPromptRequest
+2026-01-19 10:04:43,969 - mcp.server.lowlevel.server - DEBUG - [server.py:321] - Registering handler for ListResourceTemplatesRequest
+2026-01-19 10:04:44,055 - UnrealMCP_Advanced - INFO - [unreal_mcp_server_advanced.py:2795] - Starting Advanced MCP server with stdio transport
+2026-01-19 10:04:44,068 - asyncio - DEBUG - [proactor_events.py:633] - Using proactor: IocpProactor
+2026-01-19 10:04:44,072 - UnrealMCP_Advanced - INFO - [unreal_mcp_server_advanced.py:434] - UnrealMCP Advanced server starting up
+2026-01-19 10:04:44,072 - UnrealMCP_Advanced - INFO - [unreal_mcp_server_advanced.py:435] - Connection will be established lazily on first tool call
+2026-01-19 10:08:17,950 - mcp.server.lowlevel.server - DEBUG - [server.py:668] - Received message: 1 validation error for JSONRPCMessage
+  Invalid JSON: EOF while parsing a value at line 2 column 0 [type=json_invalid, input_value='\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:08:17,950 - mcp.server.lowlevel.server - ERROR - [server.py:693] - Received exception from stream: 1 validation error for JSONRPCMessage
+  Invalid JSON: EOF while parsing a value at line 2 column 0 [type=json_invalid, input_value='\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:16:06,238 - mcp.server.lowlevel.server - DEBUG - [server.py:668] - Received message: 11 validation errors for JSONRPCMessage
+JSONRPCRequest.method
+  Field required [type=missing, input_value={}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+JSONRPCRequest.jsonrpc
+  Field required [type=missing, input_value={}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+JSONRPCRequest.id
+  Field required [type=missing, input_value={}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+JSONRPCNotification.method
+  Field required [type=missing, input_value={}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+JSONRPCNotification.jsonrpc
+  Field required [type=missing, input_value={}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+JSONRPCResponse.jsonrpc
+  Field required [type=missing, input_value={}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+JSONRPCResponse.id
+  Field required [type=missing, input_value={}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+JSONRPCResponse.result
+  Field required [type=missing, input_value={}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+JSONRPCError.jsonrpc
+  Field required [type=missing, input_value={}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+JSONRPCError.id
+  Field required [type=missing, input_value={}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+JSONRPCError.error
+  Field required [type=missing, input_value={}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+2026-01-19 10:16:06,238 - mcp.server.lowlevel.server - ERROR - [server.py:693] - Received exception from stream: 11 validation errors for JSONRPCMessage
+JSONRPCRequest.method
+  Field required [type=missing, input_value={}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+JSONRPCRequest.jsonrpc
+  Field required [type=missing, input_value={}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+JSONRPCRequest.id
+  Field required [type=missing, input_value={}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+JSONRPCNotification.method
+  Field required [type=missing, input_value={}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+JSONRPCNotification.jsonrpc
+  Field required [type=missing, input_value={}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+JSONRPCResponse.jsonrpc
+  Field required [type=missing, input_value={}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+JSONRPCResponse.id
+  Field required [type=missing, input_value={}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+JSONRPCResponse.result
+  Field required [type=missing, input_value={}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+JSONRPCError.jsonrpc
+  Field required [type=missing, input_value={}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+JSONRPCError.id
+  Field required [type=missing, input_value={}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+JSONRPCError.error
+  Field required [type=missing, input_value={}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+2026-01-19 10:16:06,573 - mcp.server.lowlevel.server - DEBUG - [server.py:668] - Received message: 1 validation error for JSONRPCMessage
+  Invalid JSON: EOF while parsing a value at line 2 column 0 [type=json_invalid, input_value='\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:16:06,574 - mcp.server.lowlevel.server - ERROR - [server.py:693] - Received exception from stream: 1 validation error for JSONRPCMessage
+  Invalid JSON: EOF while parsing a value at line 2 column 0 [type=json_invalid, input_value='\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:16:06,846 - mcp.server.lowlevel.server - DEBUG - [server.py:668] - Received message: 1 validation error for JSONRPCMessage
+  Invalid JSON: EOF while parsing a value at line 2 column 0 [type=json_invalid, input_value='\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:16:06,846 - mcp.server.lowlevel.server - ERROR - [server.py:693] - Received exception from stream: 1 validation error for JSONRPCMessage
+  Invalid JSON: EOF while parsing a value at line 2 column 0 [type=json_invalid, input_value='\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:16:07,150 - mcp.server.lowlevel.server - DEBUG - [server.py:668] - Received message: 1 validation error for JSONRPCMessage
+  Invalid JSON: EOF while parsing a value at line 2 column 0 [type=json_invalid, input_value='\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:16:07,150 - mcp.server.lowlevel.server - ERROR - [server.py:693] - Received exception from stream: 1 validation error for JSONRPCMessage
+  Invalid JSON: EOF while parsing a value at line 2 column 0 [type=json_invalid, input_value='\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:16:57,796 - mcp.server.lowlevel.server - DEBUG - [server.py:162] - Initializing server 'UnrealMCP_Advanced'
+2026-01-19 10:16:57,796 - mcp.server.lowlevel.server - DEBUG - [server.py:432] - Registering handler for ListToolsRequest
+2026-01-19 10:16:57,796 - mcp.server.lowlevel.server - DEBUG - [server.py:512] - Registering handler for CallToolRequest
+2026-01-19 10:16:57,797 - mcp.server.lowlevel.server - DEBUG - [server.py:301] - Registering handler for ListResourcesRequest
+2026-01-19 10:16:57,797 - mcp.server.lowlevel.server - DEBUG - [server.py:336] - Registering handler for ReadResourceRequest
+2026-01-19 10:16:57,797 - mcp.server.lowlevel.server - DEBUG - [server.py:263] - Registering handler for PromptListRequest
+2026-01-19 10:16:57,797 - mcp.server.lowlevel.server - DEBUG - [server.py:285] - Registering handler for GetPromptRequest
+2026-01-19 10:16:57,797 - mcp.server.lowlevel.server - DEBUG - [server.py:321] - Registering handler for ListResourceTemplatesRequest
+2026-01-19 10:16:57,881 - UnrealMCP_Advanced - INFO - [unreal_mcp_server_advanced.py:2795] - Starting Advanced MCP server with stdio transport
+2026-01-19 10:16:57,893 - asyncio - DEBUG - [proactor_events.py:633] - Using proactor: IocpProactor
+2026-01-19 10:16:57,897 - UnrealMCP_Advanced - INFO - [unreal_mcp_server_advanced.py:434] - UnrealMCP Advanced server starting up
+2026-01-19 10:16:57,897 - UnrealMCP_Advanced - INFO - [unreal_mcp_server_advanced.py:435] - Connection will be established lazily on first tool call
+2026-01-19 10:16:58,140 - mcp.server.lowlevel.server - DEBUG - [server.py:668] - Received message: 1 validation error for JSONRPCMessage
+  Invalid JSON: EOF while parsing a value at line 2 column 0 [type=json_invalid, input_value='\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:16:58,141 - mcp.server.lowlevel.server - ERROR - [server.py:693] - Received exception from stream: 1 validation error for JSONRPCMessage
+  Invalid JSON: EOF while parsing a value at line 2 column 0 [type=json_invalid, input_value='\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:17:38,038 - mcp.server.lowlevel.server - DEBUG - [server.py:668] - Received message: 1 validation error for JSONRPCMessage
+  Invalid JSON: EOF while parsing a value at line 2 column 0 [type=json_invalid, input_value='\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:17:38,038 - mcp.server.lowlevel.server - ERROR - [server.py:693] - Received exception from stream: 1 validation error for JSONRPCMessage
+  Invalid JSON: EOF while parsing a value at line 2 column 0 [type=json_invalid, input_value='\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:17:38,613 - mcp.server.lowlevel.server - DEBUG - [server.py:668] - Received message: 1 validation error for JSONRPCMessage
+  Invalid JSON: EOF while parsing a value at line 2 column 0 [type=json_invalid, input_value='\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:17:38,614 - mcp.server.lowlevel.server - ERROR - [server.py:693] - Received exception from stream: 1 validation error for JSONRPCMessage
+  Invalid JSON: EOF while parsing a value at line 2 column 0 [type=json_invalid, input_value='\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:17:38,750 - mcp.server.lowlevel.server - DEBUG - [server.py:668] - Received message: 1 validation error for JSONRPCMessage
+  Invalid JSON: EOF while parsing a value at line 2 column 0 [type=json_invalid, input_value='\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:17:38,750 - mcp.server.lowlevel.server - ERROR - [server.py:693] - Received exception from stream: 1 validation error for JSONRPCMessage
+  Invalid JSON: EOF while parsing a value at line 2 column 0 [type=json_invalid, input_value='\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:17:38,917 - mcp.server.lowlevel.server - DEBUG - [server.py:668] - Received message: 1 validation error for JSONRPCMessage
+  Invalid JSON: EOF while parsing a value at line 2 column 0 [type=json_invalid, input_value='\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:17:38,918 - mcp.server.lowlevel.server - ERROR - [server.py:693] - Received exception from stream: 1 validation error for JSONRPCMessage
+  Invalid JSON: EOF while parsing a value at line 2 column 0 [type=json_invalid, input_value='\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:17:39,021 - mcp.server.lowlevel.server - DEBUG - [server.py:668] - Received message: 1 validation error for JSONRPCMessage
+  Invalid JSON: EOF while parsing a value at line 2 column 0 [type=json_invalid, input_value='\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:17:39,021 - mcp.server.lowlevel.server - ERROR - [server.py:693] - Received exception from stream: 1 validation error for JSONRPCMessage
+  Invalid JSON: EOF while parsing a value at line 2 column 0 [type=json_invalid, input_value='\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:17:39,150 - mcp.server.lowlevel.server - DEBUG - [server.py:668] - Received message: 1 validation error for JSONRPCMessage
+  Invalid JSON: EOF while parsing a value at line 2 column 0 [type=json_invalid, input_value='\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:17:39,150 - mcp.server.lowlevel.server - ERROR - [server.py:693] - Received exception from stream: 1 validation error for JSONRPCMessage
+  Invalid JSON: EOF while parsing a value at line 2 column 0 [type=json_invalid, input_value='\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:17:39,269 - mcp.server.lowlevel.server - DEBUG - [server.py:668] - Received message: 1 validation error for JSONRPCMessage
+  Invalid JSON: EOF while parsing a value at line 2 column 0 [type=json_invalid, input_value='\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:17:39,270 - mcp.server.lowlevel.server - ERROR - [server.py:693] - Received exception from stream: 1 validation error for JSONRPCMessage
+  Invalid JSON: EOF while parsing a value at line 2 column 0 [type=json_invalid, input_value='\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:17:39,389 - mcp.server.lowlevel.server - DEBUG - [server.py:668] - Received message: 1 validation error for JSONRPCMessage
+  Invalid JSON: EOF while parsing a value at line 2 column 0 [type=json_invalid, input_value='\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:17:39,390 - mcp.server.lowlevel.server - ERROR - [server.py:693] - Received exception from stream: 1 validation error for JSONRPCMessage
+  Invalid JSON: EOF while parsing a value at line 2 column 0 [type=json_invalid, input_value='\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:17:39,605 - mcp.server.lowlevel.server - DEBUG - [server.py:668] - Received message: 1 validation error for JSONRPCMessage
+  Invalid JSON: EOF while parsing a value at line 2 column 0 [type=json_invalid, input_value='\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:17:39,606 - mcp.server.lowlevel.server - ERROR - [server.py:693] - Received exception from stream: 1 validation error for JSONRPCMessage
+  Invalid JSON: EOF while parsing a value at line 2 column 0 [type=json_invalid, input_value='\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:17:39,821 - mcp.server.lowlevel.server - DEBUG - [server.py:668] - Received message: 1 validation error for JSONRPCMessage
+  Invalid JSON: EOF while parsing a value at line 2 column 0 [type=json_invalid, input_value='\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:17:39,822 - mcp.server.lowlevel.server - ERROR - [server.py:693] - Received exception from stream: 1 validation error for JSONRPCMessage
+  Invalid JSON: EOF while parsing a value at line 2 column 0 [type=json_invalid, input_value='\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:17:40,045 - mcp.server.lowlevel.server - DEBUG - [server.py:668] - Received message: 1 validation error for JSONRPCMessage
+  Invalid JSON: EOF while parsing a value at line 2 column 0 [type=json_invalid, input_value='\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:17:40,045 - mcp.server.lowlevel.server - ERROR - [server.py:693] - Received exception from stream: 1 validation error for JSONRPCMessage
+  Invalid JSON: EOF while parsing a value at line 2 column 0 [type=json_invalid, input_value='\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:17:40,286 - mcp.server.lowlevel.server - DEBUG - [server.py:668] - Received message: 1 validation error for JSONRPCMessage
+  Invalid JSON: EOF while parsing a value at line 2 column 0 [type=json_invalid, input_value='\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:17:40,286 - mcp.server.lowlevel.server - ERROR - [server.py:693] - Received exception from stream: 1 validation error for JSONRPCMessage
+  Invalid JSON: EOF while parsing a value at line 2 column 0 [type=json_invalid, input_value='\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:17:40,982 - mcp.server.lowlevel.server - DEBUG - [server.py:668] - Received message: 4 validation errors for JSONRPCMessage
+JSONRPCRequest
+  Input should be an object [type=model_type, input_value=2, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCNotification
+  Input should be an object [type=model_type, input_value=2, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCResponse
+  Input should be an object [type=model_type, input_value=2, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCError
+  Input should be an object [type=model_type, input_value=2, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+2026-01-19 10:17:40,982 - mcp.server.lowlevel.server - ERROR - [server.py:693] - Received exception from stream: 4 validation errors for JSONRPCMessage
+JSONRPCRequest
+  Input should be an object [type=model_type, input_value=2, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCNotification
+  Input should be an object [type=model_type, input_value=2, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCResponse
+  Input should be an object [type=model_type, input_value=2, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCError
+  Input should be an object [type=model_type, input_value=2, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+2026-01-19 10:17:44,230 - mcp.server.lowlevel.server - DEBUG - [server.py:668] - Received message: 4 validation errors for JSONRPCMessage
+JSONRPCRequest
+  Input should be an object [type=model_type, input_value=222222222, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCNotification
+  Input should be an object [type=model_type, input_value=222222222, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCResponse
+  Input should be an object [type=model_type, input_value=222222222, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCError
+  Input should be an object [type=model_type, input_value=222222222, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+2026-01-19 10:17:44,230 - mcp.server.lowlevel.server - ERROR - [server.py:693] - Received exception from stream: 4 validation errors for JSONRPCMessage
+JSONRPCRequest
+  Input should be an object [type=model_type, input_value=222222222, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCNotification
+  Input should be an object [type=model_type, input_value=222222222, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCResponse
+  Input should be an object [type=model_type, input_value=222222222, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCError
+  Input should be an object [type=model_type, input_value=222222222, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+2026-01-19 10:17:45,869 - mcp.server.lowlevel.server - DEBUG - [server.py:668] - Received message: 4 validation errors for JSONRPCMessage
+JSONRPCRequest
+  Input should be an object [type=model_type, input_value=222, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCNotification
+  Input should be an object [type=model_type, input_value=222, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCResponse
+  Input should be an object [type=model_type, input_value=222, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCError
+  Input should be an object [type=model_type, input_value=222, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+2026-01-19 10:17:45,870 - mcp.server.lowlevel.server - ERROR - [server.py:693] - Received exception from stream: 4 validation errors for JSONRPCMessage
+JSONRPCRequest
+  Input should be an object [type=model_type, input_value=222, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCNotification
+  Input should be an object [type=model_type, input_value=222, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCResponse
+  Input should be an object [type=model_type, input_value=222, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCError
+  Input should be an object [type=model_type, input_value=222, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+2026-01-19 10:17:46,206 - mcp.server.lowlevel.server - DEBUG - [server.py:668] - Received message: 4 validation errors for JSONRPCMessage
+JSONRPCRequest
+  Input should be an object [type=model_type, input_value=2, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCNotification
+  Input should be an object [type=model_type, input_value=2, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCResponse
+  Input should be an object [type=model_type, input_value=2, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCError
+  Input should be an object [type=model_type, input_value=2, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+2026-01-19 10:17:46,206 - mcp.server.lowlevel.server - ERROR - [server.py:693] - Received exception from stream: 4 validation errors for JSONRPCMessage
+JSONRPCRequest
+  Input should be an object [type=model_type, input_value=2, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCNotification
+  Input should be an object [type=model_type, input_value=2, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCResponse
+  Input should be an object [type=model_type, input_value=2, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCError
+  Input should be an object [type=model_type, input_value=2, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+2026-01-19 10:17:46,470 - mcp.server.lowlevel.server - DEBUG - [server.py:668] - Received message: 4 validation errors for JSONRPCMessage
+JSONRPCRequest
+  Input should be an object [type=model_type, input_value=2, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCNotification
+  Input should be an object [type=model_type, input_value=2, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCResponse
+  Input should be an object [type=model_type, input_value=2, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCError
+  Input should be an object [type=model_type, input_value=2, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+2026-01-19 10:17:46,470 - mcp.server.lowlevel.server - ERROR - [server.py:693] - Received exception from stream: 4 validation errors for JSONRPCMessage
+JSONRPCRequest
+  Input should be an object [type=model_type, input_value=2, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCNotification
+  Input should be an object [type=model_type, input_value=2, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCResponse
+  Input should be an object [type=model_type, input_value=2, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCError
+  Input should be an object [type=model_type, input_value=2, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+2026-01-19 10:17:46,709 - mcp.server.lowlevel.server - DEBUG - [server.py:668] - Received message: 4 validation errors for JSONRPCMessage
+JSONRPCRequest
+  Input should be an object [type=model_type, input_value=2, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCNotification
+  Input should be an object [type=model_type, input_value=2, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCResponse
+  Input should be an object [type=model_type, input_value=2, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCError
+  Input should be an object [type=model_type, input_value=2, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+2026-01-19 10:17:46,710 - mcp.server.lowlevel.server - ERROR - [server.py:693] - Received exception from stream: 4 validation errors for JSONRPCMessage
+JSONRPCRequest
+  Input should be an object [type=model_type, input_value=2, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCNotification
+  Input should be an object [type=model_type, input_value=2, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCResponse
+  Input should be an object [type=model_type, input_value=2, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCError
+  Input should be an object [type=model_type, input_value=2, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+2026-01-19 10:17:46,941 - mcp.server.lowlevel.server - DEBUG - [server.py:668] - Received message: 4 validation errors for JSONRPCMessage
+JSONRPCRequest
+  Input should be an object [type=model_type, input_value=2, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCNotification
+  Input should be an object [type=model_type, input_value=2, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCResponse
+  Input should be an object [type=model_type, input_value=2, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCError
+  Input should be an object [type=model_type, input_value=2, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+2026-01-19 10:17:46,941 - mcp.server.lowlevel.server - ERROR - [server.py:693] - Received exception from stream: 4 validation errors for JSONRPCMessage
+JSONRPCRequest
+  Input should be an object [type=model_type, input_value=2, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCNotification
+  Input should be an object [type=model_type, input_value=2, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCResponse
+  Input should be an object [type=model_type, input_value=2, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+JSONRPCError
+  Input should be an object [type=model_type, input_value=2, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/model_type
+2026-01-19 10:18:33,853 - mcp.server.lowlevel.server - DEBUG - [server.py:162] - Initializing server 'UnrealMCP_Advanced'
+2026-01-19 10:18:33,853 - mcp.server.lowlevel.server - DEBUG - [server.py:432] - Registering handler for ListToolsRequest
+2026-01-19 10:18:33,853 - mcp.server.lowlevel.server - DEBUG - [server.py:512] - Registering handler for CallToolRequest
+2026-01-19 10:18:33,853 - mcp.server.lowlevel.server - DEBUG - [server.py:301] - Registering handler for ListResourcesRequest
+2026-01-19 10:18:33,853 - mcp.server.lowlevel.server - DEBUG - [server.py:336] - Registering handler for ReadResourceRequest
+2026-01-19 10:18:33,853 - mcp.server.lowlevel.server - DEBUG - [server.py:263] - Registering handler for PromptListRequest
+2026-01-19 10:18:33,854 - mcp.server.lowlevel.server - DEBUG - [server.py:285] - Registering handler for GetPromptRequest
+2026-01-19 10:18:33,854 - mcp.server.lowlevel.server - DEBUG - [server.py:321] - Registering handler for ListResourceTemplatesRequest
+2026-01-19 10:18:33,941 - UnrealMCP_Advanced - INFO - [unreal_mcp_server_advanced.py:2795] - Starting Advanced MCP server with stdio transport
+2026-01-19 10:18:33,954 - asyncio - DEBUG - [proactor_events.py:633] - Using proactor: IocpProactor
+2026-01-19 10:18:33,957 - UnrealMCP_Advanced - INFO - [unreal_mcp_server_advanced.py:434] - UnrealMCP Advanced server starting up
+2026-01-19 10:18:33,957 - UnrealMCP_Advanced - INFO - [unreal_mcp_server_advanced.py:435] - Connection will be established lazily on first tool call
+2026-01-19 10:18:36,013 - mcp.server.lowlevel.server - DEBUG - [server.py:668] - Received message: 1 validation error for JSONRPCMessage
+  Invalid JSON: expected value at line 1 column 1 [type=json_invalid, input_value='s\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:18:36,013 - mcp.server.lowlevel.server - ERROR - [server.py:693] - Received exception from stream: 1 validation error for JSONRPCMessage
+  Invalid JSON: expected value at line 1 column 1 [type=json_invalid, input_value='s\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:18:36,685 - mcp.server.lowlevel.server - DEBUG - [server.py:668] - Received message: 1 validation error for JSONRPCMessage
+  Invalid JSON: expected value at line 1 column 1 [type=json_invalid, input_value='s\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:18:36,685 - mcp.server.lowlevel.server - ERROR - [server.py:693] - Received exception from stream: 1 validation error for JSONRPCMessage
+  Invalid JSON: expected value at line 1 column 1 [type=json_invalid, input_value='s\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:18:36,893 - mcp.server.lowlevel.server - DEBUG - [server.py:668] - Received message: 1 validation error for JSONRPCMessage
+  Invalid JSON: expected value at line 1 column 1 [type=json_invalid, input_value='s\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:18:36,893 - mcp.server.lowlevel.server - ERROR - [server.py:693] - Received exception from stream: 1 validation error for JSONRPCMessage
+  Invalid JSON: expected value at line 1 column 1 [type=json_invalid, input_value='s\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:18:37,077 - mcp.server.lowlevel.server - DEBUG - [server.py:668] - Received message: 1 validation error for JSONRPCMessage
+  Invalid JSON: expected value at line 1 column 1 [type=json_invalid, input_value='s\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:18:37,077 - mcp.server.lowlevel.server - ERROR - [server.py:693] - Received exception from stream: 1 validation error for JSONRPCMessage
+  Invalid JSON: expected value at line 1 column 1 [type=json_invalid, input_value='s\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:18:37,269 - mcp.server.lowlevel.server - DEBUG - [server.py:668] - Received message: 1 validation error for JSONRPCMessage
+  Invalid JSON: expected value at line 1 column 1 [type=json_invalid, input_value='s\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:18:37,269 - mcp.server.lowlevel.server - ERROR - [server.py:693] - Received exception from stream: 1 validation error for JSONRPCMessage
+  Invalid JSON: expected value at line 1 column 1 [type=json_invalid, input_value='s\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:18:37,470 - mcp.server.lowlevel.server - DEBUG - [server.py:668] - Received message: 1 validation error for JSONRPCMessage
+  Invalid JSON: expected value at line 1 column 1 [type=json_invalid, input_value='s\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 10:18:37,470 - mcp.server.lowlevel.server - ERROR - [server.py:693] - Received exception from stream: 1 validation error for JSONRPCMessage
+  Invalid JSON: expected value at line 1 column 1 [type=json_invalid, input_value='s\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 13:29:13,707 - mcp.server.lowlevel.server - DEBUG - [server.py:162] - Initializing server 'UnrealMCP_Advanced'
+2026-01-19 13:29:13,707 - mcp.server.lowlevel.server - DEBUG - [server.py:432] - Registering handler for ListToolsRequest
+2026-01-19 13:29:13,707 - mcp.server.lowlevel.server - DEBUG - [server.py:512] - Registering handler for CallToolRequest
+2026-01-19 13:29:13,707 - mcp.server.lowlevel.server - DEBUG - [server.py:301] - Registering handler for ListResourcesRequest
+2026-01-19 13:29:13,707 - mcp.server.lowlevel.server - DEBUG - [server.py:336] - Registering handler for ReadResourceRequest
+2026-01-19 13:29:13,707 - mcp.server.lowlevel.server - DEBUG - [server.py:263] - Registering handler for PromptListRequest
+2026-01-19 13:29:13,707 - mcp.server.lowlevel.server - DEBUG - [server.py:285] - Registering handler for GetPromptRequest
+2026-01-19 13:29:13,707 - mcp.server.lowlevel.server - DEBUG - [server.py:321] - Registering handler for ListResourceTemplatesRequest
+2026-01-19 13:29:13,790 - UnrealMCP_Advanced - INFO - [unreal_mcp_server_advanced.py:2795] - Starting Advanced MCP server with stdio transport
+2026-01-19 13:29:13,804 - asyncio - DEBUG - [proactor_events.py:633] - Using proactor: IocpProactor
+2026-01-19 13:29:13,808 - UnrealMCP_Advanced - INFO - [unreal_mcp_server_advanced.py:434] - UnrealMCP Advanced server starting up
+2026-01-19 13:29:13,808 - UnrealMCP_Advanced - INFO - [unreal_mcp_server_advanced.py:435] - Connection will be established lazily on first tool call
+2026-01-19 13:34:46,278 - mcp.server.lowlevel.server - DEBUG - [server.py:668] - Received message: 1 validation error for JSONRPCMessage
+  Invalid JSON: EOF while parsing a value at line 2 column 0 [type=json_invalid, input_value='\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
+2026-01-19 13:34:46,280 - mcp.server.lowlevel.server - ERROR - [server.py:693] - Received exception from stream: 1 validation error for JSONRPCMessage
+  Invalid JSON: EOF while parsing a value at line 2 column 0 [type=json_invalid, input_value='\n', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/json_invalid
