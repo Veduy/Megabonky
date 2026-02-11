@@ -115,7 +115,7 @@ TSharedPtr<FJsonObject> FEpicUnrealMCPBlueprintCommands::HandleCreateBlueprint(c
     }
 
     // Check if blueprint already exists
-    FString PackagePath = TEXT("/Game/Blueprints/MCP/");
+    FString PackagePath = TEXT("/Game/Blueprints/");
     FString AssetName = BlueprintName;
     if (UEditorAssetLibrary::DoesAssetExist(PackagePath + AssetName))
     {
@@ -128,7 +128,6 @@ TSharedPtr<FJsonObject> FEpicUnrealMCPBlueprintCommands::HandleCreateBlueprint(c
     // Handle parent class
     FString ParentClass;
     Params->TryGetStringField(TEXT("parent_class"), ParentClass);
-    UE_LOG(LogTemp, Log, TEXT("Creating blueprint '%s' with parent class '%s'"), *BlueprintName, *ParentClass);
     
     // Default to Actor if no parent class specified
     UClass* SelectedParentClass = AActor::StaticClass();
@@ -136,92 +135,45 @@ TSharedPtr<FJsonObject> FEpicUnrealMCPBlueprintCommands::HandleCreateBlueprint(c
     // Try to find the specified parent class
     if (!ParentClass.IsEmpty())
     {
-        // Prefix 없는 원본 이름으로 검색
-        UClass* FoundClass = FindFirstObjectSafe<UClass>(*ParentClass);
-
-        // Fallback: prefix 붙여서 경로 기반 검색
         FString ClassName = ParentClass;
         if (!ClassName.StartsWith(TEXT("A")))
         {
             ClassName = TEXT("A") + ClassName;
         }
-
-        // Blueprint 클래스 검색
-        if (!FoundClass)
+        
+        // First try direct StaticClass lookup for common classes
+        UClass* FoundClass = nullptr;
+        if (ClassName == TEXT("APawn"))
         {
-            //Script/Engine.Blueprint'/Game/Blueprints/MCP/BP_MCP_Enemy.BP_MCP_Enemy'
-            //Add BP_ Prefix
-            const FString BPName = ParentClass.StartsWith(TEXT("BP_")) ? ParentClass : FString::Printf(TEXT("BP_%s"), *ParentClass);
-			FString BPPath;
-            if (FPackageName::IsValidObjectPath(ParentClass))
-            {
-				UE_LOG(LogTemp, Log, TEXT("HandleCreateBlueprint: Loading Blueprint using full object path: %s"), *ParentClass);
-				UBlueprint* BP = Cast<UBlueprint>(UEditorAssetLibrary::LoadAsset(ParentClass));
-				if (BP && BP->GeneratedClass)
-                {
-                    FoundClass = BP->GeneratedClass;
-                    UE_LOG(LogTemp, Log, TEXT("Found Blueprint parent class at full path '%s'"), *ParentClass);
-                }
-                else
-                {
-                    UE_LOG(LogTemp, Warning, TEXT("Could not find Blueprint at full path '%s'"), *ParentClass);
-				}
-            }
-
-    /*        TArray<FString> SearchPaths = {
-                FString::Printf(TEXT("/Game/Blueprints/MCP/%s"), *ParentClass),
-                FString::Printf(TEXT("/Game/Blueprints/%s"), *ParentClass),
-                FString::Printf(TEXT("/Game/%s"), *ParentClass),
-                FString::Printf(TEXT("/Game/Blueprints/MCP/%s"), *BPName),
-                FString::Printf(TEXT("/Game/Blueprints/%s"), *BPName),
-                FString::Printf(TEXT("/Game/%s"), *BPName),
-            };
-
-            for (const FString& BPPath : SearchPaths)
-            {
-                UBlueprint* BP = Cast<UBlueprint>(UEditorAssetLibrary::LoadAsset(BPPath));
-                if (BP && BP->GeneratedClass)
-                {
-                    FoundClass = BP->GeneratedClass;
-                    UE_LOG(LogTemp, Log, TEXT("Found Blueprint parent class at '%s'"), *BPPath);
-                    break;
-                }
-            }*/
+            FoundClass = APawn::StaticClass();
         }
-
-        //if (!FoundClass)
-        //{
-        //    if (ClassName == TEXT("APawn"))
-        //    {
-        //        FoundClass = APawn::StaticClass();
-        //    }
-        //    else if (ClassName == TEXT("AActor"))
-        //    {
-        //        FoundClass = AActor::StaticClass();
-        //    }
-        //    else
-        //    {
-        //        // Try loading the class using LoadClass which is more reliable than FindObject
-        //        const FString ClassPath = FString::Printf(TEXT("/Script/Engine.%s"), *ClassName);
-        //        FoundClass = LoadClass<AActor>(nullptr, *ClassPath);
-
-        //        if (!FoundClass)
-        //        {
-        //            // Try alternate paths if not found
-        //            const FString GameClassPath = FString::Printf(TEXT("/Script/Game.%s"), *ClassName);
-        //            FoundClass = LoadClass<AActor>(nullptr, *GameClassPath);
-        //        }
-        //    }
-        //}
+        else if (ClassName == TEXT("AActor"))
+        {
+            FoundClass = AActor::StaticClass();
+        }
+        else
+        {
+            // Try loading the class using LoadClass which is more reliable than FindObject
+            const FString ClassPath = FString::Printf(TEXT("/Script/Engine.%s"), *ClassName);
+            FoundClass = LoadClass<AActor>(nullptr, *ClassPath);
+            
+            if (!FoundClass)
+            {
+                // Try alternate paths if not found
+                const FString GameClassPath = FString::Printf(TEXT("/Script/Game.%s"), *ClassName);
+                FoundClass = LoadClass<AActor>(nullptr, *GameClassPath);
+            }
+        }
 
         if (FoundClass)
         {
             SelectedParentClass = FoundClass;
-            UE_LOG(LogTemp, Log, TEXT("Successfully set parent class to '%s'"), *FoundClass->GetName());
+            UE_LOG(LogTemp, Log, TEXT("Successfully set parent class to '%s'"), *ClassName);
         }
         else
         {
-            UE_LOG(LogTemp, Warning, TEXT("Could not find specified parent class '%s', defaulting to AActor"), *ParentClass);
+            UE_LOG(LogTemp, Warning, TEXT("Could not find specified parent class '%s' at paths: /Script/Engine.%s or /Script/Game.%s, defaulting to AActor"), 
+                *ClassName, *ClassName, *ClassName);
         }
     }
     
@@ -280,17 +232,8 @@ TSharedPtr<FJsonObject> FEpicUnrealMCPBlueprintCommands::HandleAddComponentToBlu
     UClass* ComponentClass = nullptr;
 
     // Try to find the class with exact name first
-
-    ComponentClass = FindFirstObjectSafe<UClass>(*ComponentType);
-    if (ComponentClass)
-    {
-		UE_LOG(LogTemp, Warning, TEXT("HandleAddComponentToBlueprint: Found component class %s using FindFirstObjectSafe"), *ComponentType);
-    }
-    else if (!ComponentClass)
-    {
-        ComponentClass = FindObject<UClass>(nullptr, *ComponentType);
-    }
-
+    ComponentClass = FindObject<UClass>(nullptr, *ComponentType);
+    
     // If not found, try with "Component" suffix
     if (!ComponentClass && !ComponentType.EndsWith(TEXT("Component")))
     {
@@ -298,14 +241,6 @@ TSharedPtr<FJsonObject> FEpicUnrealMCPBlueprintCommands::HandleAddComponentToBlu
         ComponentClass = FindObject<UClass>(nullptr, *ComponentTypeWithSuffix);
     }
     
-	// Add "/Script/Engine." prefix and try again
-    if (!ComponentClass && !ComponentType.StartsWith(TEXT("/Script/Engine.")))
-    {
-	    UE_LOG(LogTemp, Warning, TEXT("HandleAddComponentToBlueprint: Searching for component class /Script/Engine/.%s"), *ComponentType);
-        FString ComponentScript = TEXT("/Script/Engine.") + ComponentType;
-        ComponentClass = FindObject<UClass>(nullptr, *ComponentScript);
-    }
-
     // If still not found, try with "U" prefix
     if (!ComponentClass && !ComponentType.StartsWith(TEXT("U")))
     {

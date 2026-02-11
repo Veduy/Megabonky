@@ -5,28 +5,6 @@
 #include "K2Node_MakeArray.h"
 #include "Json.h"
 
-// target_class 문자열로 UClass를 찾는 헬퍼
-static UClass* FindTargetClass(const FString& TargetClassName)
-{
-	// U/A 접두사 없이 검색
-	UClass* FoundClass = FindFirstObjectSafe<UClass>(*TargetClassName);
-	if (FoundClass)
-	{
-		return FoundClass;
-	}
-
-	// U 접두사 붙여서 검색 (컴포넌트 등)
-	FoundClass = FindFirstObjectSafe<UClass>(*(TEXT("U") + TargetClassName));
-	if (FoundClass)
-	{
-		return FoundClass;
-	}
-
-	// A 접두사 붙여서 검색 (액터 등)
-	FoundClass = FindFirstObjectSafe<UClass>(*(TEXT("A") + TargetClassName));
-	return FoundClass;
-}
-
 UK2Node* FDataNodeCreator::CreateVariableGetNode(UEdGraph* Graph, const TSharedPtr<FJsonObject>& Params)
 {
 	if (!Graph || !Params.IsValid())
@@ -37,36 +15,16 @@ UK2Node* FDataNodeCreator::CreateVariableGetNode(UEdGraph* Graph, const TSharedP
 	FString VariableName;
 	if (!Params->TryGetStringField(TEXT("variable_name"), VariableName))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("CreateVariableGetNode: 'variable_name' field is missing in Params JSON."));
 		return nullptr;
 	}
 
 	UK2Node_VariableGet* VarGetNode = NewObject<UK2Node_VariableGet>(Graph);
 	if (!VarGetNode)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("CreateVariableGetNode: Failed to create UK2Node_VariableGet object."));
 		return nullptr;
 	}
 
-	// target_class가 있으면 외부 클래스 프로퍼티, 없으면 블루프린트 자체 변수
-	FString TargetClassName;
-	if (Params->TryGetStringField(TEXT("target_class"), TargetClassName))
-	{
-		UClass* TargetClass = FindTargetClass(TargetClassName);
-		if (TargetClass)
-		{
-			VarGetNode->VariableReference.SetExternalMember(FName(*VariableName), TargetClass);
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("CreateVariableGetNode: target_class '%s' not found, falling back to SelfMember"), *TargetClassName);
-			VarGetNode->VariableReference.SetSelfMember(FName(*VariableName));
-		}
-	}
-	else
-	{
-		VarGetNode->VariableReference.SetSelfMember(FName(*VariableName));
-	}
+	VarGetNode->VariableReference.SetSelfMember(FName(*VariableName));
 
 	double PosX, PosY;
 	FNodeCreatorUtils::ExtractNodePosition(Params, PosX, PosY);
@@ -98,25 +56,7 @@ UK2Node* FDataNodeCreator::CreateVariableSetNode(UEdGraph* Graph, const TSharedP
 		return nullptr;
 	}
 
-	// target_class가 있으면 외부 클래스 프로퍼티, 없으면 블루프린트 자체 변수
-	FString TargetClassName;
-	if (Params->TryGetStringField(TEXT("target_class"), TargetClassName))
-	{
-		UClass* TargetClass = FindTargetClass(TargetClassName);
-		if (TargetClass)
-		{
-			VarSetNode->VariableReference.SetExternalMember(FName(*VariableName), TargetClass);
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("CreateVariableSetNode: target_class '%s' not found, falling back to SelfMember"), *TargetClassName);
-			VarSetNode->VariableReference.SetSelfMember(FName(*VariableName));
-		}
-	}
-	else
-	{
-		VarSetNode->VariableReference.SetSelfMember(FName(*VariableName));
-	}
+	VarSetNode->VariableReference.SetSelfMember(FName(*VariableName));
 
 	double PosX, PosY;
 	FNodeCreatorUtils::ExtractNodePosition(Params, PosX, PosY);

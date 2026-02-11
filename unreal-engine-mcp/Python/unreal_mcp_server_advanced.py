@@ -2050,8 +2050,10 @@ def add_node(
                     ℹ️ Creates 1 pin at creation; add/remove via set_node_property (add_pin/remove_pin)
 
             DATA:
-                "VariableGet" - Read a variable value (⚠️ variable must exist in Blueprint)
+                "VariableGet" - Read a variable value (⚠️ variable must exist in Blueprint or target_class)
+                    ℹ️ Use target_class for component properties (e.g., target_class="CharacterMovementComponent", variable_name="GravityScale")
                 "VariableSet" - Set a variable value (⚠️ variable must exist and be assignable)
+                    ℹ️ Use target_class for component properties (e.g., target_class="CharacterMovementComponent", variable_name="GravityScale")
                 "MakeArray" - Create array from individual inputs
                     ℹ️ Creates 1 pin at creation; add/remove via set_node_property with action="set_num_elements"
 
