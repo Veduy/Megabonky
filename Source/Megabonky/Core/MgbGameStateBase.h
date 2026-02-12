@@ -132,6 +132,17 @@ public:
 	int32 NextBoxGold = 30;
 
 public:
+	// 무기별 킬 수 기록
+	void RecordWeaponKill(FName WeaponName);
+
+	// 무기별 킬 통계 조회
+	const TMap<FName, int64>& GetWeaponKillRecord() const { return WeaponKillRecord; }
+
+private:
+	// 현재 세션의 무기별 킬 수 (메모리에만 저장, 게임 종료 시 파일로 저장)
+	TMap<FName, int64> WeaponKillRecord;
+
+public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Data")
 	TObjectPtr<UDataTable> DT_Weapon;
 

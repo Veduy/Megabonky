@@ -14,7 +14,9 @@
 #include "Characters/MgbEnemyCharacter.h"
 #include "MgbPlayerController.h"
 #include "Data/WeaponInfo.h"
+#include "Data/MgbSaveGame.h"
 
+#include "../MgbSubsystem.h"
 #include "../Util/NetworkLog.h"
 #include "../UI/InGame/InGame.h"
 
@@ -291,12 +293,61 @@ void AMgbGameStateBase::SpawnEnemy()
 
 void AMgbGameStateBase::HandleGameOver()
 {
+	if (bGameOver)
+	{
+		return;
+	}
+
 	bGameOver = true;
+
+	// 게임 세션 기록 수집 및 저장 (서버에서만)
+	if (HasAuthority())
+	{
+		FGameSessionRecord SessionRecord;
+		SessionRecord.TotalKills = TotalKill;
+		SessionRecord.GoldEarned = Gold;
+
+		// 무기별 킬 통계 수집
+		for (const auto& Pair : WeaponKillRecord)
+		{
+			SessionRecord.WeaponKills.Add(FWeaponKillRecord(Pair.Key, Pair.Value));
+		}
+
+		// Subsystem을 통해 저장
+		if (UGameInstance* GI = GetGameInstance())
+		{
+			if (UMgbSubsystem* Subsystem = GI->GetSubsystem<UMgbSubsystem>())
+			{
+				Subsystem->SaveGameSession(SessionRecord);
+			}
+		}
+	}
+
 	OnGameOver.Broadcast();
 	if (SpawnTimerHandle.IsValid())
 	{
 		GetWorld()->GetTimerManager().ClearTimer(SpawnTimerHandle);
 	}
+}
+
+void AMgbGameStateBase::RecordWeaponKill(FName WeaponName)
+{
+	if (WeaponName.IsNone())
+	{
+		WeaponName = FName("Unknown");  // 무기 정보가 없으면 "Unknown"으로 기록
+	}
+
+	if (int64* KillCount = WeaponKillRecord.Find(WeaponName))
+	{
+		(*KillCount)++;
+	}
+	else
+	{
+		WeaponKillRecord.Add(WeaponName, 1);
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("Weapon Kill: %s (Total: %lld)"),
+		*WeaponName.ToString(), WeaponKillRecord[WeaponName]);
 }
 
 void AMgbGameStateBase::HandleResumeRequest()

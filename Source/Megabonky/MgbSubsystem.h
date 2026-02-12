@@ -7,13 +7,11 @@
 #include "HttpModule.h"
 #include "Interfaces/IHttpRequest.h"
 #include "Interfaces/IHttpResponse.h"
+#include "Core/Data/MgbSaveGame.h"
 #include "MgbSubsystem.generated.h"
 
 class FHttpModule;
 
-/**
- * Ÿ��Ʋ�� �ΰ��� �� ������ ����
- */
 UCLASS()
 class MEGABONKY_API UMgbSubsystem : public UGameInstanceSubsystem
 {
@@ -29,6 +27,23 @@ public:
 
 	void Login();
 
+	// Save/Load
+	void SaveGameSession(const FGameSessionRecord& SessionRecord);
+	UMgbSaveGame* LoadGameData();
+
+	// Query records
+	const UMgbSaveGame* GetCurrentSaveData() const { return CurrentSaveData; }
+
+public:
 	FHttpModule* HttpModule;
 
+private:
+	UPROPERTY()
+	TObjectPtr<UMgbSaveGame> CurrentSaveData;
+
+	static const FString SaveSlotName;  // "MegabonkyPlayerData"
+	static const int32 SaveUserIndex;   // 0
+
+	void UpdateBestRecords(UMgbSaveGame* InOutSaveData, const FGameSessionRecord& NewRecord);
+	void UpdateTotalWeaponKills(UMgbSaveGame* InOutSaveData, const TArray<FWeaponKillRecord>& WeaponKills);
 };

@@ -55,6 +55,9 @@ public:
 	void HandleDamageEffect();
 	void HandleDamageEffect_Implementation();
 
+	// 마지막 데미지 무기 설정 (킬 어트리뷰션용)
+	void SetLastDamageWeapon(class AMgbWeapon* Weapon);
+
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
 	TSubclassOf<UGameplayEffect> HitDamageEffectClass;
@@ -78,4 +81,8 @@ public:
 	float TargetSpawnHeight;
 
 	FTimerHandle CheckWallTimer;
+
+private:
+	// 마지막으로 데미지를 입힌 무기 (킬 어트리뷰션용)
+	TWeakObjectPtr<class AMgbWeapon> LastDamageWeapon;
 };

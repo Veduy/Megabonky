@@ -12,6 +12,7 @@
 #include "MgbPlayerCharacter.h"
 #include "../MgbGameStateBase.h"
 #include "../MgbGameplayTags.h"
+#include "../MgbWeapon.h"
 #include "../AbilitySystem/MgbAbilitySystemComponent.h"
 #include "../AbilitySystem/AttributeSet/EnemyAttributeSet.h"
 #include "../../Util/NetworkLog.h"
@@ -168,12 +169,25 @@ void AMgbEnemyCharacter::Destroyed()
 		{
 			GS->TotalKill++;
 			GS->CurrentEnemyCount--;
+
+			// 무기별 킬 기록 추가
+			FName KillWeapon = NAME_None;
+			if (LastDamageWeapon.IsValid())
+			{
+				KillWeapon = LastDamageWeapon->WeaponName;
+			}
+			GS->RecordWeaponKill(KillWeapon);
 		}
 
 		GetWorld()->SpawnActor<AActor>(XPCrystalClass, GetActorTransform());
 	}
 
 	Super::Destroyed();
+}
+
+void AMgbEnemyCharacter::SetLastDamageWeapon(AMgbWeapon* Weapon)
+{
+	LastDamageWeapon = Weapon;
 }
 
 void AMgbEnemyCharacter::MoveToTarget(float DeltaTime)

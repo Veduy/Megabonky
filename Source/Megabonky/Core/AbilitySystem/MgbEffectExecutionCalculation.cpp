@@ -9,6 +9,7 @@
 
 #include "../AbilitySystem/MgbAbilitySystemComponent.h"
 #include "../Characters/MgbPlayerCharacter.h"
+#include "../Characters/MgbEnemyCharacter.h"
 #include "../MgbWeapon.h"
 #include "../../Core/MgbPlayerController.h"
 #include "../../Util/NetworkLog.h"
@@ -90,6 +91,24 @@ void UMgbEffectExecutionCalculation::Execute_Implementation(const FGameplayEffec
 		TotalDamage = WeaponDamage * PlayerDamage;
 	}
 
+	// 데미지를 입힌 무기 정보를 적에게 전달 (킬 어트리뷰션용)
+	if (Weapon)
+	{
+		if (ExecutionParams.GetTargetAbilitySystemComponent() == nullptr)
+			return;
+
+		AActor* TargetActor = ExecutionParams.GetTargetAbilitySystemComponent()->GetAvatarActor();
+		if (TargetActor == nullptr)
+			return;
+
+		if (AMgbEnemyCharacter* Enemy = Cast<AMgbEnemyCharacter>(TargetActor))
+		{
+			Enemy->SetLastDamageWeapon(Weapon);
+		}
+	}
+
+	if (PlayerCharacter == nullptr)
+		return;
 
 	AMgbPlayerController* PC = Cast<AMgbPlayerController>(PlayerCharacter->GetOwner());
 	if (PC)
