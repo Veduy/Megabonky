@@ -60,7 +60,6 @@ void UMgbSubsystem::RequestCompleted(FHttpRequestPtr Request, FHttpResponsePtr R
 				UE_LOG(LogTemp, Warning, TEXT("Starting Game..."));
 			}
 		}
-
 	}
 	else
 	{
