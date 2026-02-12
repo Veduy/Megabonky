@@ -4,6 +4,7 @@
 #include "MgbSubsystem.h"
 #include "JsonUtilities.h"
 #include "Kismet/GameplayStatics.h"
+#include "Core/MgbTitleController.h"
 
 
 // Static constant initialization
@@ -47,6 +48,19 @@ void UMgbSubsystem::RequestCompleted(FHttpRequestPtr Request, FHttpResponsePtr R
 	{
 		auto Name = JsonObject->GetField(TEXT("name"), EJson::String);
 		UE_LOG(LogTemp, Warning, TEXT("Login Success - name: %s"), *Name->AsString());
+
+		// Game logic for successful login can be added here
+		auto PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+		if (PC)
+		{
+			auto TitlePC = Cast<AMgbTitleController>(PC);
+			if (TitlePC)
+			{
+				TitlePC->ServerStartGame();
+				UE_LOG(LogTemp, Warning, TEXT("Starting Game..."));
+			}
+		}
+
 	}
 	else
 	{

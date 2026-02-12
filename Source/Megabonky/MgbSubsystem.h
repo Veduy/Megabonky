@@ -25,6 +25,7 @@ public:
 public:
 	void RequestCompleted(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bProcessedSuccessfully);
 
+	UFUNCTION(BlueprintCallable, Category = "Megabonky|Login")
 	void Login();
 
 	// Save/Load
@@ -34,16 +35,15 @@ public:
 	// Query records
 	const UMgbSaveGame* GetCurrentSaveData() const { return CurrentSaveData; }
 
+	void UpdateBestRecords(UMgbSaveGame* InOutSaveData, const FGameSessionRecord& NewRecord);
+	void UpdateTotalWeaponKills(UMgbSaveGame* InOutSaveData, const TArray<FWeaponKillRecord>& WeaponKills);
+
 public:
 	FHttpModule* HttpModule;
 
-private:
 	UPROPERTY()
 	TObjectPtr<UMgbSaveGame> CurrentSaveData;
 
 	static const FString SaveSlotName;  // "MegabonkyPlayerData"
 	static const int32 SaveUserIndex;   // 0
-
-	void UpdateBestRecords(UMgbSaveGame* InOutSaveData, const FGameSessionRecord& NewRecord);
-	void UpdateTotalWeaponKills(UMgbSaveGame* InOutSaveData, const TArray<FWeaponKillRecord>& WeaponKills);
 };

@@ -65,15 +65,6 @@ void UMgbEffectExecutionCalculation::Execute_Implementation(const FGameplayEffec
 	float PlayerDamageToElite = 0.f;// x����
 	PlayerDamageToElite = PlayerCharacter->GetAbilitySystemComponent()->GetNumericAttribute(UPlayerAttributeSet::GetDamageToElitesAttribute()) / 100;
 
-	// 1.Crit Chance �˻�
-	// WeaponCritChance + PlayerCritChance
-
-	// 2.Damage ��� (Crit)
-	// ���⿡ �÷��̾� ������ �����Ų��.
-	// Damage = WeaponDamage *  (1 + (WeaponCritDamage/100)) 
-	// Damage = Damage * PlayerCritDamage(���� 2.xx)
-	// Damage = Damage * PlayerDamage (����)
-
 	bool bCrit = false;
 
 	float CritChance = (WeaponCritChance + PlayerCritChance); // 0 ~ X; 
