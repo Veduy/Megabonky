@@ -126,6 +126,24 @@ void UMgbGameplayAbility_Projectile::RapidFire()
 
 ![데미지 GE](docs/images/GE_DamageEffect.png)
 
+ - Weapon Actor ASC를 Source로 ApplyGameplayEffectSpectToTarget() 함수를 호출해서.
+ Source는 Weapon이고, Target은 Enemy다. Weapon의 Owner 액터는 무기를 소유한 PlayerCharacter로 설정되어 있다.
+ WeaponActor의 Attribute값은 Source로 부터 캡처해서 가져오고, PlayerCharacter의 Attribute 값은 Weapon의 Owner()로 접근해서 참조했다.
+
+```cpp
+	
+  float WeaponDamage = 0.f; 
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageDef, EvaluatedParams, WeaponDamage);
+  ...
+
+  AMgbPlayerCharacter* PlayerCharacter = Cast<AMgbPlayerCharacter>(Weapon->GetOwner());
+
+  UAbilitySystemComponent* ASC = PlayerCharacter->GetAbilitySystemComponent();
+  PlayerDamage = PlayerCharacter->GetAbilitySystemComponent()->GetNumericAttribute(UPlayerAttributeSet::GetDamageAttribute()) / 100;
+  ...
+
+```
+
 <details>
 <summary>
 Open Full Source Code
@@ -229,6 +247,29 @@ void UMgbEffectExecutionCalculation::Execute_Implementation(const FGameplayEffec
 
 **Radial Damage 계산: 범위 데미지를 입히는 투사체일경우. 오버랩된 대상에게 GE_DamageEffect 적용시 최초 충돌위치에서 거리를 비교하여 Damage Falloff 값을 구한뒤, CalculationModifier를 통해서 캡쳐된 Damage Attribute 값에 Damage Falloff값을 SetByCaller로 Multiply 해서 범위 데미지를 구현했습니다.**
 
+```cpp
+for (const auto& Actor : OutActors)
+{
+  if (!Actor)
+    continue;
+
+  // 무기의 Damage Attribute 값에 곱해줄 비율값 계산.
+  float Length = (Actor->GetActorLocation() - GetActorLocation()).Length();
+  float DistanceRatio = FMath::Clamp(1.f - (Length / Radius), 0.3f, 1.f);
+  DistanceRatio = DistanceRatio;
+
+  if (Weapon->DamageEffectClass)
+  {
+    FGameplayEffectSpecHandle EffectSpecHandle = Weapon->GetAbilitySystemComponent()->MakeOutgoingSpec(Weapon->DamageEffectClass, 1.f, EffectContextHandle);
+
+    EffectSpecHandle.Data.Get()->SetSetByCallerMagnitude(TAG_Data_AreaDamageMultiplier, DistanceRatio);
+
+    UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Actor);
+    Weapon->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*EffectSpecHandle.Data.Get(), TargetASC);
+  }
+}
+```
+
 <details>
 <summary>
 Open Full Source Code
@@ -259,7 +300,6 @@ void AMgbProjectileActor::HandleOverlap(AActor* OtherActor)
 
 			if (Weapon->DamageEffectClass)
 			{
-				// Spec을 생성한 컴포넌트가 ExecCalc의 Source로 설정.
 				FGameplayEffectSpecHandle EffectSpecHandle = Weapon->GetAbilitySystemComponent()->MakeOutgoingSpec(Weapon->DamageEffectClass, 1.f, EffectContextHandle);
 
 				EffectSpecHandle.Data.Get()->SetSetByCallerMagnitude(TAG_Data_AreaDamageMultiplier, 1.f);
@@ -301,7 +341,6 @@ void AMgbProjectileActor::HandleOverlap(AActor* OtherActor)
 
 					if (Weapon->DamageEffectClass)
 					{
-						// Spec을 생성한 컴포넌트가 ExecCalc의 Source로 설정.
 						FGameplayEffectSpecHandle EffectSpecHandle = Weapon->GetAbilitySystemComponent()->MakeOutgoingSpec(Weapon->DamageEffectClass, 1.f, EffectContextHandle);
 
 						EffectSpecHandle.Data.Get()->SetSetByCallerMagnitude(TAG_Data_AreaDamageMultiplier, DistanceRatio);
