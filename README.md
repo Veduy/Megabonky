@@ -247,6 +247,8 @@ void UMgbEffectExecutionCalculation::Execute_Implementation(const FGameplayEffec
 
 **Radial Damage 계산: 범위 데미지를 입히는 투사체일경우. 오버랩된 대상에게 GE_DamageEffect 적용시 최초 충돌위치에서 거리를 비교하여 Damage Falloff 값을 구한뒤, CalculationModifier를 통해서 캡쳐된 Damage Attribute 값에 Damage Falloff값을 SetByCaller로 Multiply 해서 범위 데미지를 구현했습니다.**
 
+![Radial GE](docs/images/RadialDamage.gif)
+
 ```cpp
 for (const auto& Actor : OutActors)
 {
