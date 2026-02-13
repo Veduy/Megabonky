@@ -1,4 +1,4 @@
-// Copyright is owned by Veduy.
+﻿// Copyright is owned by Veduy.
 
 
 #include "MgbPlayerController.h"
@@ -52,7 +52,6 @@ void AMgbPlayerController::BeginPlay()
 
 void AMgbPlayerController::OnPossess(APawn* aPawn)
 {
-	// ���� ���������� ȣ���.
 	Super::OnPossess(aPawn);
 	
 	if (ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(GetLocalPlayer()))
@@ -67,8 +66,6 @@ void AMgbPlayerController::OnPossess(APawn* aPawn)
 	if (PlayerCharacter)
 	{
 		PlayerCharacter->EquipWeapon(PlayerCharacter->DefaultWeaponClass);
-
-		// TODO: ActivateWeapons �� ���̵� �̺�Ʈ(�����̱���)�� �������� ȣ��ǵ��� �����ʿ�.
 		PlayerCharacter->ActivateWeaponsAbility();
 	}
 }
@@ -202,13 +199,11 @@ void AMgbPlayerController::GenerateUpgradeInfo()
 
 	bool bWeapon = true;
 
-	// ���� ĭ�� �����ִٸ� ���������̺�� �ִ� ������߿��� �������� ����.
 	int WeaponCount = MgbPlayer->Weapons.Num();
 	if (WeaponCount < 4)
 	{
 		WeaponNames = GS->DT_Weapon->GetRowNames();
 	}
-	// ���Ⱑ �̹� 4�����, �÷��̾ ������ �ִ� ����� �߿��� ����.
 	else
 	{
 		for (int i = 0; i < 4; i++)
@@ -217,22 +212,15 @@ void AMgbPlayerController::GenerateUpgradeInfo()
 		}
 	}
 
-	// ���� ����.
 	WeaponNames.Sort([](const auto&, const auto&)
 		{
 			return FMath::RandBool();
 		});
 
-
-	// ������ ������ŭ ����.
 	for (int SlotNum = 0; SlotNum < 3; SlotNum++)
 	{
 		if (bWeapon)
 		{
-			// 2���� 1Ȯ���� ����/������.
-			// �ϴ� ������ ����.
-
-			// ���׷��̵��� ���⸦ ����.
 			FName RandomWeaponName = WeaponNames[SlotNum];
 			FMgbWeaponInfo* WeaponInfo = GS->DT_Weapon->FindRow<FMgbWeaponInfo>(RandomWeaponName, FString("Find Weapon"));
 			if (!WeaponInfo)
@@ -240,14 +228,12 @@ void AMgbPlayerController::GenerateUpgradeInfo()
 				return;
 			}
 
-			// ���� �ɼ� ��������.
 			auto WeaponBonus = GS->DT_WeaponUpgradeBonus->FindRow<FMgbWeaponUpgradeBonus>(RandomWeaponName, FString("Find Bouns"));
 			if (!WeaponBonus)
 			{
 				return;
 			}
 
-			// ���׷��̵� �ɼ� ����
 			auto Temp = WeaponBonus->UpgradeOptions;
 			TArray<FWeaponUpgradeOption> SelectedOptions;
 			Temp.Sort([](const auto&, const auto&)
@@ -262,12 +248,11 @@ void AMgbPlayerController::GenerateUpgradeInfo()
 				SelectedOptions.Add(Temp[i]);
 			}
 
-			// (�̰Ÿ� Ŭ���̾�Ʈ �Լ��� �����ʿ�)
 			InGameWidget->SetItemUpgradeSlot(SlotNum, RandomWeaponName, SelectedOptions);
 		}
 		else
 		{
-
+			// 비법서(추가 강화) 추가될경우.
 		}
 	}
 }

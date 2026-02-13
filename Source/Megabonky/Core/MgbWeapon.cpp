@@ -26,7 +26,6 @@ AMgbWeapon::AMgbWeapon()
 	{
 		DamageEffectClass = GE_DamageEffect.Class;
 	}
-
 }
 
 void AMgbWeapon::BeginPlay()

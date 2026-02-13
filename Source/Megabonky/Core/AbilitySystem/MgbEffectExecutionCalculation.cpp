@@ -34,7 +34,7 @@ UMgbEffectExecutionCalculation::UMgbEffectExecutionCalculation(const FObjectInit
 
 void UMgbEffectExecutionCalculation::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
 {	
-	// SourceObj(Weapon)->Owner(Player)�� Attribute�� �ʿ�.
+	// SourceObj(Weapon)->Owner(Player)
 	UObject* SourceObj = ExecutionParams.GetOwningSpec().GetEffectContext().GetSourceObject();
 	AMgbWeapon* Weapon = Cast<AMgbWeapon>(SourceObj);
 	AMgbPlayerCharacter* PlayerCharacter = Cast<AMgbPlayerCharacter>(Weapon->GetOwner());
@@ -43,31 +43,33 @@ void UMgbEffectExecutionCalculation::Execute_Implementation(const FGameplayEffec
 	EvaluatedParams.SourceTags = ExecutionParams.GetOwningSpec().CapturedSourceTags.GetAggregatedTags();
 	EvaluatedParams.TargetTags = ExecutionParams.GetOwningSpec().CapturedTargetTags.GetAggregatedTags();
 
+	// 캡쳐한 속성값들 가져오기
 	float WeaponDamage = 0.f; 
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageDef, EvaluatedParams, WeaponDamage);
 
-	float WeaponCritChance = 0.f; // %�ۼ�Ʈ
+	float WeaponCritChance = 0.f; 
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(CritChanceDef, EvaluatedParams, WeaponCritChance);
 
-	float WeaponCritDamage = 0.f; // %�ۼ�Ʈ
+	float WeaponCritDamage = 0.f; 
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(CritDamageDef, EvaluatedParams, WeaponCritDamage);
 
-	float PlayerDamage = 0.f; // x���� ���������� ���� �������� ������ �� 1.00 ~ 1.xx 
+	// 무기로의 Owner인 플레이어 캐릭터의 어빌리티 시스템 컴포넌트에서 플레이어 속성값들 가져오기
+	float PlayerDamage = 0.f; 
 	UAbilitySystemComponent* ASC = PlayerCharacter->GetAbilitySystemComponent();
 	PlayerDamage = PlayerCharacter->GetAbilitySystemComponent()->GetNumericAttribute(UPlayerAttributeSet::GetDamageAttribute()) / 100;
 
-	float PlayerCritChance = 0.f; // %�ۼ�Ʈ
+	float PlayerCritChance = 0.f; 
 	PlayerCritChance = PlayerCharacter->GetAbilitySystemComponent()->GetNumericAttribute(UPlayerAttributeSet::GetCritChanceAttribute()) / 100;
 	
-	float PlayerCritDamage = 0.f; // x����
+	float PlayerCritDamage = 0.f; 
 	PlayerCritDamage = PlayerCharacter->GetAbilitySystemComponent()->GetNumericAttribute(UPlayerAttributeSet::GetCritDamageAttribute()) / 100;
 
-	float PlayerDamageToElite = 0.f;// x����
+	float PlayerDamageToElite = 0.f;
 	PlayerDamageToElite = PlayerCharacter->GetAbilitySystemComponent()->GetNumericAttribute(UPlayerAttributeSet::GetDamageToElitesAttribute()) / 100;
 
 	bool bCrit = false;
 
-	float CritChance = (WeaponCritChance + PlayerCritChance); // 0 ~ X; 
+	float CritChance = (WeaponCritChance + PlayerCritChance); 
 	CritChance >= FMath::RandRange(0, 100) ? bCrit = true : bCrit = false;
 
 	float TotalDamage = 0.f;

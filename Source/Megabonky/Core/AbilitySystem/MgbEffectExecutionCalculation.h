@@ -17,20 +17,6 @@
 	P##Def = FGameplayEffectAttributeCaptureDefinition(P##Property, EGameplayEffectAttributeCaptureSource::T, B); \
 }
 
-// Source(Weapon)
-// ->Damage		//����
-// ->CritChance
-// ->CritDamage
-
-// PlayerCharacter (Weapon->Owner)
-// ->Damage		//����
-// ->CritChance	//�ۼ�Ʈ
-// ->CritDamage	//
-// ->DamageToElite
-
-// Target(Enemy)
-// ->Health
-
 UCLASS()
 class MEGABONKY_API UMgbEffectExecutionCalculation : public UGameplayEffectExecutionCalculation
 {
@@ -48,5 +34,4 @@ public:
 	DECLARE_ATTRIBUTE_CAPTUREDEF(CritDamage);
 
 	DECLARE_ATTRIBUTE_CAPTUREDEF(Health);
-
 };

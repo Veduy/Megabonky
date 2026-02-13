@@ -203,8 +203,6 @@ void AMgbPlayerCharacter::ActivateWeaponsAbility()
 	if (bDeath)
 		return;
 
-	// 모든 Weapon의 어빌리티 Activate
-	// PlayerAttackSpeed = 100% ~ x%;  Interval 2초,  (2 / PlayerAttackSpeed / 100)
 	float PlayerAttackSpeed = GetAbilitySystemComponent()->GetNumericAttribute(UPlayerAttributeSet::GetAttackSpeedAttribute());
 	GetWorld()->GetTimerManager().SetTimer(ActivateAbilityHandle,
 		[this]()

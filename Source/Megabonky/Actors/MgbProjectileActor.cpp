@@ -67,7 +67,6 @@ void AMgbProjectileActor::HandleOverlap(AActor* OtherActor)
 
 		// 단일 대상 데미지 계산
 		AMgbWeapon* Weapon = Cast<AMgbWeapon>(GetOwner());
-
 		if (Weapon)
 		{
 			FGameplayEffectContextHandle EffectContextHandle = Weapon->GetAbilitySystemComponent()->MakeEffectContext();
@@ -89,7 +88,6 @@ void AMgbProjectileActor::HandleOverlap(AActor* OtherActor)
 					return;
 				}
 			}
-
 			// 광역 데미지 계산
 			// 선형적으로 거리 데미지 감소(y = 1-x);
 			if (bRadialDamage == true)
@@ -98,10 +96,13 @@ void AMgbProjectileActor::HandleOverlap(AActor* OtherActor)
 				float Radius = CollisionComp->GetScaledSphereRadius() * 5;
 
 				TArray<AActor*> OutActors;
+
+	
 				UKismetSystemLibrary::SphereOverlapActors(GetWorld(), GetActorLocation(), Radius,
 					TArray<TEnumAsByte<EObjectTypeQuery>>(),
-					AMgbEnemyCharacter::StaticClass(),
-					ActorsToIgnore, OutActors);
+					AMgbEnemyCharacter::StaticClass(), 
+					ActorsToIgnore,
+					OutActors);
 
 				for (const auto& Actor : OutActors)
 				{
@@ -127,7 +128,6 @@ void AMgbProjectileActor::HandleOverlap(AActor* OtherActor)
 				Destroy();
 				return;
 			}
-
 			Destroy();
 			return;
 		}
@@ -137,10 +137,8 @@ void AMgbProjectileActor::HandleOverlap(AActor* OtherActor)
 			return;
 		}
 	}
-	else
-	{
-		Destroy();
-	}
+	
+	Destroy();
 }
 
 void AMgbProjectileActor::Bounce()

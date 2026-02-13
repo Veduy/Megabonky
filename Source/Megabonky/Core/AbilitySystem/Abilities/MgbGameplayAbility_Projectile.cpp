@@ -28,14 +28,13 @@ void UMgbGameplayAbility_Projectile::SpawnProjectile(AActor* Owner, const FVecto
 	FRotator Rotation = InSpawnDir;
 	Rotation.Roll = 0.f;
 
-	// ������ ������ ���� + ĳ���� ������ ����
 	UAbilitySystemComponent* WeaponASC = GetAbilitySystemComponentFromActorInfo();
 	auto WeaponSize = WeaponASC->GetNumericAttribute(UWeaponAttributeSet::GetSizeAttribute()) / 100;
-	auto WeaponProjSpeed = WeaponASC->GetNumericAttribute(UWeaponAttributeSet::GetProjectileSpeedAttribute()); // ���� ��
+	auto WeaponProjSpeed = WeaponASC->GetNumericAttribute(UWeaponAttributeSet::GetProjectileSpeedAttribute()); 
 
 	UAbilitySystemComponent* PlayerASC = GetPlayerASC();
 	auto PlayerSize = PlayerASC->GetNumericAttribute(UPlayerAttributeSet::GetSizeAttribute()) / 100;
-	auto PlayerProjSpeed = PlayerASC->GetNumericAttribute(UPlayerAttributeSet::GetProjectileSpeedAttribute()) / 100; //�ۼ�Ʈ
+	auto PlayerProjSpeed = PlayerASC->GetNumericAttribute(UPlayerAttributeSet::GetProjectileSpeedAttribute()) / 100; 
 
 	auto Size = WeaponSize * PlayerSize;
 	auto ProjSpeed = WeaponProjSpeed * PlayerProjSpeed;
@@ -84,7 +83,7 @@ void UMgbGameplayAbility_Projectile::RapidFire()
 		[this, PlayerActor, WeaponActor]()
 		{
 			AActor* TargetActor = nullptr;
-			// ���� ������ PrimaryTarget ���� ����.
+
 			AMgbPlayerCharacter* PlayerCharacter = Cast<AMgbPlayerCharacter>(PlayerActor);
 
 			bool bFoundTarget = false;
@@ -120,7 +119,7 @@ void UMgbGameplayAbility_Projectile::RapidFire()
 void UMgbGameplayAbility_Projectile::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
-	// Ability 종료 시 타이머 안전하게 정리 (비정상 종료 시에도 정리됨)
+	// Ability 종료 시 타이머 안전하게 정리
 	if (UWorld* World = GetWorld())
 	{
 		World->GetTimerManager().ClearTimer(SpawnTimerHandle);
