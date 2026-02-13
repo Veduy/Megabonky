@@ -1,5 +1,6 @@
 # Megabonky
 
+
 ### Gameplay Ability System (GAS) 기반 전투 시스템
 
 **서버 타이머 기반 어빌리티 활성화: 플레이어가 폰을 소유하는 시점에 기본 무기를 자동으로 장착하고, `ActivateWeaponsAbility()`함수 호출로 장착된 모든 무기의 어빌리티를 서버단에서 타이머로 주기적으로 활성화합니다.**
@@ -53,6 +54,11 @@ void AMgbPlayerCharacter::ActivateWeaponsAbility()
 **투사체 연속 발사: 무기와 플레이어 캐릭터의 투사체 개수 속성값을 합산한 후, 그 개수만큼 일정 간격으로 투사체를 스폰합니다.**
 
 ![Rapid Fire](docs/images/RapidFire.gif)
+
+<details>
+<summary>
+Open Full Source Code
+</summary>
 
 ```cpp
 void UMgbGameplayAbility_Projectile::RapidFire()
@@ -112,13 +118,19 @@ void UMgbGameplayAbility_Projectile::RapidFire()
 		0.f);
 }
 ```
+</details>
+
 <br><br>
 
 **Execution Calculation 활용한 데미지 계산: GameplayEffect적용으로 Attribute값을 조정하는데, Execution Calculation Class 를 활용해서 플레이어 캐릭터의 스탯과 무기 몬스터의 다양한 속성값을 참조해 데미지 계산을 했습니다.**
 
 ![데미지 GE](docs/images/GE_DamageEffect.png)
 
-//Damage 계산부분 코드.
+<details>
+<summary>
+Open Full Source Code
+</summary>
+
 ```cpp
 void UMgbEffectExecutionCalculation::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
 {	
@@ -211,9 +223,17 @@ void UMgbEffectExecutionCalculation::Execute_Implementation(const FGameplayEffec
 		FGameplayModifierEvaluatedData(UEnemyAttributeSet::GetDamageTakenAttribute(), EGameplayModOp::Override, TotalDamage));
 }
 ```
+</details>
+
 <br>
 
 **Radial Damage 계산: 범위 데미지를 입히는 투사체일경우. 오버랩된 대상에게 GE_DamageEffect 적용시 최초 충돌위치에서 거리를 비교하여 Damage Falloff 값을 구한뒤, CalculationModifier를 통해서 캡쳐된 Damage Attribute 값에 Damage Falloff값을 SetByCaller로 Multiply 해서 범위 데미지를 구현했습니다.**
+
+<details>
+<summary>
+Open Full Source Code
+</summary>
+
 ```cpp
 void AMgbProjectileActor::HandleOverlap(AActor* OtherActor)
 {
@@ -306,21 +326,16 @@ void AMgbProjectileActor::HandleOverlap(AActor* OtherActor)
 	Destroy();
 }
 ```
+</details>
 
 <br><br>
 
 **GameplayEffect 기반 능력치 강화:**
 
-
-
-
-
-
 **네트워크 멀티플레이어 지원**
   - Server Authority 기반 치팅 방지
   - 완전한 속성 및 상태 리플리케이션
   - RPC를 통한 효율적인 네트워크 통신
-
 
 ### 네트워크 아키텍처
 - **Server Authority**: 적 생성, 데미지 계산, XP/레벨 관리
@@ -329,6 +344,3 @@ void AMgbProjectileActor::HandleOverlap(AActor* OtherActor)
   - Server RPC: 클라이언트 → 서버 (XP 추가, 업그레이드 적용)
   - Client RPC: 서버 → 클라이언트 (데미지 텍스트)
   - Multicast RPC: 서버 → 모든 클라이언트 (UI 업데이트)
-
-
-**마지막 업데이트**: 2026-02-13
