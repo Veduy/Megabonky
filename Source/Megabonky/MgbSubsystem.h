@@ -26,7 +26,7 @@ public:
 	void RequestCompleted(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bProcessedSuccessfully);
 
 	UFUNCTION(BlueprintCallable, Category = "Megabonky|Login")
-	void Login();
+	void Login(bool bTest = false);
 
 	// Save/Load
 	void SaveGameSession(const FGameSessionRecord& SessionRecord);

@@ -36,14 +36,13 @@ void AMgbProjectileActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SetLifeSpan(5.f);	
+	SetLifeSpan(5.f);
 }
 
 // Called every frame
 void AMgbProjectileActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void AMgbProjectileActor::OnCollisionOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -53,7 +52,6 @@ void AMgbProjectileActor::OnCollisionOverlap(UPrimitiveComponent* OverlappedComp
 
 void AMgbProjectileActor::HandleOverlap(AActor* OtherActor)
 {
-	// 서버에서만 충돌 검사.
 	if (!HasAuthority())
 	{
 		return;
@@ -65,7 +63,6 @@ void AMgbProjectileActor::HandleOverlap(AActor* OtherActor)
 	{
 		ActorsToIgnore.Add(Enemy);
 
-		// 단일 대상 데미지 계산
 		AMgbWeapon* Weapon = Cast<AMgbWeapon>(GetOwner());
 		if (Weapon)
 		{
@@ -75,7 +72,6 @@ void AMgbProjectileActor::HandleOverlap(AActor* OtherActor)
 
 			if (Weapon->DamageEffectClass)
 			{
-				// Spec을 생성한 컴포넌트가 ExecCalc의 Source로 설정.
 				FGameplayEffectSpecHandle EffectSpecHandle = Weapon->GetAbilitySystemComponent()->MakeOutgoingSpec(Weapon->DamageEffectClass, 1.f, EffectContextHandle);
 
 				EffectSpecHandle.Data.Get()->SetSetByCallerMagnitude(TAG_Data_AreaDamageMultiplier, 1.f);
@@ -88,16 +84,13 @@ void AMgbProjectileActor::HandleOverlap(AActor* OtherActor)
 					return;
 				}
 			}
-			// 광역 데미지 계산
-			// 선형적으로 거리 데미지 감소(y = 1-x);
+
 			if (bRadialDamage == true)
 			{
-				// Radius 내의 적들에게 데미지 적용.
 				float Radius = CollisionComp->GetScaledSphereRadius() * 5;
 
 				TArray<AActor*> OutActors;
 
-	
 				UKismetSystemLibrary::SphereOverlapActors(GetWorld(), GetActorLocation(), Radius,
 					TArray<TEnumAsByte<EObjectTypeQuery>>(),
 					AMgbEnemyCharacter::StaticClass(), 
@@ -109,14 +102,12 @@ void AMgbProjectileActor::HandleOverlap(AActor* OtherActor)
 					if (!Actor)
 						continue;
 
-					// 무기의 Damage Attribute 값에 곱해줄 비율값 계산.
 					float Length = (Actor->GetActorLocation() - GetActorLocation()).Length();
 					float DistanceRatio = FMath::Clamp(1.f - (Length / Radius), 0.3f, 1.f);
 					DistanceRatio = DistanceRatio;
 
 					if (Weapon->DamageEffectClass)
 					{
-						// Spec을 생성한 컴포넌트가 ExecCalc의 Source로 설정.
 						FGameplayEffectSpecHandle EffectSpecHandle = Weapon->GetAbilitySystemComponent()->MakeOutgoingSpec(Weapon->DamageEffectClass, 1.f, EffectContextHandle);
 
 						EffectSpecHandle.Data.Get()->SetSetByCallerMagnitude(TAG_Data_AreaDamageMultiplier, DistanceRatio);
@@ -143,7 +134,6 @@ void AMgbProjectileActor::HandleOverlap(AActor* OtherActor)
 
 void AMgbProjectileActor::Bounce()
 {
-	// 범위내 랜덤 타겟 
 	AActor* PrimaryTarget = nullptr;
 
 	FVector Origin = GetActorLocation();
@@ -168,8 +158,6 @@ void AMgbProjectileActor::Bounce()
 
 	if (PrimaryTarget)
 	{
-		// 라이트닝 같은 능력의 바운스는 타겟만 지정시 발동되는 기술인데, 날라가는 투삭체가 아님.
-
 		FVector Direction = (PrimaryTarget->GetActorLocation() - GetActorLocation()).GetSafeNormal();
 
 		float Speed = ProjectileMovement->Velocity.Size();

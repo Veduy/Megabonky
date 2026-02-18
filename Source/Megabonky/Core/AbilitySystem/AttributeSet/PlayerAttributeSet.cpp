@@ -77,11 +77,18 @@ void UPlayerAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribut
 
 void UPlayerAttributeSet::HandleHealthChanged()
 {
+	auto Actor = GetOwningActor();
+	if (!Actor)
+		return;
+
 	auto Character = Cast<AMgbPlayerCharacter>(GetOwningActor());
 	if (!Character)
 		return;
 
 	auto PC = Cast<AMgbPlayerController>(Character->GetController());
+	if (!PC)
+		return;
+		
 	if (PC || PC->IsLocalPlayerController())
 	{
 		if (PC->InGameWidget)

@@ -49,7 +49,6 @@ void UMgbSubsystem::RequestCompleted(FHttpRequestPtr Request, FHttpResponsePtr R
 		auto Name = JsonObject->GetField(TEXT("name"), EJson::String);
 		UE_LOG(LogTemp, Warning, TEXT("Login Success - name: %s"), *Name->AsString());
 
-		// Game logic for successful login can be added here
 		auto PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 		if (PC)
 		{
@@ -67,8 +66,22 @@ void UMgbSubsystem::RequestCompleted(FHttpRequestPtr Request, FHttpResponsePtr R
 	}
 }
 
-void UMgbSubsystem::Login()
+void UMgbSubsystem::Login(bool bTest)
 {
+	if (bTest)
+	{
+		auto PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+		if (PC)
+		{
+			auto TitlePC = Cast<AMgbTitleController>(PC);
+			if (TitlePC)
+			{
+				TitlePC->ServerStartGame();
+				UE_LOG(LogTemp, Warning, TEXT("Starting Game..."));
+			}
+		}
+	}
+	
 	auto Request = HttpModule->CreateRequest();
 	Request->OnProcessRequestComplete().BindUObject(this, &UMgbSubsystem::RequestCompleted);
 

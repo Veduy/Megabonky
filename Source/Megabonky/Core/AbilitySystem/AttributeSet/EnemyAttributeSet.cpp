@@ -52,12 +52,15 @@ void UEnemyAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute
 					return;
 
 				ASC->ExecuteGameplayCue(TAG_GameplayCue_EC_Damaged);
+
+				if (NewValue <= 0.f)
+				{
+					GetOwningActor()->SetLifeSpan(0.2f);
+				}
 			}
+	
 		}
-		if (NewValue <= 0.f)
-		{
-			GetOwningActor()->SetLifeSpan(0.2f);
-		}
+	
 	}
 }
 
