@@ -47,8 +47,11 @@ public:
 	void ClientSpawnDamageTextActor(FVector Location, float DamageValue, bool bCrit = false);
 	void ClientSpawnDamageTextActor_Implementation(FVector Location, float DamageValue, bool bCrit = false);
 
-	UFUNCTION(BlueprintCallable)
-	void GenerateUpgradeInfo();
+	UFUNCTION(Client, Reliable)
+	void ClientShowUpgradeWindow(const TArray<FUpgradeSlotInfo>& Slots);
+	void ClientShowUpgradeWindow_Implementation(const TArray<FUpgradeSlotInfo>& Slots);
+
+	TArray<FUpgradeSlotInfo> ServerGenerateUpgradeSlots();
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")

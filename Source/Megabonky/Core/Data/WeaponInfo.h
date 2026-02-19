@@ -64,3 +64,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TArray<FWeaponUpgradeOption> UpgradeOptions;
 };
+
+USTRUCT(BlueprintType)
+struct FUpgradeSlotInfo
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintReadOnly)
+	FName WeaponName;
+
+	UPROPERTY(BlueprintReadOnly)
+	TArray<FWeaponUpgradeOption> Options;
+};

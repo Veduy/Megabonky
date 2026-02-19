@@ -371,39 +371,54 @@ void AMgbProjectileActor::HandleOverlap(AActor* OtherActor)
 
 <br><br>
 
-**무기 능력 업그레이드: 플레이어 레벨업시 업그레이드 정보를 생성하고, UI에 정보를 전달합니다. 클라이언트측 에서 UI클릭시 UI에 저장된 정보를 인자로 서버측으로 RPC 함수를 호출합니다. 서버측에선 모든 강화 수치가 0으로 설정된 GameplayEffect의 강화 수치를 인자로 받은 값으로 설정하고 플레이어에 적용합니다.**
+**무기 능력 업그레이드: 플레이어 레벨업시 서버측에서 업그레이드 정보를 생성하고, 클라이언트의 UI에 정보를 전달합니다. 클라이언트측 에서 UI클릭시 UI에 저장된 정보를 인자로 서버측으로 RPC 함수를 호출합니다. 서버측에선 모든 강화 수치가 0으로 설정된 GameplayEffect의 강화 수치를 인자로 받은 값으로 설정하고 플레이어에 적용합니다.**
 ![Upgrade](docs/images/WeaponUpgrade.gif)
 
 ```cpp
-//레벨업시 서버측에서 업그레이드 정보를 생성하고, Multicast RPC로 클라이언트에서 UI를 업데이트 합니다.
-void AMgbGameStateBase::MulticastShowItemSelectWindow_Implementation()
+//레벨업시 서버측에서 업그레이드 정보를 생성하고, Client RPC로 클라이언트에서 UI를 업데이트 함수를 호출 합니다.
+void AMgbGameStateBase::ServerAddXP_Implementation(float InValue)
 {
-	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	if (PC && PC->IsLocalPlayerController())
+	CurrentXP += InValue;
+	float Percent = CurrentXP / RequiredXP;
+
+	MulticastUpdateUI_XP(Percent);
+
+	if (CurrentXP >= RequiredXP)
 	{
-		AMgbPlayerController* MgbPC = Cast<AMgbPlayerController>(PC);
-		if (MgbPC)
+		float temp = CurrentXP - RequiredXP;
+		CurrentXP = 0;
+		CurrentLevel++;
+		RequiredXP = RequiredXP * (1.2f);
+
+		ServerAddXP(temp);
+
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.0001f);
+
+		// 서버에서 각 플레이어마다 업그레이드 옵션을 생성하여 해당 클라이언트로 전송
+		for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 		{
-			if (MgbPC)
+			if (AMgbPlayerController* MgbPC = Cast<AMgbPlayerController>(Iterator->Get()))
 			{
-				MgbPC->GenerateUpgradeInfo(); 
-				MgbPC->InGameWidget->ShowItemSelectWindow();
+				TArray<FUpgradeSlotInfo> Slots = MgbPC->ServerGenerateUpgradeSlots();
+				MgbPC->ClientShowUpgradeWindow(Slots);
 			}
 		}
+
+		MulticastSetPauseGame(true);
 	}
 }
 
 ...
 
 // 업그레이드 무기를 정할때 현재 플레이어가 가진 무기가 최대 소유가능 무기개수 4개를 넘지 않을경우, 무기 테이블에서 모든 무기를 업그레이드 후보선상에 올립니다.
-// 후보선상에 오른 무기들을 랜덤으로 정렬하여 앞에서부터 3개의 무기를 뽑고, 각 무기별 가능한 업그레이드 옵션도 1~2개 랜덤으로 뽑아서 무기의 강화 정보를 생성합니다.
-void AMgbPlayerController::GenerateUpgradeInfo()
+// 후보선상에 오른 무기들을 섞어 앞에서부터 3개의 무기를 뽑고, 각 무기별 가능한 업그레이드 옵션도 1~2개 랜덤으로 뽑아서 무기의 강화 정보를 생성합니다.
+TArray<FUpgradeSlotInfo> AMgbPlayerController::ServerGenerateUpgradeSlots()
 {
+	TArray<FUpgradeSlotInfo> Result;
+
 	AMgbGameStateBase* GS = Cast<AMgbGameStateBase>(GetWorld()->GetGameState());
 	AMgbPlayerCharacter* MgbPlayer = Cast<AMgbPlayerCharacter>(GetPawn());
 	TArray<FName> WeaponNames;
-
-	bool bWeapon = true;
 
 	int WeaponCount = MgbPlayer->Weapons.Num();
 	if (WeaponCount < 4)
@@ -418,49 +433,40 @@ void AMgbPlayerController::GenerateUpgradeInfo()
 		}
 	}
 
-	WeaponNames.Sort([](const auto&, const auto&)
-		{
-			return FMath::RandBool();
-		});
+	Algo::RandomShuffle(WeaponNames);
 
 	for (int SlotNum = 0; SlotNum < 3; SlotNum++)
 	{
-		if (bWeapon)
+		FName RandomWeaponName = WeaponNames[SlotNum];
+		FMgbWeaponInfo* WeaponInfo = GS->DT_Weapon->FindRow<FMgbWeaponInfo>(RandomWeaponName, FString("Find Weapon"));
+		if (!WeaponInfo)
 		{
-			FName RandomWeaponName = WeaponNames[SlotNum];
-			FMgbWeaponInfo* WeaponInfo = GS->DT_Weapon->FindRow<FMgbWeaponInfo>(RandomWeaponName, FString("Find Weapon"));
-			if (!WeaponInfo)
-			{
-				return;
-			}
-
-			auto WeaponBonus = GS->DT_WeaponUpgradeBonus->FindRow<FMgbWeaponUpgradeBonus>(RandomWeaponName, FString("Find Bouns"));
-			if (!WeaponBonus)
-			{
-				return;
-			}
-
-			auto Temp = WeaponBonus->UpgradeOptions;
-			TArray<FWeaponUpgradeOption> SelectedOptions;
-			Temp.Sort([](const auto&, const auto&)
-				{
-					return FMath::RandBool();
-				});
-
-			int32 Count = FMath::RandRange(1, 2);
-
-			for (int32 i = 0; i < Count && i < Temp.Num(); ++i)
-			{
-				SelectedOptions.Add(Temp[i]);
-			}
-
-			InGameWidget->SetItemUpgradeSlot(SlotNum, RandomWeaponName, SelectedOptions);
+			return Result;
 		}
-		else
+
+		auto WeaponBonus = GS->DT_WeaponUpgradeBonus->FindRow<FMgbWeaponUpgradeBonus>(RandomWeaponName, FString("Find Bonus"));
+		if (!WeaponBonus)
 		{
-			// 비법서(추가 강화) 추가될경우.
+			return Result;
 		}
+
+		auto Temp = WeaponBonus->UpgradeOptions;
+		TArray<FWeaponUpgradeOption> SelectedOptions;
+		Algo::RandomShuffle(Temp);
+
+		int32 Count = FMath::RandRange(1, 2);
+		for (int32 i = 0; i < Count && i < Temp.Num(); ++i)
+		{
+			SelectedOptions.Add(Temp[i]);
+		}
+
+		FUpgradeSlotInfo SlotInfo;
+		SlotInfo.WeaponName = RandomWeaponName;
+		SlotInfo.Options = SelectedOptions;
+		Result.Add(SlotInfo);
 	}
+
+	return Result;
 }
 
 ...
@@ -494,13 +500,16 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct FMgbWeaponUpgradeBonus : public FTableRowBase
+struct FUpgradeSlotInfo
 {
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TArray<FWeaponUpgradeOption> UpgradeOptions;
+	UPROPERTY(BlueprintReadOnly)
+	FName WeaponName;
+
+	UPROPERTY(BlueprintReadOnly)
+	TArray<FWeaponUpgradeOption> Options;
 };
 
 ```

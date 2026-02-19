@@ -54,6 +54,12 @@ void AMgbGameStateBase::Tick(float DeltaTime)
 			PassedTimeSec = (int)(GetServerWorldTimeSeconds() - GameStartTime);
 			OnTimeChanged.Broadcast(PassedTimeSec);
 			ElapsedTime = 0.f;
+
+			if(PassedTimeSec % 60 == 0)
+			{
+				// 60초마다 30초간 몬스터 스폰 증가.
+				ActivateSpawnMultiplierBurst(5);
+			}
 		}
 	}
 }
@@ -94,8 +100,18 @@ void AMgbGameStateBase::ServerAddXP_Implementation(float InValue)
 
 		ServerAddXP(temp);
 
-		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.0001f); 
-		MulticastShowItemSelectWindow();
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.0001f);
+
+		// 서버에서 각 플레이어마다 업그레이드 옵션을 생성하여 해당 클라이언트로 전송
+		for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+		{
+			if (AMgbPlayerController* MgbPC = Cast<AMgbPlayerController>(Iterator->Get()))
+			{
+				TArray<FUpgradeSlotInfo> Slots = MgbPC->ServerGenerateUpgradeSlots();
+				MgbPC->ClientShowUpgradeWindow(Slots);
+			}
+		}
+
 		MulticastSetPauseGame(true);
 	}
 }
@@ -138,19 +154,7 @@ void AMgbGameStateBase::MulticastSetPauseGame_Implementation(bool bPause)
 
 void AMgbGameStateBase::MulticastShowItemSelectWindow_Implementation()
 {
-	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	if (PC && PC->IsLocalPlayerController())
-	{
-		AMgbPlayerController* MgbPC = Cast<AMgbPlayerController>(PC);
-		if (MgbPC)
-		{
-			if (MgbPC)
-			{
-				MgbPC->GenerateUpgradeInfo(); 
-				MgbPC->InGameWidget->ShowItemSelectWindow();
-			}
-		}
-	}
+	// 업그레이드 창 표시는 ClientShowUpgradeWindow에서 처리됨
 }
 
 void AMgbGameStateBase::MulticastHandleGameOver_Implementation()
@@ -161,6 +165,31 @@ void AMgbGameStateBase::MulticastHandleGameOver_Implementation()
 void AMgbGameStateBase::ServerHandleGameOver_Implementation()
 {
 	HandleGameOver();
+}
+
+void AMgbGameStateBase::ActivateSpawnMultiplierBurst(int32 InValue)
+{
+	if (!HasAuthority())
+	{
+		return;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Activate Spawn Multiply - '%d'"), InValue);
+
+	GetWorld()->GetTimerManager().ClearTimer(SpawnMultiplierResetTimerHandle);
+
+	EnemySpawnMultiplier = InValue;
+
+	GetWorld()->GetTimerManager().SetTimer(
+		SpawnMultiplierResetTimerHandle,
+		[this]()
+		{
+			EnemySpawnMultiplier = 1;
+			UE_LOG(LogTemp, Warning, TEXT("Deactivate Spawn Multiply"));
+		},
+		30.f,
+		false
+	);
 }
 
 void AMgbGameStateBase::InitSpawnEnemyTimer()
@@ -227,7 +256,7 @@ void AMgbGameStateBase::SpawnEnemy()
 			if (PassedTimeSec == 0)
 				return;
 
-			// 스폰할 마리수 계산 (로그함수)
+			// 스폰할 마리수 계산 
 			int EnemyToSpawn = EnemySpawnMultiplier * FMath::Loge(float(1 + (PassedTimeSec * PassedTimeSec) / 600)) + 3;
 			EnemyToSpawn = FMath::Clamp(EnemyToSpawn, 0, 100);
 

@@ -60,11 +60,17 @@ public:
 	UFUNCTION()
 	void SpawnEnemy();
 
+	UFUNCTION(BlueprintCallable)
+	void ActivateSpawnMultiplierBurst(int32 InValue);
+
 	UFUNCTION()
 	void HandleGameOver();
 
 	UFUNCTION()
 	void HandleResumeRequest();
+
+	// 무기별 킬 수 기록
+	void RecordWeaponKill(FName WeaponName);
 
 	uint32 GetCurrentPlayerCount();
 
@@ -76,6 +82,8 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	FTimerHandle SpawnTimerHandle;
+
+	FTimerHandle SpawnMultiplierResetTimerHandle;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
@@ -111,7 +119,7 @@ public:
 	float SpawnRange = 1000.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
-	int32 EnemySpawnMultiplier = 5;
+	int32 EnemySpawnMultiplier = 1;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data")
 	float RequiredXP = 100.f;
@@ -130,10 +138,6 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Data", Replicated)
 	int32 NextBoxGold = 30;
-
-public:
-	// 무기별 킬 수 기록
-	void RecordWeaponKill(FName WeaponName);
 
 	// 무기별 킬 통계 조회
 	const TMap<FName, int64>& GetWeaponKillRecord() const { return WeaponKillRecord; }

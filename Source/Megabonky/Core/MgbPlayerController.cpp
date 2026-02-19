@@ -190,13 +190,13 @@ void AMgbPlayerController::ClientSpawnDamageTextActor_Implementation(FVector Loc
 	}
 }
 
-void AMgbPlayerController::GenerateUpgradeInfo()
+TArray<FUpgradeSlotInfo> AMgbPlayerController::ServerGenerateUpgradeSlots()
 {
+	TArray<FUpgradeSlotInfo> Result;
+
 	AMgbGameStateBase* GS = Cast<AMgbGameStateBase>(GetWorld()->GetGameState());
 	AMgbPlayerCharacter* MgbPlayer = Cast<AMgbPlayerCharacter>(GetPawn());
 	TArray<FName> WeaponNames;
-
-	bool bWeapon = true;
 
 	int WeaponCount = MgbPlayer->Weapons.Num();
 	if (WeaponCount < 4)
@@ -211,48 +211,47 @@ void AMgbPlayerController::GenerateUpgradeInfo()
 		}
 	}
 
-	WeaponNames.Sort([](const auto&, const auto&)
-		{
-			return FMath::RandBool();
-		});
+	Algo::RandomShuffle(WeaponNames);
 
 	for (int SlotNum = 0; SlotNum < 3; SlotNum++)
 	{
-		if (bWeapon)
+		FName RandomWeaponName = WeaponNames[SlotNum];
+		FMgbWeaponInfo* WeaponInfo = GS->DT_Weapon->FindRow<FMgbWeaponInfo>(RandomWeaponName, FString("Find Weapon"));
+		if (!WeaponInfo)
 		{
-			FName RandomWeaponName = WeaponNames[SlotNum];
-			FMgbWeaponInfo* WeaponInfo = GS->DT_Weapon->FindRow<FMgbWeaponInfo>(RandomWeaponName, FString("Find Weapon"));
-			if (!WeaponInfo)
-			{
-				return;
-			}
-
-			auto WeaponBonus = GS->DT_WeaponUpgradeBonus->FindRow<FMgbWeaponUpgradeBonus>(RandomWeaponName, FString("Find Bouns"));
-			if (!WeaponBonus)
-			{
-				return;
-			}
-
-			auto Temp = WeaponBonus->UpgradeOptions;
-			TArray<FWeaponUpgradeOption> SelectedOptions;
-			Algo::RandomShuffle(Temp);
-			Temp.Sort([](const auto&, const auto&)
-				{
-					return FMath::RandBool();
-				});
-
-			int32 Count = FMath::RandRange(1, 2);
-
-			for (int32 i = 0; i < Count && i < Temp.Num(); ++i)
-			{
-				SelectedOptions.Add(Temp[i]);
-			}
-
-			InGameWidget->SetItemUpgradeSlot(SlotNum, RandomWeaponName, SelectedOptions);
+			return Result;
 		}
-		else
+
+		auto WeaponBonus = GS->DT_WeaponUpgradeBonus->FindRow<FMgbWeaponUpgradeBonus>(RandomWeaponName, FString("Find Bonus"));
+		if (!WeaponBonus)
 		{
-			// 비법서(추가 강화) 추가될경우.
+			return Result;
 		}
+
+		auto Temp = WeaponBonus->UpgradeOptions;
+		TArray<FWeaponUpgradeOption> SelectedOptions;
+		Algo::RandomShuffle(Temp);
+
+		int32 Count = FMath::RandRange(1, 2);
+		for (int32 i = 0; i < Count && i < Temp.Num(); ++i)
+		{
+			SelectedOptions.Add(Temp[i]);
+		}
+
+		FUpgradeSlotInfo SlotInfo;
+		SlotInfo.WeaponName = RandomWeaponName;
+		SlotInfo.Options = SelectedOptions;
+		Result.Add(SlotInfo);
 	}
+
+	return Result;
+}
+
+void AMgbPlayerController::ClientShowUpgradeWindow_Implementation(const TArray<FUpgradeSlotInfo>& Slots)
+{
+	for (int32 i = 0; i < Slots.Num(); i++)
+	{
+		InGameWidget->SetItemUpgradeSlot(i, Slots[i].WeaponName, Slots[i].Options);
+	}
+	InGameWidget->ShowItemSelectWindow();
 }
