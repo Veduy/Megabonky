@@ -7,7 +7,8 @@
 #include "InputMappingContext.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
-#include "Components\AudioComponent.h"
+#include "Components/AudioComponent.h"
+#include "Algo/RandomShuffle.h"
 
 #include "MgbGameStateBase.h"
 #include "MgbGameModeBase.h"
@@ -234,6 +235,7 @@ void AMgbPlayerController::GenerateUpgradeInfo()
 
 			auto Temp = WeaponBonus->UpgradeOptions;
 			TArray<FWeaponUpgradeOption> SelectedOptions;
+			Algo::RandomShuffle(Temp);
 			Temp.Sort([](const auto&, const auto&)
 				{
 					return FMath::RandBool();

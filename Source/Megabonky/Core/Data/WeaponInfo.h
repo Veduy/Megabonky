@@ -52,7 +52,7 @@ public:
 	EWeaponUpgradeStat StatType = EWeaponUpgradeStat::Damage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float IncreaseValue = 0.f; // 증가 수치
+	float IncreaseValue = 0.f; 
 };
 
 USTRUCT(BlueprintType)

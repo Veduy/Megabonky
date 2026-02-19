@@ -126,9 +126,9 @@ void UMgbGameplayAbility_Projectile::RapidFire()
 
 ![데미지 GE](docs/images/GE_DamageEffect.png)
 
- - Weapon Actor ASC를 Source로 ApplyGameplayEffectSpectToTarget() 함수를 호출해서.
- Source는 Weapon이고, Target은 Enemy다. Weapon의 Owner 액터는 무기를 소유한 PlayerCharacter로 설정되어 있다.
- WeaponActor의 Attribute값은 Source로 부터 캡처해서 가져오고, PlayerCharacter의 Attribute 값은 Weapon의 Owner()로 접근해서 참조했다.
+ Weapon Actor ASC를 Source로 ApplyGameplayEffectSpectToTarget() 함수 호출.
+ Source(Weapon), Target(Enemy), Weapon의 Owner 액터는 무기를 소유한 PlayerCharacter로 설정.
+ WeaponActor의 Attribute값은 Source로 부터 캡처해서 가져오고 PlayerCharacter의 Attribute 값은 Weapon의 Owner()로 접근해서 참조 했습니다.
 
 ```cpp
 	
@@ -245,7 +245,7 @@ void UMgbEffectExecutionCalculation::Execute_Implementation(const FGameplayEffec
 
 <br>
 
-**Radial Damage 계산: 범위 데미지를 입히는 투사체일경우. 오버랩된 대상에게 GE_DamageEffect 적용시 최초 충돌위치에서 거리를 비교하여 Damage Falloff 값을 구한뒤, CalculationModifier를 통해서 캡쳐된 Damage Attribute 값에 Damage Falloff값을 SetByCaller로 Multiply 해서 범위 데미지를 구현했습니다.**
+**Radial Damage 계산: 범위 데미지를 입히는 투사체일경우. 오버랩된 대상에게 GE_DamageEffect 적용시 최초 충돌위치에서 거리를 비교하여 Damage Falloff 값을 구한뒤, CalculationModifier를 통해서 캡쳐된 Damage Attribute 값에 SetByCaller로 Damage Falloff값을 곱해서 범위 데미지를 구현했습니다.**
 
 ![Radial GE](docs/images/RadialDamage.gif)
 
@@ -371,15 +371,101 @@ void AMgbProjectileActor::HandleOverlap(AActor* OtherActor)
 
 <br><br>
 
-**GameplayEffect 기반 능력치 강화: 무기 강화와 캐릭터 성장시 GameplayEffect를 적용**
-![Radial GE](docs/images/WeaponUpgrade.gif)
-
-<details>
-<summary>
-Open Full Source Code
-</summary>
+**무기 능력 업그레이드: 플레이어 레벨업시 업그레이드 정보를 생성하고, UI에 정보를 전달합니다. 클라이언트측 에서 UI클릭시 UI에 저장된 정보를 인자로 서버측으로 RPC 함수를 호출합니다. 서버측에선 모든 강화 수치가 0으로 설정된 GameplayEffect의 강화 수치를 인자로 받은 값으로 설정하고 플레이어에 적용합니다.**
+![Upgrade](docs/images/WeaponUpgrade.gif)
 
 ```cpp
+//레벨업시 서버측에서 업그레이드 정보를 생성하고, Multicast RPC로 클라이언트에서 UI를 업데이트 합니다.
+void AMgbGameStateBase::MulticastShowItemSelectWindow_Implementation()
+{
+	APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (PC && PC->IsLocalPlayerController())
+	{
+		AMgbPlayerController* MgbPC = Cast<AMgbPlayerController>(PC);
+		if (MgbPC)
+		{
+			if (MgbPC)
+			{
+				MgbPC->GenerateUpgradeInfo(); 
+				MgbPC->InGameWidget->ShowItemSelectWindow();
+			}
+		}
+	}
+}
+
+...
+
+// 업그레이드 무기를 정할때 현재 플레이어가 가진 무기가 최대 소유가능 무기개수 4개를 넘지 않을경우, 무기 테이블에서 모든 무기를 업그레이드 후보선상에 올립니다.
+// 후보선상에 오른 무기들을 랜덤으로 정렬하여 앞에서부터 3개의 무기를 뽑고, 각 무기별 가능한 업그레이드 옵션도 1~2개 랜덤으로 뽑아서 무기의 강화 정보를 생성합니다.
+void AMgbPlayerController::GenerateUpgradeInfo()
+{
+	AMgbGameStateBase* GS = Cast<AMgbGameStateBase>(GetWorld()->GetGameState());
+	AMgbPlayerCharacter* MgbPlayer = Cast<AMgbPlayerCharacter>(GetPawn());
+	TArray<FName> WeaponNames;
+
+	bool bWeapon = true;
+
+	int WeaponCount = MgbPlayer->Weapons.Num();
+	if (WeaponCount < 4)
+	{
+		WeaponNames = GS->DT_Weapon->GetRowNames();
+	}
+	else
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			WeaponNames.Add(MgbPlayer->Weapons[i]->WeaponName);
+		}
+	}
+
+	WeaponNames.Sort([](const auto&, const auto&)
+		{
+			return FMath::RandBool();
+		});
+
+	for (int SlotNum = 0; SlotNum < 3; SlotNum++)
+	{
+		if (bWeapon)
+		{
+			FName RandomWeaponName = WeaponNames[SlotNum];
+			FMgbWeaponInfo* WeaponInfo = GS->DT_Weapon->FindRow<FMgbWeaponInfo>(RandomWeaponName, FString("Find Weapon"));
+			if (!WeaponInfo)
+			{
+				return;
+			}
+
+			auto WeaponBonus = GS->DT_WeaponUpgradeBonus->FindRow<FMgbWeaponUpgradeBonus>(RandomWeaponName, FString("Find Bouns"));
+			if (!WeaponBonus)
+			{
+				return;
+			}
+
+			auto Temp = WeaponBonus->UpgradeOptions;
+			TArray<FWeaponUpgradeOption> SelectedOptions;
+			Temp.Sort([](const auto&, const auto&)
+				{
+					return FMath::RandBool();
+				});
+
+			int32 Count = FMath::RandRange(1, 2);
+
+			for (int32 i = 0; i < Count && i < Temp.Num(); ++i)
+			{
+				SelectedOptions.Add(Temp[i]);
+			}
+
+			InGameWidget->SetItemUpgradeSlot(SlotNum, RandomWeaponName, SelectedOptions);
+		}
+		else
+		{
+			// 비법서(추가 강화) 추가될경우.
+		}
+	}
+}
+
+...
+
+// 무기 업그레이드 관련 Struct, Enum
 UENUM(BlueprintType)
 enum class EWeaponUpgradeStat : uint8
 {
@@ -407,8 +493,34 @@ public:
 	float IncreaseValue = 0.f; // 증가 수치
 };
 
-...
+USTRUCT(BlueprintType)
+struct FMgbWeaponUpgradeBonus : public FTableRowBase
+{
+	GENERATED_BODY()
 
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TArray<FWeaponUpgradeOption> UpgradeOptions;
+};
+
+```
+
+```cpp
+// UI 위젯의 강화 슬롯 버튼을 클릭시 Server RPC 를 호출합니다.
+void UItemSelectButton::HandleButtonClicked()
+{
+	APlayerController* PC = GetOwningPlayer();
+	if (AMgbPlayerController* MgbPC = Cast<AMgbPlayerController>(PC))
+	{
+		MgbPC->ServerApplyWeaponUpgradeEffect(UpgradeItemName, Upgrades);
+	}
+
+	OnItemSelected.Broadcast();
+}
+```
+
+```cpp
+// 인자로 받은 UpgradeData를 바탕으로 강화 수치를 설정하고, 무기 능력치에 적용합니다.
 void AMgbPlayerController::ServerApplyWeaponUpgradeEffect_Implementation(FName InWeaponName, const TArray<FWeaponUpgradeOption>& UpgradeData)
 {
 	AMgbPlayerCharacter* MgbPlayer = Cast<AMgbPlayerCharacter>(GetPawn());
@@ -487,9 +599,9 @@ void AMgbPlayerController::ServerApplyWeaponUpgradeEffect_Implementation(FName I
 	}
 }
 ```
-</details>
 
-<br><br><br>
+<br><br>
+
 **네트워크 멀티플레이어 지원**
   - Server Authority 기반 설계
   - RPC를 통한 효율적인 네트워크 통신

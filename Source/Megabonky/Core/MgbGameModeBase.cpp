@@ -22,9 +22,6 @@ void AMgbGameModeBase::StartPlay()
 {
 	Super::StartPlay();
 
-	// ������ ���ۉ����� ���������ϴ°͵�;
-	//1.EnemySpawn
-	//2.�������� Timer ����
 	AMgbGameStateBase* GS = GetGameState<AMgbGameStateBase>();
 	if (GS)
 	{
