@@ -371,11 +371,127 @@ void AMgbProjectileActor::HandleOverlap(AActor* OtherActor)
 
 <br><br>
 
-**GameplayEffect 기반 능력치 강화:**
+**GameplayEffect 기반 능력치 강화: 무기 강화와 캐릭터 성장시 GameplayEffect를 적용**
+![Radial GE](docs/images/WeaponUpgrade.gif)
 
+<details>
+<summary>
+Open Full Source Code
+</summary>
+
+```cpp
+UENUM(BlueprintType)
+enum class EWeaponUpgradeStat : uint8
+{
+	Damage,
+	CritChance,
+	CritDamage,
+	ProjectileCount,
+	ProjectileSpeed,
+	ProjectileBounce,
+	Size,
+	Knockback,
+	Duration
+};
+
+USTRUCT(BlueprintType)
+struct FWeaponUpgradeOption
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	EWeaponUpgradeStat StatType = EWeaponUpgradeStat::Damage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float IncreaseValue = 0.f; // 증가 수치
+};
+
+...
+
+void AMgbPlayerController::ServerApplyWeaponUpgradeEffect_Implementation(FName InWeaponName, const TArray<FWeaponUpgradeOption>& UpgradeData)
+{
+	AMgbPlayerCharacter* MgbPlayer = Cast<AMgbPlayerCharacter>(GetPawn());
+	UAbilitySystemComponent* PlayerASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(MgbPlayer);
+
+	auto EquipedWeapons = MgbPlayer->Weapons;
+	for (const auto& w : EquipedWeapons)
+	{
+		if (w->WeaponName == InWeaponName)
+		{
+			UAbilitySystemComponent* WeaponASC = w->GetAbilitySystemComponent();
+
+			auto ContextHandle = WeaponASC->MakeEffectContext();
+			auto SpecHandle = WeaponASC->MakeOutgoingSpec(GE_WeaponUpgradeDefaultClass, 1.f, ContextHandle);
+			check(GE_WeaponUpgradeDefaultClass);
+			auto EffectSpec = SpecHandle.Data.Get();
+
+			EffectSpec->SetSetByCallerMagnitude(TAG_Attribute_Weapon_Damage, 0.f);
+			EffectSpec->SetSetByCallerMagnitude(TAG_Attribute_Weapon_CritChance, 0.f);
+			EffectSpec->SetSetByCallerMagnitude(TAG_Attribute_Weapon_CritDamage, 0.f);
+			EffectSpec->SetSetByCallerMagnitude(TAG_Attribute_Weapon_ProjectileCount, 0.f);
+			EffectSpec->SetSetByCallerMagnitude(TAG_Attribute_Weapon_ProjectileSpeed, 0.f);
+			EffectSpec->SetSetByCallerMagnitude(TAG_Attribute_Weapon_ProjectileBounces, 0.f);
+			EffectSpec->SetSetByCallerMagnitude(TAG_Attribute_Weapon_Size, 0.f);
+			EffectSpec->SetSetByCallerMagnitude(TAG_Attribute_Weapon_Knockback, 0.f);
+			EffectSpec->SetSetByCallerMagnitude(TAG_Attribute_Weapon_Duration, 0.f);
+
+			for (const auto& u : UpgradeData)
+			{
+				switch (u.StatType)
+				{
+				case EWeaponUpgradeStat::Damage:
+					EffectSpec->SetSetByCallerMagnitude(TAG_Attribute_Weapon_Damage, u.IncreaseValue);
+					break;
+				case EWeaponUpgradeStat::CritChance:
+					EffectSpec->SetSetByCallerMagnitude(TAG_Attribute_Weapon_CritChance, u.IncreaseValue);
+					break;
+				case EWeaponUpgradeStat::CritDamage:
+					EffectSpec->SetSetByCallerMagnitude(TAG_Attribute_Weapon_CritDamage, u.IncreaseValue);
+					break;
+				case EWeaponUpgradeStat::ProjectileCount:
+					EffectSpec->SetSetByCallerMagnitude(TAG_Attribute_Weapon_ProjectileCount, u.IncreaseValue);
+					break;
+				case EWeaponUpgradeStat::ProjectileSpeed:
+					EffectSpec->SetSetByCallerMagnitude(TAG_Attribute_Weapon_ProjectileSpeed, u.IncreaseValue);
+					break;
+				case EWeaponUpgradeStat::ProjectileBounce:
+					EffectSpec->SetSetByCallerMagnitude(TAG_Attribute_Weapon_ProjectileBounces, u.IncreaseValue);
+					break;
+				case EWeaponUpgradeStat::Size:
+					EffectSpec->SetSetByCallerMagnitude(TAG_Attribute_Weapon_Size, u.IncreaseValue);
+					break;
+				case EWeaponUpgradeStat::Knockback:
+					EffectSpec->SetSetByCallerMagnitude(TAG_Attribute_Weapon_Knockback, u.IncreaseValue);
+					break;
+				case EWeaponUpgradeStat::Duration:
+					EffectSpec->SetSetByCallerMagnitude(TAG_Attribute_Weapon_Duration, u.IncreaseValue);
+					break;
+				}
+			}
+
+			WeaponASC->ApplyGameplayEffectSpecToSelf(*EffectSpec);
+			return;
+		}
+	}
+
+	if (DT_Weapons)
+	{
+		auto WeaponInfo = DT_Weapons->FindRow<FMgbWeaponInfo>(InWeaponName, FString("Find Weapon"));
+
+		TSubclassOf<AMgbWeapon> Weapon = WeaponInfo->WeaponClass;
+		if (Weapon)
+		{
+			MgbPlayer->EquipWeapon(Weapon);
+		}
+	}
+}
+```
+</details>
+
+<br><br><br>
 **네트워크 멀티플레이어 지원**
-  - Server Authority 기반 치팅 방지
-  - 완전한 속성 및 상태 리플리케이션
+  - Server Authority 기반 설계
   - RPC를 통한 효율적인 네트워크 통신
 
 ### 네트워크 아키텍처

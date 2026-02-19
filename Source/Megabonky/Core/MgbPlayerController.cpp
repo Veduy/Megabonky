@@ -100,7 +100,6 @@ void AMgbPlayerController::ServerApplyWeaponUpgradeEffect_Implementation(FName I
 	auto EquipedWeapons = MgbPlayer->Weapons;
 	for (const auto& w : EquipedWeapons)
 	{
-		// �������� �����ϰ��.
 		if (w->WeaponName == InWeaponName)
 		{
 			UAbilitySystemComponent* WeaponASC = w->GetAbilitySystemComponent();
@@ -159,7 +158,6 @@ void AMgbPlayerController::ServerApplyWeaponUpgradeEffect_Implementation(FName I
 		}
 	}
 
-	// �ű� �����ϰ�� �����߰�, ������ ���̺���� Ŭ���� �����ͼ� 
 	if (DT_Weapons)
 	{
 		auto WeaponInfo = DT_Weapons->FindRow<FMgbWeaponInfo>(InWeaponName, FString("Find Weapon"));
