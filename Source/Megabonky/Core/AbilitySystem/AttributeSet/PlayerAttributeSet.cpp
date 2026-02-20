@@ -104,7 +104,6 @@ void UPlayerAttributeSet::HandleHealthChanged()
 		{
 			GS->ServerHandleGameOver();
 		}
-		Character->HandleDeath();
 	}
 }
 

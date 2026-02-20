@@ -12,6 +12,7 @@
 
 #include "GameFramework/Character.h"
 #include "Characters/MgbEnemyCharacter.h"
+#include "Characters/MgbPlayerCharacter.h"
 #include "MgbPlayerController.h"
 #include "Data/WeaponInfo.h"
 #include "Data/MgbSaveGame.h"
@@ -332,6 +333,21 @@ void AMgbGameStateBase::HandleGameOver()
 	// 게임 세션 기록 수집 및 저장 (서버에서만)
 	if (HasAuthority())
 	{
+		// 모든 플레이어에게 사망 처리 RPC 호출
+		for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+		{
+			if (APlayerController* PC = Iterator->Get())
+			{
+				if (APawn* PlayerPawn = PC->GetPawn())
+				{
+					if (AMgbPlayerCharacter* PlayerCharacter = Cast<AMgbPlayerCharacter>(PlayerPawn))
+					{
+						PlayerCharacter->ServerHandleDeath();
+					}
+				}
+			}
+		}
+
 		FGameSessionRecord SessionRecord;
 		SessionRecord.TotalKills = TotalKill;
 		SessionRecord.GoldEarned = Gold;

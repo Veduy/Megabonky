@@ -65,9 +65,13 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void DeathFadeOut();
 
-	void HandleDeath();
+	// Server RPC: 사망 처리 (Server 권한 작업)
+	UFUNCTION(Server, Reliable)
+	void ServerHandleDeath();
 
-	//UPrimitiveComponent, OnComponentBeginOverlap, UPrimitiveComponent*, OverlappedComponent, AActor*, OtherActor, UPrimitiveComponent*, OtherComp, int32, OtherBodyIndex, bool, bFromSweep, const FHitResult&, SweepResult)
+	// Multicast RPC: 클라이언트에서 Death UI/Effect 처리
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastClientHandleDeath();
 
 	UFUNCTION(BlueprintCallable)
 	void PickupBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);

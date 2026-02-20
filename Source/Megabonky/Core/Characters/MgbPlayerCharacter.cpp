@@ -278,20 +278,38 @@ void AMgbPlayerCharacter::UpdateCharacterMeshRotation(float DeltaTime)
 	}
 }
 
-void AMgbPlayerCharacter::HandleDeath()
+void AMgbPlayerCharacter::ServerHandleDeath_Implementation()
 {
-	bDeath = true;
-
-	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+	// Server에서만 실행되는 사망 처리
+	if (!HasAuthority())
 	{
-		DisableInput(PC);
+		return;
 	}
 
+	bDeath = true;
+
+	// 어빌리티 타이머 정리 (Server에서)
 	if (ActivateAbilityHandle.IsValid())
 	{
 		GetWorld()->GetTimerManager().ClearTimer(ActivateAbilityHandle);
 	}
 
+	// 모든 클라이언트에서 Death UI/Effect 실행
+	MulticastClientHandleDeath();
+}
+
+void AMgbPlayerCharacter::MulticastClientHandleDeath_Implementation()
+{
+	// 로컬 플레이어 컨트롤러인 경우 Input 비활성화
+	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+	{
+		if (PC->IsLocalPlayerController())
+		{
+			DisableInput(PC);
+		}
+	}
+
+	// 클라이언트 사망 UI/Effect (Blueprint에서 구현)
 	DeathFadeOut();
 }
 

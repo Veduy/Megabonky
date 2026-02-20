@@ -96,8 +96,11 @@ void AMgbEnemyCharacter::BeginPlay()
 		// HP, Damage Attribute 적용.
 		auto Level = Cast<AMgbGameStateBase>(GetWorld()->GetGameState())->PassedTimeSec;
 		auto ContextHandle = ASC->MakeEffectContext();
-		auto EffectSpec = ASC->MakeOutgoingSpec(InitAttributeEffect, Level, ContextHandle);
-		ASC->ApplyGameplayEffectSpecToSelf(*EffectSpec.Data.Get());
+		if (InitAttributeEffect)
+		{
+			auto EffectSpec = ASC->MakeOutgoingSpec(InitAttributeEffect, Level, ContextHandle);
+			ASC->ApplyGameplayEffectSpecToSelf(*EffectSpec.Data.Get());
+		}
 	}
 
 	GetWorld()->GetTimerManager().SetTimer(CheckWallTimer, this, &AMgbEnemyCharacter::CheckWall, 0.5f, true, 2.f);
@@ -344,12 +347,92 @@ void AMgbEnemyCharacter::CollisionHit(UPrimitiveComponent* HitComponent, AActor*
 		PlayerMove->AddImpulse(FVector(0.f, 0.f, 1.f) * 10000.f);
 
 		FGameplayEffectContextHandle ContextHandle = AbilitySystemComponent->MakeEffectContext();
-		FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(HitDamageEffectClass, 1.f, ContextHandle);
-		AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), PlayerASC);
+		if (HitDamageEffectClass)
+		{
+			FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(HitDamageEffectClass, 1.f, ContextHandle);
+			AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), PlayerASC);
+		}
 	}
 }
 
 void AMgbEnemyCharacter::HandleDamageEffect_Implementation()
 {
 
+}
+
+FVector AMgbEnemyCharacter::GetPredictedTargetLocation(float PredictionTime) const
+{
+	if (!IsValid(TargetActor))
+	{
+		return FVector::ZeroVector;
+	}
+
+	FVector CurrentLocation = TargetActor->GetActorLocation();
+
+	// Target의 Velocity를 가져옴 (Character인 경우 CharacterMovement 사용)
+	FVector TargetVelocity = FVector::ZeroVector;
+	if (ACharacter* TargetCharacter = Cast<ACharacter>(TargetActor))
+	{
+		TargetVelocity = TargetCharacter->GetCharacterMovement()->Velocity;
+	}
+
+	// 예상 위치 = 현재 위치 + (속도 * 예측 시간)
+	FVector PredictedLocation = CurrentLocation + (TargetVelocity * PredictionTime);
+
+	return PredictedLocation;
+}
+
+void AMgbEnemyCharacter::SpawnAttackTelegraphAtPredictedTarget(TSubclassOf<AActor> TelegraphActorClass, float PredictionTime)
+{
+	// 서버에서만 실행
+	if (!HasAuthority())
+	{
+		return;
+	}
+
+	if (!IsValid(TargetActor) || !TelegraphActorClass)
+	{
+		return;
+	}
+
+	// 예상 위치 계산
+	FVector PredictedLocation = GetPredictedTargetLocation(PredictionTime);
+
+	FVector TraceStart = PredictedLocation + FVector(0.f, 0.f, 5000.f);
+	FVector TraceEnd = PredictedLocation + FVector(0.f, 0.f, -5000.f);
+
+	FHitResult HitResult;
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(this);
+	if (TargetActor)
+	{
+		QueryParams.AddIgnoredActor(TargetActor);
+	}
+
+	bool bHit = GetWorld()->LineTraceSingleByChannel(
+		HitResult,
+		TraceStart,
+		TraceEnd,
+		ECC_WorldStatic,
+		QueryParams
+	);
+
+	FVector SpawnLocation = bHit ? HitResult.ImpactPoint : PredictedLocation;
+
+	// Telegraph 액터를 바닥 위치에 스폰
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.Instigator = this;
+
+	AActor* Telegraph = GetWorld()->SpawnActor<AActor>(
+		TelegraphActorClass,
+		SpawnLocation,
+		FRotator::ZeroRotator,
+		SpawnParams
+	);
+
+	if (Telegraph)
+	{
+		// 추가 설정이 필요하면 여기에 작성
+	}
 }

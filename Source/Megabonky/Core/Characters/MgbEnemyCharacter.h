@@ -55,6 +55,14 @@ public:
 	void HandleDamageEffect();
 	void HandleDamageEffect_Implementation();
 
+	// Target의 이동 방향을 예측하여 0.5초 후 예상 위치를 반환
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FVector GetPredictedTargetLocation(float PredictionTime = 0.5f) const;
+
+	// Target의 예상 위치에 Telegraph 액터 스폰
+	UFUNCTION(BlueprintCallable)
+	void SpawnAttackTelegraphAtPredictedTarget(TSubclassOf<AActor> TelegraphActorClass, float PredictionTime = 0.5f);
+
 	// 마지막 데미지 무기 설정 (킬 어트리뷰션용)
 	void SetLastDamageWeapon(class AMgbWeapon* Weapon);
 
