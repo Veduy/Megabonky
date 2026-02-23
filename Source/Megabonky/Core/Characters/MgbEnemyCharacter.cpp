@@ -12,6 +12,7 @@
 #include "MgbPlayerCharacter.h"
 #include "../MgbGameStateBase.h"
 #include "../MgbGameplayTags.h"
+#include "../EnemyMovementOptimizer.h"
 #include "../MgbWeapon.h"
 #include "../AbilitySystem/MgbAbilitySystemComponent.h"
 #include "../AbilitySystem/AttributeSet/EnemyAttributeSet.h"
@@ -54,6 +55,11 @@ void AMgbEnemyCharacter::BeginPlay()
 
 	bSpawnFinished = false;
 	AutoPossessAI = EAutoPossessAI::Disabled;
+
+	if (UEnemyMovementOptimizer* Optimizer = GetWorld()->GetSubsystem<UEnemyMovementOptimizer>())
+	{
+		Optimizer->RegisterEnemy(this);
+	}
 
 	auto MeshComp = GetMesh();
 	if (MeshComp->GetSkeletalMeshAsset())
@@ -165,6 +171,11 @@ void AMgbEnemyCharacter::Destroyed()
 {
 	// 타이머 정리 (EndPlay보다 먼저 호출될 수 있으므로 명시적으로 정리)
 	GetWorld()->GetTimerManager().ClearTimer(CheckWallTimer);
+
+	if (UEnemyMovementOptimizer* Optimizer = GetWorld()->GetSubsystem<UEnemyMovementOptimizer>())
+	{
+		Optimizer->UnregisterEnemy(this);
+	}
 
 	if (HasAuthority())
 	{

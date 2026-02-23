@@ -21,6 +21,7 @@
 #include "../MgbWeapon.h"
 #include "../../Actors/MgbItemActor.h"
 
+#include "../EnemyMovementOptimizer.h"
 #include "../../Util/NetworkLog.h"
 
 AMgbPlayerCharacter::AMgbPlayerCharacter()
@@ -82,7 +83,22 @@ void AMgbPlayerCharacter::BeginPlay()
 	if (HasAuthority())
 	{
 		PickupSphere->OnComponentBeginOverlap.AddDynamic(this, &AMgbPlayerCharacter::PickupBeginOverlap);
+
+		if (UEnemyMovementOptimizer* Optimizer = GetWorld()->GetSubsystem<UEnemyMovementOptimizer>())
+		{
+			Optimizer->RegisterPlayer(this);
+		}
 	}
+}
+
+void AMgbPlayerCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	if (UEnemyMovementOptimizer* Optimizer = GetWorld()->GetSubsystem<UEnemyMovementOptimizer>())
+	{
+		Optimizer->UnregisterPlayer(this);
+	}
+
+	Super::EndPlay(EndPlayReason);
 }
 
 void AMgbPlayerCharacter::Tick(float DeltaTime)
