@@ -10,7 +10,6 @@
 #include "Components/AudioComponent.h"
 #include "Net/UnrealNetwork.h"
 
-#include "GameFramework/Character.h"
 #include "Characters/MgbEnemyCharacter.h"
 #include "Characters/MgbPlayerCharacter.h"
 #include "MgbPlayerController.h"

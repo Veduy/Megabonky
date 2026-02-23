@@ -12,7 +12,6 @@
 				"Engine",
 				"GameplayAbilities",
 				"UMG",
-				"EditorSubsystem"
 			]
 		}
 	],
@@ -36,5 +35,8 @@
 			"Name": "HttpBlueprint",
 			"Enabled": true
 		}
+	],
+	"TargetPlatforms": [
+		"Windows"
 	]
 }
