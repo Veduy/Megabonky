@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "5.7",
+	"EngineAssociation": "{21998E78-4830-F731-2647-A8A821DA294A}",
 	"Category": "",
 	"Description": "",
 	"Modules": [
@@ -11,7 +11,7 @@
 			"AdditionalDependencies": [
 				"Engine",
 				"GameplayAbilities",
-				"UMG",
+				"UMG"
 			]
 		}
 	],

@@ -55,12 +55,10 @@ void UEnemyAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute
 
 				if (NewValue <= 0.f)
 				{
-					GetOwningActor()->SetLifeSpan(0.2f);
+					GetOwningActor()->SetLifeSpan(0.1f);
 				}
 			}
-	
 		}
-	
 	}
 }
 

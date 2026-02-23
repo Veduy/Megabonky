@@ -18,7 +18,5 @@ void UTitle::NativeOnInitialized()
 
 void UTitle::HandlePlayBtnClicked()
 {
-	//컨트롤러에서 서버RPC로 실행
 	//GetWorld()->ServerTravel(TEXT("/Game/Maps/GameMap?listen"));
-
 }

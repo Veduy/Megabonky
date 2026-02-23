@@ -222,8 +222,6 @@ void AMgbGameStateBase::SpawnEnemy()
 
 	FCollisionObjectQueryParams ObjectQueryParams;
 	ObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldStatic);
-	//TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypesForTrace;
-	//ObjectTypesForTrace.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_WorldStatic));
 
 	// 플레이어 수만큼 플레이어를 타겟으로한 몬스터를 소환한다.
 	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)

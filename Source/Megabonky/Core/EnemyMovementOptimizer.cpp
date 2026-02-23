@@ -140,8 +140,8 @@ void UEnemyMovementOptimizer::UpdateEnemyTickRates()
 		if (MinDistSq < NearDistSq)
 		{
 			// Near: 풀 틱
-			CMC->SetComponentTickInterval(0.f);
-			Enemy->SetActorTickInterval(0.f);
+			CMC->SetComponentTickInterval(0.01f);
+			Enemy->SetActorTickInterval(0.01f);
 			Enemy->SetNetUpdateFrequency(30.f);
 		}
 		else if (MinDistSq < MidDistSq)
