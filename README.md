@@ -609,13 +609,186 @@ void AMgbPlayerController::ServerApplyWeaponUpgradeEffect_Implementation(FName I
 }
 ```
 
-<br><br>
+<br>
 
-**네트워크 멀티플레이어 지원**
-  - Server Authority 기반 설계
-  - RPC를 통한 효율적인 네트워크 통신
+### Unreal 에디터 MCP 연동
+https://github.com/flopperam/unreal-engine-mcp.git 0.5
+
+**MCP 구조**
+LLM --> MCP Python Server --> MCP UE Plugin
+
+**엔진 내장 컴포넌트 부착 오류 개선: 엔진 내장 컴포넌트 탐색경로를 추가해서, 컴포넌트가 옳바르게 클래스에 부착되게 개선.**
+```cpp
+	// Add "/Script/Engine." prefix and try again
+    if (!ComponentClass && !ComponentType.StartsWith(TEXT("/Script/Engine.")))
+    {
+	    UE_LOG(LogTemp, Warning, TEXT("HandleAddComponentToBlueprint: Searching for component class /Script/Engine/.%s"), *ComponentType);
+        FString ComponentScript = TEXT("/Script/Engine.") + ComponentType;
+        ComponentClass = FindObject<UClass>(nullptr, *ComponentScript);
+    }
+```
+
+**커스텀 클래스 탐색 개선: 엔진 내장 클래스만 찾도록 설정되어 있어서, 사용자가 만든 C++클래스와, 블루프린트 클래스를 옳바르게 찾도록 경로와 탐색방법을 수정.**
+![Create C++ Class](docs/images/CreateClass.gif)
+![Create BP Class](docs/images/CreateClassFromBP.gif)
+
+- 수정전: JSON패킷에서 parent_class필드값을 파싱한후 "A"접두사를 붙힌후 엔진 기본 경로에서 탐색.
+```cpp
+ // Handle parent class
+    FString ParentClass;
+    Params->TryGetStringField(TEXT("parent_class"), ParentClass);
+    
+    // Default to Actor if no parent class specified
+    UClass* SelectedParentClass = AActor::StaticClass();
+    
+    // Try to find the specified parent class
+    if (!ParentClass.IsEmpty())
+    {
+        FString ClassName = ParentClass;
+        if (!ClassName.StartsWith(TEXT("A")))
+        {
+            ClassName = TEXT("A") + ClassName;
+        }
+        
+        // First try direct StaticClass lookup for common classes
+        UClass* FoundClass = nullptr;
+        if (ClassName == TEXT("APawn"))
+        {
+            FoundClass = APawn::StaticClass();
+        }
+        else if (ClassName == TEXT("AActor"))
+        {
+            FoundClass = AActor::StaticClass();
+        }
+        else
+        {
+            // Try loading the class using LoadClass which is more reliable than FindObject
+            const FString ClassPath = FString::Printf(TEXT("/Script/Engine.%s"), *ClassName);
+            FoundClass = LoadClass<AActor>(nullptr, *ClassPath);
+            
+            if (!FoundClass)
+            {
+                // Try alternate paths if not found
+                const FString GameClassPath = FString::Printf(TEXT("/Script/Game.%s"), *ClassName);
+                FoundClass = LoadClass<AActor>(nullptr, *GameClassPath);
+            }
+        }
+		...
+```
+<br>
+
+- 수정후: FindFirstObjectSafe 함수로 찾는 현재 메모리에 이미 로드되어 있는 UObject들 중에서 ParentClass와 이름이 같은 일치하는 클래스 탐색. 못찾는 경우 BP_ 접두사를 붙여서 블루프린트 클래스로 탐색시도.
+
+```cpp
+// 미리 정해둔 경로에서 탐색
+FString PackagePath = TEXT("/Game/Blueprints/MCP/");
+FString AssetName = BlueprintName;
+if (UEditorAssetLibrary::DoesAssetExist(PackagePath + AssetName))
+{
+	return FEpicUnrealMCPCommonUtils::CreateErrorResponse(FString::Printf(TEXT("Blueprint already exists: %s"), *BlueprintName));
+}
+
+...
+
+// Try to find the specified parent class
+    if (!ParentClass.IsEmpty())
+    {
+        // Prefix 없는 원본 이름으로 검색
+        UClass* FoundClass = FindFirstObjectSafe<UClass>(*ParentClass);
+
+        // Fallback: prefix 붙여서 경로 기반 검색
+        FString ClassName = ParentClass;
+        if (!ClassName.StartsWith(TEXT("A")))
+        {
+            ClassName = TEXT("A") + ClassName;
+        }
+
+        // Blueprint 클래스 검색
+        if (!FoundClass)
+        {
+            //Script/Engine.Blueprint'/Game/Blueprints/MCP/BP_MCP_Enemy.BP_MCP_Enemy'
+            //Add BP_ Prefix
+            const FString BPName = ParentClass.StartsWith(TEXT("BP_")) ? ParentClass : FString::Printf(TEXT("BP_%s"), *ParentClass);
+			FString BPPath;
+            if (FPackageName::IsValidObjectPath(ParentClass))
+            {
+				UE_LOG(LogTemp, Log, TEXT("HandleCreateBlueprint: Loading Blueprint using full object path: %s"), *ParentClass);
+				UBlueprint* BP = Cast<UBlueprint>(UEditorAssetLibrary::LoadAsset(ParentClass));
+				if (BP && BP->GeneratedClass)
+                {
+                    FoundClass = BP->GeneratedClass;
+                    UE_LOG(LogTemp, Log, TEXT("Found Blueprint parent class at full path '%s'"), *ParentClass);
+                }
+                else
+                {
+                    UE_LOG(LogTemp, Warning, TEXT("Could not find Blueprint at full path '%s'"), *ParentClass);
+				}
+            }
+```
+
+**자연어 블루프린트 작성 개선: 클래스가 가지고있는 변수(클래스)의 변수에 접근하지 못하던 문제가 있어서, 외부 클래스 변수와, 함수를 불러올수 있도록 MCP Server의 변수 접근 규칙 추가**
+![Eidt Nodes](docs/images/EditBlueprint.gif)
+```cpp
+"VariableGet" - Read a variable value (⚠️ variable must exist in Blueprint)
+
+// 찾는 변수가 클래스의 변수일경우 target_class라는 필드 규칙 추가.
+"VariableGet" - Read a variable value (⚠️ variable must exist in Blueprint or target_class)
+ℹ️ Use target_class for component properties (e.g., target_class="CharacterMovementComponent", variable_name="GravityScale")
+```
+
+ - CreateVariableGetNode() 노드를 만드는 함수 내부 코드 추가. 
+ target_class 필드에 값으로 외부클래스 변수인지, 블루프린트 내부 변수인지 검사후 변수를 가져옴.
+```cpp
+// target_class가 있으면 외부 클래스 프로퍼티, 없으면 블루프린트 자체 변수
+	FString TargetClassName;
+	if (Params->TryGetStringField(TEXT("target_class"), TargetClassName))
+	{
+		UClass* TargetClass = FindTargetClass(TargetClassName);
+		if (TargetClass)
+		{
+			VarGetNode->VariableReference.SetExternalMember(FName(*VariableName), TargetClass);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("CreateVariableGetNode: target_class '%s' not found, falling back to SelfMember"), *TargetClassName);
+			VarGetNode->VariableReference.SetSelfMember(FName(*VariableName));
+		}
+	}
+	else
+	{
+		VarGetNode->VariableReference.SetSelfMember(FName(*VariableName));
+	}
+```
+
+- 블루프린트 노드 생성시 target_class 문자열로 UClass찾는 헬퍼 함수 추가. 
+```cpp
+// target_class 문자열로 UClass를 찾는 헬퍼
+static UClass* FindTargetClass(const FString& TargetClassName)
+{
+	// U/A 접두사 없이 검색
+	UClass* FoundClass = FindFirstObjectSafe<UClass>(*TargetClassName);
+	if (FoundClass)
+	{
+		return FoundClass;
+	}
+
+	// U 접두사 붙여서 검색 (컴포넌트 등)
+	FoundClass = FindFirstObjectSafe<UClass>(*(TEXT("U") + TargetClassName));
+	if (FoundClass)
+	{
+		return FoundClass;
+	}
+
+	// A 접두사 붙여서 검색 (액터 등)
+	FoundClass = FindFirstObjectSafe<UClass>(*(TEXT("A") + TargetClassName));
+	return FoundClass;
+}
+```
 
 ### 네트워크 아키텍처
+- **네트워크 멀티플레이어 지원**
+  - Server Authority 기반 설계
+  - RPC를 통한 효율적인 네트워크 통신
 - **Server Authority**: 적 생성, 데미지 계산, XP/레벨 관리
 - **Replication**: 모든 중요 속성 및 상태 동기화
 - **RPC 활용**:
