@@ -66,6 +66,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void DeathFadeOut();
 
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void TestCameraShake();
+
 	// Server RPC: 사망 처리 (Server 권한 작업)
 	UFUNCTION(Server, Reliable)
 	void ServerHandleDeath();

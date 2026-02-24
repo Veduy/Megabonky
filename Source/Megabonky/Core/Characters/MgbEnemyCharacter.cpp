@@ -191,9 +191,8 @@ void AMgbEnemyCharacter::Destroyed()
 				KillWeapon = LastDamageWeapon->WeaponName;
 			}
 			GS->RecordWeaponKill(KillWeapon);
+			GS->ServerAddXP(20.f);
 		}
-
-		GetWorld()->SpawnActor<AActor>(XPCrystalClass, GetActorTransform());
 	}
 
 	Super::Destroyed();

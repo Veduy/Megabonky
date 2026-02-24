@@ -93,6 +93,7 @@ void UPlayerAttributeSet::HandleHealthChanged()
 	{
 		if (PC->InGameWidget)
 		{
+			Character->TestCameraShake();
 			PC->InGameWidget->UpdateHPBar(GetMaxHealth(), GetHealth());
 		}
 	}
