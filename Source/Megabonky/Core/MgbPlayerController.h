@@ -50,12 +50,15 @@ public:
 	UFUNCTION(Client, Reliable)
 	void ClientShowUpgradeWindow(const TArray<FUpgradeSlotInfo>& Slots);
 	void ClientShowUpgradeWindow_Implementation(const TArray<FUpgradeSlotInfo>& Slots);
-
+	
 	TArray<FUpgradeSlotInfo> ServerGenerateUpgradeSlots();
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UAudioComponent> Audio_Levelup;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<UAudioComponent> Audio_BGM;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputMappingContext> InputMappingContext;

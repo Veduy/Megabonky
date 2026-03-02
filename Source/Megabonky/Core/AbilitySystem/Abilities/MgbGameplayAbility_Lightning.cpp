@@ -111,7 +111,7 @@ void UMgbGameplayAbility_Lightning::Lightning()
 							FGameplayCueParameters Params;
 							Params.Location = TargetLoc;
 							//auto PlayerASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent();
-							TargetASC->ExecuteGameplayCue(TAG_GameplayCue_Lightning_Hit, Params);
+							WeaponASC->ExecuteGameplayCue(TAG_GameplayCue_Lightning_Hit, Params);
 						}
 					}
 

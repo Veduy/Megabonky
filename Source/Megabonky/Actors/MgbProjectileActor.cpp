@@ -164,7 +164,7 @@ void AMgbProjectileActor::Bounce()
 		ProjectileMovement->Velocity = Direction * Speed;
 		SetActorRotation(Direction.Rotation());
 	}
-
+	
 	BounceCount--;
 }
 

@@ -44,6 +44,9 @@ public:
 	UPROPERTY()
 	TObjectPtr<UMgbSaveGame> CurrentSaveData;
 
+	UPROPERTY()
+	FString CurrentUserID;
+
 	static const FString SaveSlotName;  // "MegabonkyPlayerData"
 	static const int32 SaveUserIndex;   // 0
 };

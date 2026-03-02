@@ -79,11 +79,31 @@ void UMgbGameplayAbility_Projectile::RapidFire()
 
 	float SpawnInterval = float(1) / float(SpawnProjectileCount);
 
-	GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle,
-		[this, PlayerActor, WeaponActor]()
+	// [Fix] 안전하게 어빌리티와 액터들의 소멸을 감지하기 위한 Weak 캡처 포인터
+	TWeakObjectPtr<UMgbGameplayAbility_Projectile> WeakThis(this);
+	TWeakObjectPtr<AActor> WeakPlayerActor(PlayerActor);
+	TWeakObjectPtr<AActor> WeakWeaponActor(WeaponActor);
+
+	// [Fix] 생포인터(this) 대신 CreateWeakLambda를 사용하여 어빌리티 파괴 시 타이머가 참조 위반을 일으키지 않도록 방어
+	FTimerDelegate Delegate = FTimerDelegate::CreateWeakLambda(this, [WeakThis, WeakPlayerActor, WeakWeaponActor]()
+	{
+		UMgbGameplayAbility_Projectile* StrongThis = WeakThis.Get();
+		if (!StrongThis || !StrongThis->IsActive())
+		{
+			return;
+		}
+
+		AActor* PlayerActor = WeakPlayerActor.Get();
+		AActor* WeaponActor = WeakWeaponActor.Get();
+
+		// [Fix] 플레이어 또는 무기 액터가 타이머 반복 도중 파괴되었을 경우 능력(Ability) 강제 종료
+		if (!IsValid(PlayerActor) || !IsValid(WeaponActor))
+		{
+			StrongThis->CurrentSpawnCount = StrongThis->SpawnProjectileCount; // Force end ability
+		}
+		else
 		{
 			AActor* TargetActor = nullptr;
-
 			AMgbPlayerCharacter* PlayerCharacter = Cast<AMgbPlayerCharacter>(PlayerActor);
 
 			bool bFoundTarget = false;
@@ -92,28 +112,32 @@ void UMgbGameplayAbility_Projectile::RapidFire()
 				bFoundTarget = PlayerCharacter->FindPrimaryTargetByCondition(TargetActor);
 			}
 
-			if (bFoundTarget && TargetActor && Cast<AMgbEnemyCharacter>(TargetActor)->bSpawnFinished)
+			// [Fix] 캐스팅 후 IsValid를 통해 Enemy 포인터가 유효한지 안전하게 검사 (널 포인터 참조 크래시 방지)
+			AMgbEnemyCharacter* EnemyTarget = Cast<AMgbEnemyCharacter>(TargetActor);
+			if (bFoundTarget && IsValid(EnemyTarget) && EnemyTarget->bSpawnFinished)
 			{
-				FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(PlayerActor->GetActorLocation(), TargetActor->GetActorLocation());
-
-				SpawnProjectile(WeaponActor, PlayerActor->GetActorLocation(), TargetRotation);
+				FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(PlayerActor->GetActorLocation(), EnemyTarget->GetActorLocation());
+				StrongThis->SpawnProjectile(WeaponActor, PlayerActor->GetActorLocation(), TargetRotation);
 			}
 			else
 			{
-				CurrentSpawnCount++;
+				StrongThis->CurrentSpawnCount++;
 			}
+		}
 
-			if (CurrentSpawnCount >= SpawnProjectileCount)
+		if (StrongThis->CurrentSpawnCount >= StrongThis->SpawnProjectileCount)
+		{
+			StrongThis->CurrentSpawnCount = 0;
+			if (UWorld* World = StrongThis->GetWorld())
 			{
-				CurrentSpawnCount = 0;
-				GetWorld()->GetTimerManager().ClearTimer(SpawnTimerHandle);
-
-				EndAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), false, false);
+				World->GetTimerManager().ClearTimer(StrongThis->SpawnTimerHandle);
 			}
-		},
-		SpawnInterval,
-		true,
-		0.f);
+
+			StrongThis->EndAbility(StrongThis->GetCurrentAbilitySpecHandle(), StrongThis->GetCurrentActorInfo(), StrongThis->GetCurrentActivationInfo(), false, false);
+		}
+	});
+
+	GetWorld()->GetTimerManager().SetTimer(SpawnTimerHandle, Delegate, SpawnInterval, true, 0.f);
 }
 
 void UMgbGameplayAbility_Projectile::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,

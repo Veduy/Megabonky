@@ -4,6 +4,7 @@
 #include "MgbSubsystem.h"
 #include "JsonUtilities.h"
 #include "Kismet/GameplayStatics.h"
+#include "AbilitySystemGlobals.h"
 #include "Core/MgbTitleController.h"
 
 
@@ -14,6 +15,9 @@ const int32 UMgbSubsystem::SaveUserIndex = 0;
 void UMgbSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	HttpModule = &FHttpModule::Get();
+
+	// 이 코드가 없으면 빌드 버전에서 GameplayCue Manager가 작동하지 않습니다.
+	UAbilitySystemGlobals::Get().InitGlobalData();
 
 	// Load saved data on game start
 	LoadGameData();
@@ -46,8 +50,10 @@ void UMgbSubsystem::RequestCompleted(FHttpRequestPtr Request, FHttpResponsePtr R
 
 	if (bResult)
 	{
-		auto Name = JsonObject->GetField(TEXT("name"), EJson::String);
-		UE_LOG(LogTemp, Warning, TEXT("Login Success - name: %s"), *Name->AsString());
+		auto ReturnedID = JsonObject->GetField(TEXT("name"), EJson::String); // Note: server currently repurposes 'name' property in CreateJsonResponse
+		UE_LOG(LogTemp, Warning, TEXT("Login Success - user_id: %s"), *ReturnedID->AsString());
+		
+		CurrentUserID = ReturnedID->AsString();
 
 		auto PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 		if (PC)
@@ -121,6 +127,35 @@ void UMgbSubsystem::SaveGameSession(const FGameSessionRecord& SessionRecord)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Game session saved successfully: %lld kills, %d weapons"),
 			SessionRecord.TotalKills, SessionRecord.WeaponKills.Num());
+			
+		// 혹시 에디터에서 바로 시작해서 로그인을 안 거친 경우를 위한 fallback
+		if (CurrentUserID.IsEmpty())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("CurrentUserID is empty! Fallback to 'admin' for testing."));
+			CurrentUserID = TEXT("admin");
+		}
+		
+		auto Request = HttpModule->CreateRequest();
+		FString JsonBody = FString::Printf(TEXT("{\"user_id\": \"%s\", \"total_kills\": %lld}"), *CurrentUserID, SessionRecord.TotalKills);
+
+		Request->SetURL(TEXT("http://127.0.0.1:8080/api/save_kills"));
+		Request->SetVerb(TEXT("POST"));
+		Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
+		Request->SetContentAsString(JsonBody);
+		
+		Request->OnProcessRequestComplete().BindLambda([](FHttpRequestPtr Req, FHttpResponsePtr Res, bool bProcessedSuccessfully) {
+			if (bProcessedSuccessfully && Res.IsValid())
+			{
+				UE_LOG(LogTemp, Log, TEXT("Save kills to DB response: %s"), *Res->GetContentAsString());
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("Save kills to DB Request Failed!"));
+			}
+		});
+
+		bool bSent = Request->ProcessRequest();
+		UE_LOG(LogTemp, Log, TEXT("ProcessRequest for save_kills called. Return: %d"), bSent);
 	}
 	else
 	{

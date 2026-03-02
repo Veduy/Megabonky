@@ -198,6 +198,13 @@ void AMgbEnemyCharacter::Destroyed()
 	Super::Destroyed();
 }
 
+void AMgbEnemyCharacter::EndPlay(const EEndPlayReason::Type EndPlayReaason)
+{
+	Super::EndPlay(EndPlayReaason);
+
+	GetWorld()->GetTimerManager().ClearTimer(CheckWallTimer);
+}
+
 void AMgbEnemyCharacter::SetLastDamageWeapon(AMgbWeapon* Weapon)
 {
 	LastDamageWeapon = Weapon;
@@ -265,7 +272,13 @@ void AMgbEnemyCharacter::CheckWall()
 {
 	if (!bSpawnFinished)
 		return;
+
+	if (!IsValid(this) || GetWorld() == nullptr)
+		return;
 	
+	if (TargetActor == nullptr)
+		return;
+
 	FVector Dir = TargetActor->GetActorLocation() - GetActorLocation();
 	Dir = Dir.GetSafeNormal2D();
 	FVector Start = GetActorLocation() - FVector(0.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 0.9f);
@@ -353,8 +366,8 @@ void AMgbEnemyCharacter::CollisionHit(UPrimitiveComponent* HitComponent, AActor*
 		FVector ImpulseDir = Player->GetActorLocation() - GetActorLocation();
 		ImpulseDir = ImpulseDir.GetSafeNormal();
 		
-		PlayerMove->AddImpulse(ImpulseDir * 15000.f);
-		PlayerMove->AddImpulse(FVector(0.f, 0.f, 1.f) * 10000.f);
+		PlayerMove->AddImpulse(ImpulseDir * HitImpulsePower);
+		PlayerMove->AddImpulse(FVector(0.f, 0.f, 1.f) * HitImpulsePower);
 
 		FGameplayEffectContextHandle ContextHandle = AbilitySystemComponent->MakeEffectContext();
 		if (HitDamageEffectClass)

@@ -32,8 +32,10 @@ public:
 
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
+
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void Destroyed() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReaason) override;
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -84,6 +86,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
 	TSubclassOf<AActor> XPCrystalClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Data")
+	float HitImpulsePower = 30000.f;
 
 	UPROPERTY()
 	float TargetSpawnHeight;

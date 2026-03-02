@@ -29,6 +29,7 @@ AMgbPlayerController::AMgbPlayerController()
 	}
 
 	Audio_Levelup = CreateDefaultSubobject<UAudioComponent>("LevelUp");
+	Audio_BGM = CreateDefaultSubobject<UAudioComponent>("BGM");
 }
 
 void AMgbPlayerController::AcknowledgePossession(APawn* P)
