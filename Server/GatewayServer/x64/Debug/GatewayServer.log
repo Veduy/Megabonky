@@ -1,0 +1,3 @@
+﻿  GatewayServer.cpp
+Common.lib(Common.obj) : warning LNK4204: 'D:\Work\Megabonky\Server\x64\Debug\Common.pdb' is missing debugging information for referencing module; linking object as if no debug info
+  GatewayServer.vcxproj -> D:\Work\Megabonky\Server\x64\Debug\GatewayServer.exe

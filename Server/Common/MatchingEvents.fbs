@@ -1,0 +1,12 @@
+namespace MatchingEvents;
+
+table UserInfo {
+idx: int;
+name: string;
+}
+
+table MatchData {
+	users: [UserInfo];
+}
+
+root_type MatchData;

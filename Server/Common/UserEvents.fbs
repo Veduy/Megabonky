@@ -1,0 +1,24 @@
+namespace UserEvents;
+
+table ServerLogin {
+	idx: int;
+	name: string;
+}
+
+table ClientLogin {
+	player_id: uint32;
+	success: bool;
+	message: string;
+}
+
+union EventType {
+	ClientLogin,
+	ServerLogin
+}
+
+table EventData {
+	timestamp: uint64;
+	data: EventType;
+}
+
+root_type EventData;

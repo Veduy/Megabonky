@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "WebServer\\WebServer.vcxproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "Client\\Client.vcxproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]
